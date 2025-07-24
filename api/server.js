@@ -7,8 +7,8 @@ const XLSX = require('xlsx');
 const session = require('express-session');
 const http = require('http');
 const { Server } = require('socket.io');
-const pool = require('./db/mysql'); // MySQL pool (mysql2)
-const { sendOtpEmail } = require('./GmailMailer');
+const pool = require('../db/mysql'); // MySQL pool (mysql2)
+const { sendOtpEmail } = require('../GmailMailer');
 
 const app = express();
 const server = http.createServer(app);

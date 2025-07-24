@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CAREER | TUP Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="career-posting.css" />
+</head>
+<body>
+  <div class="careerpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="Line2"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <img class="Logo" src="Logo.png" alt="University Logo" />
+
+    <button class="back-button" id="backBtn">
+      <span class="underline-slide">BACK</span>
+    </button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">C</span>
+      <span class="a-l-u-m-n-i-span2">a r e e r s</span>
+      <span class="d-a-t-a-b-a-s-e-span">P</span>
+      <span class="d-a-t-a-b-a-s-e-span2">O S T I N G</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+    <!-- Trigger Button -->
+    <button id="openModalBtn">POST NEW CAREER</button>
+
+    <div id="eventModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeModalBtn">&times;</span>
+        <h1>Create Event</h1>
+        <form id="adminForm" enctype="multipart/form-data">
+          <label>Title: HIRING!!!</label><input type="text" name="title" required><br>
+          <label>Details</label><input type="text" name="link" required><br>
+          <label>Image</label><input type="file" name="image" accept=".png,.jpg" required><br>
+          <label>Links</label><textarea name="description" rows="3" required></textarea><br>
+          <button type="submit">Publish</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    
+  <section>
+    <h2>Your Posted Careers (15 Max)</h2>
+    <div class="card-grid" id="adminEvents">Loading your careers…</div>
+  </section>
+
+  <div id="editCareerModal" class="inbox-confirm-modal hidden">
+    <div class="inbox-modal-content">
+      <h3>Edit Career Post</h3>
+      <input type="text" id="editTitle" placeholder="Title"><br><br>
+      <input type="text" id="editLink" placeholder="Link"><br><br>
+      <textarea id="editDesc" placeholder="Description"></textarea><br><br>
+      <button id="saveEditBtn">Save</button>
+      <button onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="deleteConfirmModal" class="inbox-confirm-modal hidden">
+    <div class="inbox-modal-content">
+      <p>Are you sure you want to delete this post?</p>
+      <button id="confirmDeleteYes">Yes</button>
+      <button id="confirmDeleteNo">No</button>
+    </div>
+  </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById('eventModal');
+  const editModal = document.getElementById('editCareerModal');
+  const toast = document.getElementById('toast');
+  const loaderWrapper = document.getElementById("loader-wrapper");
+  const progressBar = document.getElementById("progress-bar");
+  const percentageText = document.getElementById("percentage");
+  const backBtn = document.getElementById('backBtn');
+
+  const editTitleInput = document.getElementById('editTitle');
+  const editLinkInput = document.getElementById('editLink');
+  const editDescInput = document.getElementById('editDesc');
+  const saveEditBtn = document.getElementById('saveEditBtn');
+  const cancelEditBtn = document.querySelector('#editCareerModal button[onclick="closeEditModal()"]');
+  const role = sessionStorage.getItem('userRole');
+
+  let currentEditId = null;
+
+  if (role !== 'admin' && role !== 'employer') {
+    return window.location.href = 'homepage.html';
+  }
+
+  backBtn.onclick = () => {
+    window.location.href = role === 'admin' ? 'admin-homepage.html' : 'employer-page.html';
+  };
+
+  document.getElementById('openModalBtn').onclick = () => modal.style.display = 'flex';
+  document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
+  window.onclick = e => {
+    if (e.target === modal) modal.style.display = 'none';
+    if (e.target === editModal) editModal.classList.remove('show');
+  };
+
+  document.getElementById('adminForm').onsubmit = async e => {
+    e.preventDefault();
+    const res = await fetch('/api/careers/add', {
+      method: 'POST',
+      body: new FormData(e.target)
+    });
+
+    if (!res.ok) {
+      showToast('❌ Error: ' + await res.text());
+      return;
+    }
+
+    showToast('✅ Career posted!');
+    e.target.reset();
+    modal.style.display = 'none';
+    loadAdminCareers();
+  };
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.className = 'toast show';
+    setTimeout(() => toast.className = 'toast', 3000);
+  }
+
+  async function loadAdminCareers() {
+    const container = document.getElementById('adminEvents');
+    container.innerHTML = 'Loading…';
+    try {
+      const res = await fetch('/api/careers');
+      if (!res.ok) throw new Error(await res.text());
+
+      const { careers } = await res.json();
+      const list = careers.slice(0, 15);
+      while (list.length < 15) list.push(null);
+
+      container.innerHTML = list.map(e => e ? `
+        <div class="card" data-id="${e.id}">
+          <img src="${e.image}" alt="">
+          <div class="card-title">${e.title}</div>
+          <div class="card-meta">${e.link}</div>
+          <div class="card-desc">${e.description}</div>
+          ${role === 'admin' ? `
+            <div class="actions">
+              <button class="edit">Edit</button>
+              <button class="del">Delete</button>
+            </div>` : ''}
+        </div>` : `<div class="card empty-card"></div>`
+      ).join('');
+
+      container.querySelectorAll('.edit').forEach(btn => {
+        btn.onclick = () => editCareer(btn.closest('.card'));
+      });
+
+      container.querySelectorAll('.del').forEach(btn => {
+        btn.onclick = () => deleteCareer(btn.closest('.card').dataset.id);
+      });
+
+    } catch (err) {
+      console.error(err);
+      container.textContent = '❌ Failed to load careers.';
+    }
+  }
+
+  function editCareer(card) {
+    currentEditId = card.dataset.id;
+    editTitleInput.value = card.querySelector('.card-title').innerText;
+    editLinkInput.value = card.querySelector('.card-meta').innerText;
+    editDescInput.value = card.querySelector('.card-desc').innerText;
+    editModal.classList.add('show');
+  }
+
+  saveEditBtn.onclick = async () => {
+    if (!currentEditId) return;
+    const title = editTitleInput.value.trim();
+    const link = editLinkInput.value.trim();
+    const description = editDescInput.value.trim();
+
+    if (!title || !link || !description) return alert('All fields are required');
+
+    const res = await fetch(`/api/careers/${currentEditId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, link, description })
+    });
+
+    if (!res.ok) return alert('❌ Edit error: ' + await res.text());
+    showToast('✅ Career updated!');
+    editModal.classList.remove('show');
+    loadAdminCareers();
+    currentEditId = null;
+  };
+
+  window.closeEditModal = () => {
+    editModal.classList.remove('show');
+    currentEditId = null;
+  };
+
+  function deleteCareer(id) {
+    const modal = document.getElementById('deleteConfirmModal');
+    const yesBtn = document.getElementById('confirmDeleteYes');
+    const noBtn = document.getElementById('confirmDeleteNo');
+
+    modal.classList.add('show');
+
+    yesBtn.onclick = async () => {
+      const res = await fetch(`/api/careers/${id}`, { method: 'DELETE' });
+      if (!res.ok) return alert('Error: ' + await res.text());
+      modal.classList.remove('show');
+      showToast('🗑️ Career deleted!');
+      loadAdminCareers();
+    };
+
+    noBtn.onclick = () => modal.classList.remove('show');
+  }
+
+  // Loader Bar
+  let percentage = 80;
+  const interval = setInterval(() => {
+    if (percentage < 100) {
+      percentage++;
+      progressBar.style.width = percentage + "%";
+      percentageText.textContent = percentage + "%";
+    } else {
+      clearInterval(interval);
+      loaderWrapper.style.display = "none";
+    }
+  }, 30);
+
+  loadAdminCareers();
+});
+</script>
+</body>
+</html>

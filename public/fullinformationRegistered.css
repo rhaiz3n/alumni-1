@@ -1,0 +1,237 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  overflow-x: hidden;
+  font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
+}
+.fullInforegisteredpage {
+  background: #ffffff;
+  border: 1px solid #000000;
+  height: 365vh;
+  width: 100vw;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  display:block
+}
+.Navbar {
+  position: absolute;
+  width: 100%;                 
+  height: 195px;
+  display: flex;
+}
+.Line1 {
+  border-style: solid;
+  border-color: #000000;
+  border-width: 60px 0 0 0;
+  width: 100%; 
+  height: 100%; 
+  position: absolute;
+  left: 0; 
+  top: 195px;
+  transform-origin: left top; 
+  transform: rotate(0deg) scale(1, 1);
+  z-index: 999px;
+}
+.label1 {
+  color: white; 
+  text-align: center; 
+  font-family: "Alegreya-Medium", serif;
+  font-size: 50px;
+  font-weight: 500;
+  position: absolute;
+  left: 55%;
+  top: 37px;
+  transform: translateX(-50%); 
+  width: max-content;
+  -webkit-text-stroke: 1px #ffffff; 
+}
+.Logo {
+  width: 160px;
+  height: 160px;
+  position: absolute;
+  left: 160px;
+  top: 15px;
+  object-fit: cover;
+}
+.a-l-u-m-n-i {
+  color: #000000;
+  text-align: left;
+  font-size: 100px;
+  font-weight: 400;
+  position: absolute;
+  left: 330px;
+  top: 70px;
+  -webkit-text-stroke: 3px #ffffff;
+  font-family: 'Alegreya', serif;
+}
+.a-l-u-m-n-i-span,
+.a-l-u-m-n-i-span2 {
+  font-family: 'Alegreya', serif;
+  font-weight: 700;
+}
+.d-a-t-a-b-a-s-e-span,
+.d-a-t-a-b-a-s-e-span2 {
+  font-family: 'Alegreya', serif;
+  font-weight: 700;
+}
+button {
+  position: relative;
+  left: 10px;
+  top: 194px;
+  padding: 19.5px 25px;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: medium;
+  border: none;
+  border-radius: 0px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #8b0000;
+}
+input[type="text"],
+input[type="date"] {
+  font-family: 'Albert Sans', sans-serif;
+  position: absolute;
+  top: 206px;
+  left: 390px;
+  padding: 6px;
+  width: 400px;
+  border: 4px solid #ffffff;
+  border-radius: 3px;
+  z-index: 1000;
+}
+#registeredTable {
+  position: absolute;
+  font-family: 'Albert Sans', sans-serif;
+  top: 270px;
+  left: 270px;
+  width: 70%;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+#registeredTable th, #registeredTable td {
+      border: 1px solid #b8b8b8; 
+      padding: 5px; 
+      text-align: left;
+}
+
+#registeredTable th {
+  background-color: maroon;
+  color: white;
+}
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #registeredTable, #registeredTable * {
+    visibility: visible !important;
+  }
+    th:nth-child(9),
+  td:nth-child(9) {
+    display: none !important;
+  }
+  #registeredTable {
+    font-size: 15px;
+    margin-top: 0px;
+    padding: 10px 5px; 
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  td:last-child,
+  th:last-child {
+    display: none !important;
+  }
+}
+#loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.loader-content {
+  text-align: center;
+  font-family: 'Alegraya', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #882323;
+  -webkit-text-stroke: 1px #000000;
+}
+.loading-span {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.loading-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 40px;
+  font-weight: 700;
+}
+.progress-container {
+  width: 300px;
+  height: 20px;
+  background: #ddd;
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #990000;
+  transition: width 0.2s ease;
+}
+.percentage {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #000;
+}
+.footer-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+#pageSelect{
+  position: absolute;
+      left: 260px;
+      top: 195px;
+      padding: 19.5px 25px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+      font-family: 'Albert Sans', sans-serif;
+      font-size: medium;
+      border: none;
+      border-radius: 0px;
+      cursor: pointer;
+    }
+    #pageSelect:hover {
+      background-color: #8b0000;
+    }
+.back-button {
+  position: relative;
+  bottom: 400px;
+  left: 1750px;
+  background-color: #00000000;
+  color: #ffffff;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 1000;
+}
+.back-button:hover {
+  background-color: #000000;
+}

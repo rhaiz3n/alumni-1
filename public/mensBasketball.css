@@ -1,0 +1,448 @@
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      overflow-x: hidden;
+      font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;;
+    }
+    .eventpage {
+      background: #ffffff;
+      border: 1px solid #000000;
+      height: 365vh;
+      width: 100vw;
+      margin: 0 auto;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      display:block
+    }
+    .Navbar {
+      position: absolute;
+      width: 100%;                 
+      height: 195px;
+      display: flex;
+    }
+    .Line1 {
+      border-style: solid;
+      border-color: #000000;
+      border-width: 60px 0 0 0;
+      width: 100%; 
+      height: 100%; 
+      position: absolute;
+      left: 0; 
+      top: 195px;
+      transform-origin: left top; 
+      transform: rotate(0deg) scale(1, 1);
+      z-index: 999px;
+    }
+    .label1 {
+      background: linear-gradient(90deg, rgb(255, 255, 255) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: left;
+      font-family: "Alegreya-Bold", serif;
+      font-size: 40px;
+      font-weight: 700;
+      position: absolute;
+      left: 300px;
+      top: 30px;
+    }
+    .Logo {
+      width: 160px;
+      height: 160px;
+      position: absolute;
+      left: 140px;
+      top: 20px;
+      object-fit: cover;
+    }
+    .a-l-u-m-n-i {
+      color: #000000;
+      text-align: left;
+      font-size: 100px;
+      font-weight: 400;
+      position: absolute;
+      left: 330px;
+      top: 60px;
+      -webkit-text-stroke: 3px #ffffff;
+      font-family: 'Alegreya', serif;
+    }
+    .a-l-u-m-n-i-span,
+    .a-l-u-m-n-i-span2 {
+      font-family: 'Alegreya', serif;
+      font-weight: 700;
+    }
+    .d-a-t-a-b-a-s-e-span,
+    .d-a-t-a-b-a-s-e-span2 {
+      font-family: 'Alegreya', serif;
+      font-weight: 700;
+    }
+    .header h1 { 
+      position: absolute;
+      color: white;
+      left: 50px;
+      top: 180px;
+    }
+    .controls { 
+      display: flex; 
+      gap: 10px; 
+      margin-bottom: 10px; 
+    }
+    #searchInput { 
+      flex:1; 
+      padding:6px; 
+    }
+    #pageSelect, #statusFilter { 
+      padding:6px; 
+    }
+    table#teamsTable {
+      font-family: 'Albert Sans', sans-serif;
+      font-size: 15px;
+      width: 70%;
+      border-collapse: collapse;
+      background: #ffffff;
+      margin-top: 200px;
+      margin-left: 270px;
+    }
+    table#teamsTable th, td { 
+      border: 1px solid #b8b8b8; 
+      padding: 5px; 
+      text-align: left; 
+    }
+    table#teamsTable th { 
+      background-color: maroon;
+      color: white;
+      text-align: left;
+      font-size: small;
+    }
+    table#membersTable { 
+      font-family: 'Albert Sans', sans-serif;
+      font-size: 15px;
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff; 
+    }
+    table#membersTable th, td{
+      border: 1px solid #b8b8b8; 
+      padding: 5px; 
+      text-align: left;
+    }
+
+    table#membersTable th{
+      background-color: maroon;
+      color: white;
+      text-align: left;
+      font-size: small;
+    }
+        .accept-btn, .decline-btn, .view-btn {
+      position: relative;
+      padding: 5px 10px;
+      font-size: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+    }
+    .accept-btn { 
+      background: green; 
+      z-index: 1;
+     }
+    .decline-btn { 
+      background: #cc0000; 
+      z-index: 1;
+    }
+        .action { 
+      position: relative;
+      padding: 5px 10px;
+      font-size: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: rgb(255, 255, 255);
+    }
+    .action { 
+      background: #cc0000; 
+      z-index: 1;
+    }
+      .status {
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 0px;
+  }
+  .status.PENDING {
+    color: #b26a00;
+    background: #fff3cd;
+    border: 1px solid #b8b8b8;
+  }
+  .status.ACCEPTED {
+    color: #155724;
+    background: #d4edda;
+    border: 1px solid #b8b8b8;
+  }
+  .status.DECLINED {
+    color: #721c24;
+    background: #f8d7da;
+    border: 1px solid #b8b8b8;
+  }
+    /* Members Modal */
+    .modal { 
+      display:none; 
+      position:fixed; 
+      inset:0; 
+      background:rgba(0,0,0,0.6); 
+      align-items:center; 
+      justify-content:center; 
+      z-index:1000; 
+    }
+    .modal-content { 
+      background:#fff; 
+      padding:20px; 
+      border-radius:8px; 
+      width:100%; 
+      max-width:630px; 
+    }
+    .modal-content h2 { 
+      margin-top:0; 
+    }
+    .modal-content table {
+       margin-top:10px; 
+      }
+    .modal-content button { 
+      margin-top:10px; 
+      padding:6px 12px;
+     }
+        #pageSelect{
+      position: absolute;
+      left: 605px;
+      top: 195px;
+      padding: 19.5px 25px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+      font-family: 'Albert Sans', sans-serif;
+      font-size: medium;
+      border: none;
+      border-radius: 0px;
+      cursor: pointer;
+    }
+    #pageSelect:hover {
+      background-color: #8b0000;
+    }
+    #statusFilter {
+      position: absolute;
+      left: 720px;
+      top: 195px;
+      padding: 19.5px 25px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+      font-family: 'Albert Sans', sans-serif;
+      font-size: medium;
+      border: none;
+      border-radius: 0px;
+      cursor: pointer;
+    }
+    #statusFilter:hover {
+      background-color: #8b0000;
+    }
+            input#searchInput{
+      position: absolute;
+      top: 205px;
+      left: 910px;
+  padding: 8px 50px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc
+    }
+        #printAcceptedBtn {
+      position: relative;
+      left: 380px;
+      top: 184px;
+      padding: 19.5px 25px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+      font-family: 'Albert Sans', sans-serif;
+      font-size: medium;
+      border: none;
+      border-radius: 0px;
+      cursor: pointer;
+    }
+    #printAcceptedBtn:hover {
+      background-color: #8b0000;
+    }
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  body.print-teams #teamsPrintTitle,
+  body.print-teams #teamsPrintTitle *,
+  body.print-teams #teamsTable,
+  body.print-teams #teamsTable * {
+    visibility: visible !important;
+  }
+
+  body.print-teams #teamsPrintTitle {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.print-teams #teamsTable {
+    position: fixed !important;
+    top: 40px !important;  /* Just below the title */
+    left: 0 !important;
+    width: 100% !important;
+    font-size: 13px !important;
+    border-collapse: collapse !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.print-teams #teamsTable th,
+  body.print-teams #teamsTable td {
+    border: 1px solid #000 !important;
+    padding: 4px 6px !important;
+  }
+
+  body.print-teams #teamsTable th:nth-child(5),
+  body.print-teams #teamsTable td:nth-child(5) {
+    display: none !important;
+  }
+
+  body.print-teams #printAcceptedBtn {
+    display: none !important;
+  }
+
+  /* ✅ Show only Members Modal when printing members */
+  body.print-members #membersModal,
+  body.print-members #membersModal * {
+    visibility: visible !important;
+  }
+
+  body.print-members #membersModal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 10px;
+    width: 100%;
+    background: white;
+    display: block;
+  }
+
+  body.print-members #modalTeamName {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  body.print-members #membersTable {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 98%;
+    font-size: 13px;
+    border-collapse: collapse;
+    margin: 0;
+  }
+
+  body.print-members #membersTable th,
+  body.print-members #membersTable td {
+    border: 1px solid #000;
+    padding: 4px 6px;
+  }
+
+  body.print-members #printTeamBtn {
+    display: none !important;
+  }
+}
+
+    .back-button {
+      position: absolute;
+      top: 215px;
+      left: 1750px;
+      background-color: #00000000;
+      color: #ffffff;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 1000;
+    }
+    .back-button:hover {
+        background-color: #000000;
+    }
+    #printTeamBtn{
+      padding: 10px 30px;
+      background-color: maroon;
+      border-color: #000000;
+      border-radius: 5px;
+      color: #ffffff;
+    }
+        #loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.loader-content {
+  text-align: center;
+  font-family: 'Alegraya', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #882323;
+  -webkit-text-stroke: 1px #000000;
+}
+.loading-span {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.loading-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 40px;
+  font-weight: 700;
+}
+.progress-container {
+  width: 300px;
+  height: 20px;
+  background: #ddd;
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #990000;
+  transition: width 0.2s ease;
+}
+.percentage {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #000;
+}
+.footer-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}

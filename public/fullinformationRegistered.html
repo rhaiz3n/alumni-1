@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FULL INFORMATION REGISTERED | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="fullinformationRegistered.css" />
+</head>
+<body>
+  <div class="fullInforegisteredpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='data-registration.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">A</span>
+      <span class="a-l-u-m-n-i-span2">l u m n i</span>
+      <span class="d-a-t-a-b-a-s-e-span">R</span>
+      <span class="d-a-t-a-b-a-s-e-span2">E G I S T E R E D</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+  
+  <input type="text" id="searchInput" placeholder="Search..." />
+  <button id="printTableBtn">🖨️ Print Table</button>
+  <select id="pageSelect"></select>
+
+  <table id="registeredTable" border="1">
+    <thead>
+      <tr>
+        <th>First Name</th><th>Last Name</th><th>Initial</th>
+        <th>Suffix</th><th>Gender</th><th>Civil Status</th>
+        <th>Date of Birth</th><th>Maiden</th><th>Phone No.</th>
+        <th>Major</th><th>Year Started</th><th>Graduated</th>
+        <th>Student No.</th>
+      </tr>
+    </thead>
+    <tbody id="registeredTableBody"></tbody>
+  </table>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody       = document.querySelector('#registeredTable tbody');
+  const printBtn    = document.getElementById('printTableBtn');
+  const pageSelect  = document.getElementById('pageSelect');
+  const searchInput = document.getElementById('searchInput');
+
+  const ROWS_PER_PAGE = 100;
+  let currentPage = 1;
+  let totalPages  = 1;
+
+  if (sessionStorage.getItem('userRole') !== 'admin') {
+    window.location.href = 'homepage.html';
+    return;
+  }
+
+  // Debounced search input for performance
+  searchInput?.addEventListener('input', debounce(() => loadPage(1, searchInput.value.trim()), 300));
+  pageSelect.addEventListener('change', () => loadPage(+pageSelect.value, searchInput.value.trim()));
+  printBtn.addEventListener('click', () => window.print());
+
+  // Helper function to format date for display
+  function formatDateForDisplay(dateValue) {
+    if (!dateValue) return '';
+    
+    try {
+      const date = new Date(dateValue);
+      if (isNaN(date.getTime())) return dateValue; // Return original if invalid
+      
+      // Format as readable date: June 22, 2001
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return dateValue; // Return original value if formatting fails
+    }
+  }
+
+  async function loadPage(page = 1, search = '') {
+    currentPage = page;
+    const url = `/api/fullInformation?page=${page}&limit=${ROWS_PER_PAGE}&search=${encodeURIComponent(search)}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(await res.text());
+      const { rows, totalPages: tp } = await res.json();
+      totalPages = tp;
+
+      // Render table rows
+      tbody.innerHTML = '';
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        [
+          'firstName','lastName','initial','suffix','gender','civilStatus',
+          'dateBirth','maiden','phoneNo','major','yearStarted','graduated','studentNo'
+        ].forEach(key => {
+          const td = document.createElement('td');
+          
+          // FIXED: Format date field for display
+          if (key === 'dateBirth') {
+            td.textContent = formatDateForDisplay(r[key]);
+          } else {
+            td.textContent = r[key] || '';
+          }
+          
+          tr.appendChild(td);
+        });
+        tbody.prepend(tr); // latest on top
+      });
+
+      buildPagination();
+    } catch (err) {
+      console.error('❌ Error loading data:', err);
+      tbody.innerHTML = `<tr><td colspan="13">Error loading data</td></tr>`;
+    }
+  }
+
+  function buildPagination() {
+    pageSelect.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const opt = new Option(`Page ${i}`, i, i === currentPage, i === currentPage);
+      pageSelect.appendChild(opt);
+    }
+  }
+
+  function debounce(func, wait) {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  // Initial data load
+  loadPage();
+
+  // Loading animation
+  let percentage = 80;
+  const loaderWrapper = document.getElementById("loader-wrapper");
+  const progressBar   = document.getElementById("progress-bar");
+  const percentageText = document.getElementById("percentage");
+
+  if (loaderWrapper && progressBar && percentageText) {
+    const loadingInterval = setInterval(() => {
+      if (percentage < 100) {
+        percentage++;
+        progressBar.style.width = percentage + "%";
+        percentageText.textContent = percentage + "%";
+      } else {
+        clearInterval(loadingInterval);
+        loaderWrapper.style.display = "none";
+      }
+    }, 30);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1121 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
+}
+.registrationpage {
+  background: #ffffff;
+  border: 5px solid #000000;
+  height: 255vh;
+  width: 100vw;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  display: block;
+}
+.Navbar {
+  width: 100%;                 
+  height: 195px;
+  object-fit: cover;
+  display: block;
+}
+.line1 {
+  margin-top: -10px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 100%;
+  height: 0px; 
+  position: absolute;
+  left: 0;
+  top: 200px;
+  transform-origin: left top;
+  transform: rotate(0deg) scale(1, 1);
+}
+.line2 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 1710px;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 650px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.line3 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 1710px;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 1090px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.line4 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 1710px;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 1230px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.line5 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 1710px;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 1610px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.line6 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 1710px;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 1905px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.label1 {
+  background: linear-gradient(90deg, rgb(255, 255, 255) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: left;
+  font-family: "Alegreya-Bold", serif;
+  font-size: 40px;
+  font-weight: 700;
+  position: absolute;
+  left: 300px;
+  top: 37px;
+}
+
+.Logo {
+  width: 310px;
+  height: 350px;
+  position: relative;
+  object-fit: cover;
+  left: 750px;
+  bottom: 120px;
+  margin: 0 auto;
+}
+.frame {
+  width: 1368px;
+  height: 2039px;
+  position: absolute;
+  left: 36px;
+  top: 194px;
+  overflow: visible;
+}
+.frame {
+  background: #83838300;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 5px;
+  width: 1770px;
+  height: 1950px;
+  position: absolute;
+  left: 63px;
+  top: 255px;
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.8s ease-out forwards;
+}
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.zoom-in {
+  animation: zoomIn 0.8s ease-out forwards;
+}
+.alumni {
+  color: #990000;
+  text-align: left;
+  position: absolute;
+  left: 350px;
+  top: 400px;
+  -webkit-text-stroke: 1px #000000;
+}
+.alumni-span {
+  font-family: "Alegreya", serif;
+  font-size: 140px;
+  font-weight: 700;
+}
+.alumni-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 110px;
+  font-weight: 700;
+}
+.reminders {
+  color: #990000;
+  text-align: left;
+  font-size: 40px;
+  font-weight: 700;
+  position: absolute;
+  font-family: "Sanchez", serif;
+  left: 100px;
+  top: 590px;
+}
+.required-star {
+  color: red;
+}
+.required {
+  color: red;
+}
+.reminder {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: relative;
+  top: 120px;
+  left: 120px;
+}
+.notify {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 2065px;
+  left: 125px;
+  width: 1670px;
+}
+.consents {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  left: 120px;
+  top: 720px;
+  width: 1670px;
+}
+.about-yourself {
+  color: #990000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 40px;
+  font-weight: 700;
+  position: relative;
+  left: 100px;
+  top: 650px;
+}
+.certificate {
+  color: #990000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 40px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 1620px;
+}
+.personal {
+  color: #990000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 40px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 1915px;
+}
+.alumnir1 {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 15px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 2230px;
+}
+.alumnir2 {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 15px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 2250px;
+}
+.first-name {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: relative;
+  top: 660px;
+  left: 125px;
+}
+.first-name-typebox {
+  position: relative;
+  width: 400px; 
+  margin: 10px 0;
+  left: 125px;
+  top: 650px; 
+}
+.firstname-typebox {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+.last-name {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: relative;
+  top: 562px;
+  left: 580px;
+}
+.last-name-typebox {
+  position: relative;
+  width: 400px; 
+  margin: 10px 0;
+  left: 550px;
+  top: 552px; 
+}
+.lastname-typebox {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+.initial-name {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: relative;
+  top: 465px;
+  left: 970px;
+}
+.initial-name-typebox {
+  position: relative;
+  width: 100px; 
+  margin: 10px 0;
+  left: 970px;
+  top: 454px; 
+}
+.initialname-typebox {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+/* Label Styling (Gender & Civil Status share this) */
+.gender {
+    color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1400px; 
+  left: 130px;
+}
+.civil-status {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1400px;
+  left: 450px;
+}
+
+/* Dropdown (Select) Styling */
+/* GENDER DROPDOWN ONLY */
+#gender {
+  width: 300px;
+  padding: 10px;
+  font-size: 15px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  background-color: #ffffff;
+  cursor: pointer;
+  position: absolute;
+  top: 1438px;  
+  left: 130px;
+  margin-bottom: 40px;
+  font-family: "Sanchez", serif;
+}
+
+/* CIVIL STATUS DROPDOWN ONLY */
+#civilStatus {
+  width: 300px;
+  padding: 10px;
+  font-size: 15px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  background-color: #ffffff;
+  cursor: pointer;
+  position: absolute;
+  top: 1438px;  
+  left: 450px;    
+  font-family: "Sanchez", serif;
+}
+option {
+  font-size: 15px;
+  padding: 10px;
+  color: #000;
+}
+
+/* Date of Birth Section */
+.dob-container {
+  position: absolute;     
+  top: 1400px;             
+  left: 770px;         
+  font-family: 'Sanchez', serif;
+  z-index: 2;
+}
+
+.dob-label {
+  font-size: 30px;
+  font-weight: 400;
+  color: #000;
+}
+.dob-selects {
+  display: flex;
+  gap: 15px;
+}
+
+.dob-selects select {
+  width: 100px;           
+  padding: 10px;
+  font-size: 15px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  font-family: 'Sanchez', serif;
+}
+.phone-number {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1505px;
+  left: 130px;
+}
+.phone-number-typebox {
+  position: absolute;
+  width: 400px; /* Adjust as needed */
+  left: 130px;
+  top: 1545px;
+}
+.phonenumber-typebox {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+.maiden-name {
+  position: absolute;
+  top: 1403px;  
+  left: 1130px;  
+  font-size: 30px;
+  font-family: 'Sanchez', serif;
+  font-weight: 400;
+  color: #000;
+}
+.maidenname-typebox {
+  width: 250px;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.maiden-name-typebox {
+  position: absolute;
+  top: 1440px;  
+  left: 1130px; 
+  width: 1000px;
+}
+.user-name {
+  color: #000000;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1500px;
+  left: 550px;
+}
+.user-name-typebox {
+  position: absolute;
+  width: 250px; 
+  margin: 10px 0;
+  top: 1530px;
+  left: 550px;
+}
+.username-typebox {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+.passWords {
+  color: #000000;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1500px;
+  left: 830px;
+}
+.password-wrapper {
+  top: 1537px;
+  left: 830px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+}
+.password-input {
+  padding: 10px;
+  width: 250px;
+  height: 18px;
+  font-size: 15px;
+  border: 2px solid #000;
+  border-radius: 6px;
+}
+.toggle-password {
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: -30px;
+  user-select: none;
+}
+.degree {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1680px;
+  left: 125px;
+}
+.degree-typebox {
+  position: absolute;
+  width: 400px; 
+  margin: 10px 0;
+  top: 1710px;
+  left: 125px; 
+}
+.degrees-typebox {
+  width: 150%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+.personalEmail {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1970px;
+  left: 125px;
+}
+.personale-typebox {
+  position: absolute;
+  width: 400px; 
+  margin: 10px 0;
+  top: 2000px;
+  left: 125px; 
+}
+.personales-typebox {
+  width: 150%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+.retype {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1970px;
+  left: 750px;
+}
+.retypee-typebox {
+  position: absolute;
+  width: 400px; 
+  margin: 10px 0;
+  top: 2000px;
+  left: 750px; 
+}
+.retypees-typebox {
+  width: 150%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+.year {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1680px;
+  left: 750px;
+}
+.year-typebox {
+  position: absolute;
+  width: 250px; 
+  margin: 10px 0;
+  top: 1710px;
+  left: 750px;
+}
+.years-typebox {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+
+.yearg {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1680px;
+  left: 1025px;
+}
+.yearg-typebox {
+  position: absolute;
+  width: 250px; 
+  margin: 10px 0;
+  top: 1710px;
+  left: 1025px;
+}
+.yearg-typebox1 {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  left: 100px;
+}
+/* Suffix Section */
+/* General Label Styling */
+/* Suffix Label Styling */
+.label-suffix {
+  display: flex;
+  align-items: center;
+  font-family: 'Sanchez', serif;
+  font-size: 14px;
+  color: #333;
+  position: absolute;
+  top: 1385px;
+  left: 1100px;
+}
+
+/* Student No. Label Styling */
+.label-student {
+  display: flex;
+  align-items: center;
+  font-family: 'Sanchez', serif;
+  font-size: 14px;
+  color: #333;
+  position: absolute;
+  top: 1865px;
+  left: 133px;
+}
+
+/* Suffix Section Styling */
+.suffix-name {
+  color: #000;
+  font-family: 'Sanchez', serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1307px;
+  left: 1100px;
+}
+
+.suffix-typebox {
+  position: absolute;
+  top: 1343px;
+  left: 1100px;
+}
+
+.suffix {
+  width: 300px;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+  position: absolute;
+}
+
+/* Student Number Section Styling */
+.student-no {
+  color: #000;
+  font-family: 'Sanchez', serif;
+  font-size: 30px;
+  font-weight: 400;
+  position: absolute;
+  top: 1780px;
+  left: 125px;
+}
+
+.student-no-typebox {
+  position: absolute;
+  top: 1820px;
+  left: 125px;
+}
+
+.student {
+  width: 300px;
+  height: 40px;
+  padding: 10px;
+  font-size: 15px;
+  font-family: 'Albert Sans', serif;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+#loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.loader-content {
+  text-align: center;
+  font-family: 'Alegraya', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #882323;
+  -webkit-text-stroke: 1px #000000;
+}
+.loading-span {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.loading-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 40px;
+  font-weight: 700;
+}
+.progress-container {
+  width: 300px;
+  height: 20px;
+  background: #ddd;
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #990000;
+  transition: width 0.2s ease;
+}
+.percentage {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #000;
+}
+.footer-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+.label-privary{
+  display: flex;
+  align-items: center;
+  font-family: 'Sanchez', serif;
+  font-size: 20px;
+  color: #000000;
+  position: absolute;
+  top: 2150px;
+  left: 125px;
+}
+.modal {
+  display: none;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.alumniTable {
+  position: absolute;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.submitform-button {
+  font-family: "Albert Sans", sans-serif;
+  position: absolute;
+  top: 2240px;
+  left: 1690px;
+  padding: 10px 20px;
+  font-size: 30px;
+  cursor: pointer;
+  background: #990000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+.submitform-button:hover {
+  background: #b32a2a;
+}
+@keyframes fadeInZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.toast-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #28a745;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 6px;
+  font-size: 15px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.toast-notification.show {
+  opacity: 5;
+  pointer-events: auto;
+}
+.toast-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.toast-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-warning {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.toast-warning.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-header.warn {
+  display: flex;
+  align-items: center;
+  background-color: #882323;
+  padding: 10px;
+}
+.toast-logo {
+  height: 30px;
+  margin-right: 10px;
+}
+.toast-title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+}
+.toast-content {
+  padding: 15px;
+  font-size: 25px;
+  color: #333;
+  white-space: pre-line;
+}
+.back-button {
+  position: relative;
+  bottom: 400px;
+  left: 1750px;
+  background-color: #00000000;
+  color: #ffffff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 1000;
+}
+.back-button:hover {
+  background-color: #00000000;
+}
+  .notify-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border-left: 5px solid #d9534f;
+    color: #333;
+    padding: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    z-index: 9999;
+    max-width: 300px;
+    font-family: sans-serif;
+  }
+
+  .notify-popup.success {
+    border-left-color: #28a745;
+  }
+
+  .notify-popup strong {
+    display: block;
+    margin-bottom: 8px;
+  }
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-message {
+  font-size: 14px;
+}
+.toast {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 16px 40px 16px 16px;
+  position: fixed;
+  z-index: 9999;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.5s, bottom 0.5s;
+}
+
+.toast.show {
+  visibility: visible;
+  opacity: 1;
+  bottom: 50px;
+}
+
+#toastCloseBtn {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+  .consent-wrapper {
+    position: relative;
+    top: 1220px;
+    left: 90px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-family: "Alegreya-Bold", serif;
+    margin: 2px 0;
+  }
+
+  .check-button {
+    background-color: white;
+    font-family: "Alegreya-Bold", serif;
+    border: 0px solid #333;
+    padding: 5px 15px;
+    border-radius: 0px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 700px;
+    transition: background-color 0.3s;
+    max-width: 1500px;
+  }
+
+
+  .hover-underline1 {
+    text-decoration: none;
+  }
+
+  .highlight-text {
+    color: rgb(0, 129, 172);
+    font-weight: bold;
+  }
+
+.hover-underline1::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #990000;
+  transition: width 0.3s ease-in-out;
+}
+.hover-underline1 {
+  font-family: 'Albert Sans', serif;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: #000000; 
+}
+.check-button:hover .hover-underline1::after {
+  width: 13.5%;
+}

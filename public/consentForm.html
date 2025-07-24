@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Consent Form</title>
+  <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <link rel="stylesheet" href="consentForm.css" />
+</head>
+<body>
+  <div class="consentpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="alumni-registration.html"><img class="Logo" src="Logo2.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='alumni-registration.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">A</span>
+      <span class="a-l-u-m-n-i-span2">LUMNI</span>
+      <span class="d-a-t-a-b-a-s-e-span">R</span>
+      <span class="d-a-t-a-b-a-s-e-span2">EGISTRATION</span>
+    </div>
+
+<div class="title">
+  CERTIFICATION AND DATA PRIVACY CONSENT FORM
+</div>
+
+<div class="content">
+  <h2>CERTIFICATION AND DATA PRIVACY CONSENT FORM <br>FOR TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE ALUMNI USER REGISTRATION</h2>
+
+  <h3>I. CERTIFICATION</h3>
+  <ol type="1">
+    <li>I am an Alumnus/Alumna of the Technological University of the Philippines - Cavite, and the information provided in this registration form is accurate, true and complete to the best of my knowledge.</li>
+    <li>I acknowledge that only one Alumni User Account will be issued per Alumnus/Alumna, and I agree not to request additional accounts or share my login details with any unauthorized person.</li>
+    <li>I accept responsibility for the proper use of the User Account and will notify the TUP-Cavite Office of Alumni Relations immediately in case of any issues or discrepancies with my Account.</li>
+  </ol>
+
+  <h3>II. DATA PRIVACY CONSENT</h3>
+  <ol start="5">
+    <li>In compliance with the Data Privacy Act of 2012 (Republic Act No. 10173), I consent to the collection, storage and processing of my personal data provided for my Alumni User registration by the TUP-Cavite Office of Alumni Relations. I understand and agree to the following:</li>
+    <li>The Personal Information provided in this form will be securely stored and processed for the purpose of issuing and managing my Alumni User Account.</li>
+    <li>My Data will be used exclusively for Alumni communication, verification of my Alumni Status, and updates regarding Alumni programs, event and others relevant University Activities.</li>
+    <li>I grant consent for the TUP-Cavite System to Process the following personal data for the purpose of my Alumni User registration.</li>
+    <li>I understand that my personal data will be kept confidential and will not be shared with third parties without my consent, except where required by law or University policy.</li>
+    <li>I have the right to access, correct and withdraw my consent concerning the processing of my personal Data at any time by contacting the TUP-Cavite Office of Alumni Relations.</li>
+    <li>I acknowledge that the TUP-Cavite Alumni User is a privilege and that any false information provided may result in the suspension or deactivation of my account without prior notice.</li>
+    <li>I accept that TUP-Cavite is not liable for any issues related to the discontinuation of this service or any other problems associated with the provision of the Alumni User service.</li>
+  </ol>
+</div>
+
+
+    <!-- Contact Section -->
+    <div class="contact-section">
+      </a>
+    </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const contactSection = document.querySelector('.contact-section');
+    if (!contactSection) return console.warn('⚠️ No .contact-section found');
+
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          contactSection.classList.add('slide-up');
+          contactSection.classList.remove('slide-down');
+        } else {
+          contactSection.classList.remove('slide-up');
+          contactSection.classList.add('slide-down');
+        }
+      }
+    }, { threshold: 0.1 });
+
+    observer.observe(contactSection);
+  });
+</script>
+</body>
+</html>

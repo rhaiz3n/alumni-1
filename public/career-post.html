@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVENT | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="career-post.css" />
+</head>
+<body>
+  <div class="careerpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="user-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='user-homepage.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">C</span>
+      <span class="a-l-u-m-n-i-span2">a r e e r</span>
+      <span class="d-a-t-a-b-a-s-e-span">P</span>
+      <span class="d-a-t-a-b-a-s-e-span2">O S T</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+    
+  <section class="event-section">
+    <h2>AVAILABLE CAREERS OPPORTUNITIES</h2>
+    <div id="eventsGrid" class="card-grid">Loading events…</div>
+  </section>
+
+  <div id="descModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <div class="navbar"></div>
+        <img class="Logo2" src="Logo2.png" alt="TUPC Logo" />
+        <div class="event-selection">
+          <span class="event-selection-span">E</span>
+          <span class="event-selection-span2">VENT</span>
+          <span class="event-selection-span">D</span>
+          <span class="event-selection-span2">ESCRIPTION</span>
+        </div>
+        <div class="Line1-1"></div>
+        <div class="event-selection2"></div>
+      <span class="close-btn" id="descClose">&times;</span>
+      <p id="descText"></p>
+    </div>
+  </div>
+  
+
+<script>
+  async function loadCareers() {
+    const c = document.getElementById('eventsGrid');
+    if (!c) return console.error('Container #eventsGrid not found');
+    
+    try {
+      const r = await fetch('/api/careers');
+      if (!r.ok) throw new Error(await r.text());
+      const { careers } = await r.json();
+      const list = (careers || []).slice(0, 15);
+      while (list.length < 15) list.push(null);
+
+      c.innerHTML = list.map(e => e
+        ? `
+        <div class="card">
+          <img src="${e.image || ''}" alt="${e.title || 'Career'}">
+          <div class="card-title">${e.title || ''}</div>
+          <div class="card-meta">${e.link || ''}</div>
+          <div class="btn-group-vertical">
+            <button class="card-btn readmore" data-desc="${encodeURIComponent(e.description || '')}">READ MORE</button>
+          </div>
+        </div>`
+        : `<div class="card empty-card"></div>`
+      ).join('');
+
+      document.querySelectorAll('.readmore').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const desc = decodeURIComponent(btn.dataset.desc);
+          const modal = document.getElementById('descModal');
+          const textEl = document.getElementById('descText');
+          if (textEl) textEl.textContent = desc;
+          if (modal) modal.style.display = 'block';
+        });
+      });
+
+    } catch (err) {
+      console.error(err);
+      if (c) c.textContent = 'Failed to load Careers.';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadCareers();
+
+    const warnDismiss = document.getElementById('warnDismiss');
+    if (warnDismiss) {
+      warnDismiss.addEventListener('click', () => {
+        document.getElementById('warnOverlay').style.display = 'none';
+        document.getElementById('warnToast').style.display = 'none';
+      });
+    }
+
+    const descClose = document.getElementById('descClose');
+    if (descClose) {
+      descClose.addEventListener('click', () => {
+        document.getElementById('descModal').style.display = 'none';
+      });
+    }
+
+    window.addEventListener('click', e => {
+      if (e.target.id === 'descModal') {
+        document.getElementById('descModal').style.display = 'none';
+      }
+    });
+  });
+
+  // Loading Screen Logic
+  document.addEventListener("DOMContentLoaded", () => {
+    let percentage = 80;
+    const loaderWrapper = document.getElementById("loader-wrapper");
+    const progressBar = document.getElementById("progress-bar");
+    const percentageText = document.getElementById("percentage");
+
+    const loadingInterval = setInterval(() => {
+      if (percentage < 100) {
+        percentage++;
+        progressBar.style.width = percentage + "%";
+        percentageText.textContent = percentage + "%";
+      } else {
+        clearInterval(loadingInterval);
+        loaderWrapper.style.display = "none";
+      }
+    }, 30);
+  });
+    const role = sessionStorage.getItem('userRole');
+  if (!role) {
+    // ❌ User not logged in
+    window.location.href = 'homepage.html';
+  } else if (role === 'admin') {
+    // ❌ Admin trying to access user-only page
+    window.location.href = 'admin-homepage.html';
+  }
+</script>
+</body>
+</html>

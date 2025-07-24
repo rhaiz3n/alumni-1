@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALUMNI | Registration</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="alumni-registration.css" />
+  </head>
+  <body>
+    <div class="registrationpage">
+      <img class="Navbar" src="Navbar.png" />
+      <div class="frame"></div>
+      <div class="line1"></div>
+      <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+      <button class="back-button" onclick="location.href='homepage.html'"><span class="underline-slide">BACK</span></button>
+
+      <img class="Logo" src="Logo2.png" alt="University Logo" />
+      <div class="alumni zoom-in" style="animation-delay: 0.2s">
+        <span class="alumni-span">A</span>
+        <span class="alumni-span2">LUMNI</span>
+        <span class="alumni-span">R</span>
+        <span class="alumni-span2">EGISTRATION</span>
+      </div>
+
+    <div class="reminders slide-in" style="animation-delay: 0.2s">REMINDERS</div>
+    <div class="line2 zoom-in" style="animation-delay: 0.2s"></div>
+    <div class="reminder slide-in" style="animation-delay: 0.2s">
+      Sign up today to receive your personalized Alumni Account.
+    </div>
+
+    <div class="notify slide-in" style="animation-delay: 0.2s">
+      The system will send an email to this address once your registration confirmation has been successfully reviewed for your Alumni Account.
+    </div>
+
+    <div class="consents slide-in" style="animation-delay: 0.2s">
+      Your information will be reviewed, and we will notify you once your account is ready.
+      The details you provide will also be used to update your records with the TUP-Cavite System Office of Alumni Relations.
+      <br><br>
+      <strong>Important Instructions</strong><br>
+      Please ensure that the information you submit matches the University's records to prevent delays or issues in processing your registration.
+      <br><br>
+      Once you have submitted your details, the system will review them. After verification, you will receive a notification regarding the status of your registration and the successful creation of your account.
+      <br><br>
+      All personal information submitted during registration will be securely stored and managed by the TUP-Cavite System Office of Alumni Relations. Your data will remain confidential and will not be shared with external parties, ensuring full respect for your privacy rights.
+    </div>
+
+    <div class="line3 zoom-in" style="animation-delay: 0.2s"></div>
+    <div class="line4 zoom-in" style="animation-delay: 0.2s"></div>
+    <div class="line5 zoom-in" style="animation-delay: 0.2s"></div>
+    <div class="line6 zoom-in" style="animation-delay: 0.2s"></div>
+    <div class="about-yourself slide-in" style="animation-delay: 0.2s">ABOUT YOURSELF</div>
+    <div class="certificate slide-in" style="animation-delay: 0.2s">YOUR MOST RECENT UP DEGREE/CERTIFICATE</div>
+    <div class="personal slide-in" style="animation-delay: 0.2s">PERSONAL CONTACT INFORMATION</div>
+    <div class="alumnir1 slide-in" style="animation-delay: 0.2s">Alumni User Registration</div>
+    <div class="alumnir2 slide-in" style="animation-delay: 0.2s">Technological University of the Philippines - Cavite</div>
+
+
+    <form id="regForm">
+
+      <!-- First Name -->
+      <div class="first-name slide-in">First Name <span class="required-star">*</span></div>
+      <div class="first-name-typebox slide-in">
+        <input type="text" class="firstname-typebox" name="firstName" placeholder="First Name" required />
+      </div>
+
+      <!-- Last Name -->
+      <div class="last-name slide-in">Last Name <span class="required-star">*</span></div>
+      <div class="last-name-typebox slide-in">
+        <input type="text" class="lastname-typebox" name="lastName" placeholder="Last Name" required />
+      </div>
+
+      <!-- Initial -->
+      <div class="initial-name slide-in">Initial <span class="required-star">*</span></div>
+      <div class="initial-name-typebox slide-in">
+        <input type="text" class="initialname-typebox" name="initial" placeholder="Initial" required />
+      </div>
+
+      <!-- Username -->
+      <div class="user-name slide-in">Username <span class="required-star">*</span></div>
+      <div class="user-name-typebox slide-in">
+        <input type="text" class="username-typebox" name="userName" placeholder="Enter Username" required />
+      </div>
+
+
+      <!-- Major -->
+      <div class="degree slide-in">Major in. (BET/BTVTED) <span class="required-star">*</span></div>
+      <div class="degree-typebox slide-in">
+        <input type="text" class="degrees-typebox" name="major" placeholder="Degree/Certificate & Major" required />
+      </div>
+
+      <!-- Personal Email -->
+      <div class="personalEmail slide-in" style="animation-delay: 0.2s">Personal Email Address <span class="required-star">*</span></div>
+      <div class="personale-typebox slide-in" style="animation-delay: 0.2s">
+        <input type="email" class="personales-typebox" name="personalEmail" placeholder="Personal Email Address" required />
+      </div>
+
+      <div class="retype slide-in" style="animation-delay: 0.2s">Retype Email Address <span class="required-star">*</span></div>
+      <div class="retypee-typebox slide-in" style="animation-delay: 0.2s">
+        <input type="text" class="retypees-typebox" placeholder="Retype Email Address" />
+      </div>
+
+      <!-- Year Started -->
+      <div class="year slide-in">Year Started <span class="required-star">*</span></div>
+      <div class="year-typebox slide-in">
+        <select id="year-started" class="years-typebox" name="yearStarted" required>
+          <option value="" disabled selected hidden>Select Year</option>
+          <!-- You can populate this with JS -->
+        </select>
+      </div>
+
+      <!-- Year Graduated -->
+      <div class="yearg slide-in">Graduated <span class="required-star">*</span></div>
+      <div class="yearg-typebox slide-in">
+        <select id="year-graduated" class="yearg-typebox1" name="graduated" required>
+          <option value="" disabled selected hidden>Select Year Graduated</option>
+        </select>
+      </div>
+
+      <!-- Password -->
+      <label class="passWords slide-in">Password <span class="required-star">*</span></label>
+      <div class="password-wrapper slide-in">
+        <input type="password" id="password" class="password-input" name="passWord" placeholder="Enter Password" required />
+        <span id="togglePassword" class="toggle-password">☐</span>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="phone-number slide-in" style="animation-delay: 0.2s">Phone No. <span class="required-star">*</span></div>
+      <div class="phone-number-typebox slide-in" style="animation-delay: 0.2s">
+        <input 
+          type="tel" 
+          class="phonenumber-typebox" 
+          placeholder="" 
+          name="phoneNo"
+          pattern="[0-9]*" 
+          inputmode="numeric"
+          oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+        />
+      </div>
+
+      <!-- Full name -->
+      <div class="maiden-name slide-in" style="animation-delay: 0.2s">Maiden Name <span class="required">*</span></div>
+      <div class="maiden-name-typebox slide-in" style="animation-delay: 0.2s">
+        <input type="text" class="maidenname-typebox" placeholder="Maiden Name" name="maiden" />
+      </div>
+
+      <!-- Loading Screen -->
+      <div id="loader-wrapper">
+        <div class="loader-content">
+            <span class="loading-span">T</span>
+            <span class="loading-span2">ECHNOLOGICAL</span>
+            <span class="loading-span">U</span>
+            <span class="loading-span2">NIVERSITY OF THE</span>
+            <span class="loading-span">P</span>
+            <span class="loading-span2">HILIPPINES - </span>
+            <span class="loading-span">C</span>
+            <span class="loading-span2">AVITE</span>
+
+          <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+          <div class="percentage" id="percentage">0%</div>
+          <div class="footer-text">LOADING PLEASE WAIT</div>
+        </div>
+      </div>
+
+      <!-- Gender -->
+      <div class="gender slide-in" style="animation-delay: 0.2s">Gender <span class="required-star">*</span></div>
+      <select name="gender" id="gender" required class="slide-in" style="animation-delay: 0.2s">
+        <option value="" disabled selected hidden>Select Gender</option>
+        <option value="MALE">MALE</option>
+        <option value="FEMALE">FEMALE</option>
+        <option value="TRANSFORMER">TRANSFORMER</option>
+        <option value="AVENGERS">AVENGERS</option>
+      </select>
+
+      <!-- Civil Status -->
+      <div class="civil-status slide-in" style="animation-delay: 0.2s">Civil Status <span class="required-star">*</span></div>
+      <select name="civilStatus" id="civilStatus" required class="slide-in" style="animation-delay: 0.2s">
+        <option value="" disabled selected hidden>Select Civil Status</option>
+        <option value="SINGLE">SINGLE</option>
+        <option value="MARRIED">MARRIED</option>
+        <option value="SEPARATED">SEPARATED</option>
+        <option value="WIDOWED">WIDOWED</option>
+        <option value="Divorced">DIVORCED</option>
+        <option value="Wasted">WASTED</option>
+      </select>
+
+      <!-- Suffix Section -->
+      <label class="label-suffix slide-in" style="animation-delay: 0.2s">
+        <input type="checkbox" id="toggleSuffix" />
+        My name does not end with a suffix. (e.g., Jr, Sr, I, II, etc.)
+      </label>
+      <div class="suffix-name slide-in" style="animation-delay: 0.2s">Suffix <span class="required">*</span></div>
+      <div class="suffix-typebox slide-in" style="animation-delay: 0.2s" id="suffixBox">
+        <input type="text" class="suffix" placeholder="Suffix" name="suffix" />
+      </div>
+
+      <!-- Student Number Section -->
+      <label class="label-student slide-in" style="animation-delay: 0.2s">
+        <input type="checkbox" id="toggleStudentNo" />
+        My Student No. is no longer available
+      </label>
+      <div class="student-no slide-in" style="animation-delay: 0.2s">Student No. (03**) <span class="required">*</span></div>
+      <div class="student-no-typebox slide-in" style="animation-delay: 0.2s" id="studentNoBox">
+        <input type="text" class="student" placeholder="Student No." name="studentNo" />
+      </div>
+
+      <div class="consent-wrapper">
+        <input type="checkbox" id="consentCheckbox" />
+        <button type="button" class="check-button" onclick="location.href='consentForm.html'">
+          <span class="hover-underline1">
+            <span class="highlight-text">I understand and agree</span> that by clicking the Register submit button below I am deemed to have read, understood, and signed this certification and data privacy consent form.
+          </span>
+        </button>
+      </div>
+
+      <!-- Date of Birth -->
+      <div class="dob-container" name="dateBirth">
+        <div class="dob-label slide-in" style="animation-delay: 0.2s">Date of Birth<span class="required-star">*</span>
+        </div>
+        <div class="dob-selects">
+          <select id="dob-day" name="dob-day" required class="slide-in" style="animation-delay: 0.2s">
+            <option value="" disabled selected hidden>Day</option>
+          </select>
+
+          <select id="dob-month" name="dob-month" required class="slide-in" style="animation-delay: 0.2s">
+            <option value="" disabled selected hidden>Month</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+
+          <select id="dob-year" name="dob-year" required class="slide-in" style="animation-delay: 0.2s">
+            <option value="" disabled selected hidden>Year</option>
+          </select>
+        </div>
+      </div>
+    <!-- Warning Toast -->
+    <div class="toast-overlay" id="warnOverlay"></div>
+    <div class="toast-warning" id="warnToast">
+      <div class="toast-header warn">
+        <img src="Logo2.png" alt="Logo" class="toast-logo">
+        <span class="toast-title">TUP-Cavite Alert</span>
+      </div>
+      <div class="toast-content" id="warnContent">
+        <!-- JS will inject missing field list here -->
+      </div>
+    </div> 
+      <!-- Submit Button -->
+    <button id="submitform" type="button" class="submitform-button">Submit</button>
+      <!-- Notification -->
+        <div id="successToast" class="toast-notification">
+          <div class="toast-message">
+            <strong>✅ Registration Complete!</strong><br>
+            Your application is under review. You will receive an email once your alumni account is approved.
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div id="errorToast" class="toast-notification" style="background-color: #e74c3c;">
+      <div class="toast-message" id="errorToastMessage">
+        ❌ An error occurred. Please try again.
+      </div>
+    </div>
+
+    <div id="notifyBox" class="notify-popup" style="display: none;"></div>
+
+  <!-- JavaScript -->
+<script>
+// --- Suffix & Student No. Checkboxes ---
+const toggleSuffix = document.getElementById('toggleSuffix');
+const suffixInput = document.querySelector('#suffixBox input');
+toggleSuffix.addEventListener('change', () => {
+  suffixInput.disabled = toggleSuffix.checked;
+});
+
+const toggleStudentNo = document.getElementById('toggleStudentNo');
+const studentInput = document.querySelector('#studentNoBox input');
+toggleStudentNo.addEventListener('change', () => {
+  studentInput.disabled = toggleStudentNo.checked;
+});
+
+// --- Maiden Name Logic Based on Gender + Civil Status ---
+const gender = document.getElementById('gender');
+const civilStatus = document.getElementById('civilStatus');
+const maidenInput = document.querySelector('[name="maiden"]');
+
+function updateMaidenVisibility() {
+  const isFemale = gender.value === 'FEMALE';
+  const needsMaiden = ['MARRIED', 'SEPARATED', 'WIDOWED'].includes(civilStatus.value);
+  maidenInput.disabled = !(isFemale && needsMaiden);
+}
+gender.addEventListener('change', updateMaidenVisibility);
+civilStatus.addEventListener('change', updateMaidenVisibility);
+
+// --- DOB Day + Year Populate ---
+const daySelect = document.getElementById("dob-day");
+for (let i = 1; i <= 31; i++) {
+  const opt = document.createElement("option");
+  opt.value = opt.textContent = i;
+  daySelect.appendChild(opt);
+}
+
+const yearSelect = document.getElementById("dob-year");
+const currentYear = new Date().getFullYear();
+for (let y = currentYear; y >= 1900; y--) {
+  const opt = document.createElement("option");
+  opt.value = opt.textContent = y;
+  yearSelect.appendChild(opt);
+}
+
+// --- Year Started / Graduated ---
+const yearStartedSelect = document.getElementById('year-started');
+const yearGraduatedSelect = document.getElementById('year-graduated');
+for (let y = currentYear; y >= 1900; y--) {
+  const opt1 = document.createElement('option');
+  const opt2 = document.createElement('option');
+  opt1.value = opt2.value = y;
+  opt1.textContent = opt2.textContent = y;
+  yearStartedSelect.appendChild(opt1);
+  yearGraduatedSelect.appendChild(opt2);
+}
+
+// --- Password Visibility Toggle ---
+const passwordInput = document.getElementById('password');
+const togglePassword = document.getElementById('togglePassword');
+togglePassword.addEventListener('click', () => {
+  const isPassword = passwordInput.type === 'password';
+  passwordInput.type = isPassword ? 'text' : 'password';
+  togglePassword.textContent = isPassword ? '🗹' : '☐';
+});
+
+// --- Loader Animation ---
+document.addEventListener("DOMContentLoaded", () => {
+  let percentage = 80;
+  const loaderWrapper = document.getElementById("loader-wrapper");
+  const progressBar = document.getElementById("progress-bar");
+  const percentageText = document.getElementById("percentage");
+  
+  if (loaderWrapper && progressBar && percentageText) {
+    const loadingInterval = setInterval(() => {
+      if (percentage < 100) {
+        percentage++;
+        progressBar.style.width = percentage + "%";
+        percentageText.textContent = percentage + "%";
+      } else {
+        clearInterval(loadingInterval);
+        loaderWrapper.style.display = "none";
+      }
+    }, 30);
+  }
+});
+
+// Toast Error Function (Global)
+function showErrorToast(msg) {
+  const errorToast = document.getElementById('errorToast');
+  const errorToastMessage = document.getElementById('errorToastMessage');
+  if (errorToast && errorToastMessage) {
+    errorToastMessage.innerHTML = ' ' + msg;
+    errorToast.classList.add('show');
+    setTimeout(() => {
+      errorToast.classList.remove('show');
+    }, 3000);
+  } else {
+    console.error(msg);
+    alert(msg); // Fallback
+  }
+}
+
+async function submitregForm() {
+  const f = document.getElementById('regForm');
+  
+  // Validate form exists
+  if (!f) {
+    showErrorToast('❌ Form not found');
+    return;
+  }
+
+  const dobDay = document.getElementById('dob-day').value;
+  const dobMonth = document.getElementById('dob-month').value;
+  const dobYear = document.getElementById('dob-year').value;
+  
+  // FIXED: Ensure proper date format YYYY-MM-DD
+  const dateBirth = `${dobYear}-${dobMonth.padStart(2, '0')}-${dobDay.padStart(2, '0')}`;
+
+  const suffix = document.getElementById('toggleSuffix').checked ? 'NONE' : f.suffix.value.trim();
+  const studentNo = document.getElementById('toggleStudentNo').checked ? 'NONE' : f.studentNo.value.trim();
+
+  const gender = f.gender.value;
+  const civilStatus = f.civilStatus.value;
+  const maidenNeeded = (gender === 'FEMALE' && ['MARRIED', 'SEPARATED', 'WIDOWED'].includes(civilStatus));
+  const maiden = maidenNeeded ? f.maiden.value.trim() : 'NONE';
+
+  const payload = {
+    firstName: f.firstName.value.trim(),
+    lastName: f.lastName.value.trim(),
+    personalEmail: f.personalEmail.value.trim(),
+    userName: f.userName.value.trim(),
+    passWord: f.passWord.value.trim(),
+    initial: f.initial.value.trim(),
+    suffix,
+    gender,
+    civilStatus,
+    dateBirth, // This should now be in YYYY-MM-DD format
+    maiden,
+    phoneNo: f.phoneNo.value.trim(),
+    major: f.major.value.trim(),
+    yearStarted: f.yearStarted.value,
+    graduated: f.graduated.value,
+    studentNo
+  };
+
+  console.log('Date birth formatted:', dateBirth); // Debug log
+  console.log('Full payload:', payload); // Debug log
+
+
+  const missing = [];
+  for (const [key, val] of Object.entries(payload)) {
+    if (!val || val === '') missing.push(key);
+  }
+
+  if (missing.length > 0) {
+    const msg = `⚠️ Please fill out the following fields:\n\n• ${missing.join('\n• ')}`;
+    const warnContent = document.getElementById('warnContent');
+    const warnOverlay = document.getElementById('warnOverlay');
+    const warnToast = document.getElementById('warnToast');
+    
+    if (warnContent && warnOverlay && warnToast) {
+      warnContent.textContent = msg;
+      warnOverlay.classList.add('show');
+      warnToast.classList.add('show');
+      setTimeout(() => {
+        warnOverlay.classList.remove('show');
+        warnToast.classList.remove('show');
+      }, 3000);
+    } else {
+      showErrorToast(`Please fill: ${missing.join(', ')}`);
+    }
+    return;
+  }
+
+  // ✅ Check if userName ends with ".alumni"
+  if (!payload.userName.endsWith('.alumni')) {
+    showErrorToast('❗ Preferred Username must end with ".alumni"');
+    return;
+  }
+
+  // Disable submit button during processing
+  const submitBtn = document.getElementById('submitform');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Submitting...';
+  submitBtn.disabled = true;
+
+  try {
+    console.log('Sending registration data:', {
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      personalEmail: payload.personalEmail,
+      gender: payload.gender,
+      userName: payload.userName,
+      passWord: payload.passWord,
+      major: payload.major,
+      graduated: payload.graduated
+    });
+
+    // First API call - registration
+    const res = await fetch('/api/registration/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        personalEmail: payload.personalEmail,
+        gender: payload.gender,
+        userName: payload.userName,
+        passWord: payload.passWord,
+        major: payload.major,
+        graduated: payload.graduated
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+
+    console.log('Registration successful, sending full information...');
+
+    // Second API call - full information
+    const res2 = await fetch('/api/fullInformation/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data2 = await res2.json();
+    if (!res2.ok) {
+      console.warn('Full information save failed:', data2.error);
+      // Don't throw error, registration was successful
+    }
+
+    // Show success
+    const successToast = document.getElementById('successToast');
+    if (successToast) {
+      successToast.classList.add('show');
+      setTimeout(() => {
+        successToast.classList.remove('show');
+        window.location.href = 'homepage.html';
+      }, 3000);
+    } else {
+      alert('✅ Registration successful! Redirecting...');
+      setTimeout(() => {
+        window.location.href = 'homepage.html';
+      }, 2000);
+    }
+
+    // Reset form
+    f.reset();
+
+  } catch (err) {
+    console.error('❌ Submission failed:', err);
+    showErrorToast(err.message || 'Registration failed. Please try again.');
+  } finally {
+    // Re-enable submit button
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+}
+
+document.getElementById('submitform').addEventListener('click', (e) => {
+  e.preventDefault();
+
+  const consentCheckbox = document.getElementById('consentCheckbox');
+  if (!consentCheckbox.checked) {
+    showErrorToast('⚠️ Please read the consent form and check the box to proceed.');
+    return;
+  }
+
+  submitregForm();
+});
+
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  if (toast && toastMessage) {
+    toastMessage.textContent = message;
+    toast.className = `toast show ${type}`;
+  }
+}
+
+document.getElementById('toastCloseBtn').addEventListener('click', () => {
+  const toast = document.getElementById('toast');
+  if (toast) {
+    toast.className = 'toast';
+  }
+});
+</script>
+</body>
+</html>

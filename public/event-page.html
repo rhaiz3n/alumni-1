@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVENT | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="event-page.css" />
+</head>
+<body>
+  <div class="eventpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='homepage.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">A</span>
+      <span class="a-l-u-m-n-i-span2">l u m n i</span>
+      <span class="d-a-t-a-b-a-s-e-span">E</span>
+      <span class="d-a-t-a-b-a-s-e-span2">V E N T</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+    
+  <section class="event-section">
+    <h2>UPCOMING EVENTS</h2>
+    <div id="eventsGrid" class="card-grid">Loading events…</div>
+  </section>
+
+  <div id="descModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <div class="navbar"></div>
+        <img class="Logo2" src="Logo2.png" alt="TUPC Logo" />
+        <div class="event-selection">
+          <span class="event-selection-span">E</span>
+          <span class="event-selection-span2">VENT</span>
+          <span class="event-selection-span">D</span>
+          <span class="event-selection-span2">ESCRIPTION</span>
+        </div>
+        <div class="Line1-1"></div>
+        <div class="event-selection2"></div>
+      <span class="close-btn" id="descClose">&times;</span>
+      <p id="descText"></p>
+    </div>
+  </div>
+
+    <!-- Overlay for dimming background -->
+  <div class="toast-overlay" id="warnOverlay" style="display:none;"></div>
+
+  <!-- Warning popup -->
+  <div class="career-warning" id="warnToast" style="display:none;">
+    <div class="toast-header warn">
+      <span class="toast-icon">⚠️</span>
+      <span class="toast-title">Registration or Sign‑In Required!</span>
+    </div>
+    <div class="toast-content">
+      <ul>
+        <li>You must <strong>sign in or register</strong> before pre‑registering for this event.</li>
+        <li>If you don’t have an account, please register as a TUP‑Cavite Alumni first.</li>
+      </ul>
+    </div>
+    <button class="toast-button" id="warnDismiss">UNDERSTOOD</button>
+  </div>  
+
+  
+
+<script>
+  async function loadEvents() {
+    const grid = document.getElementById('eventsGrid');
+    try {
+      const response = await fetch('/api/events');
+      if (!response.ok) throw new Error(await response.text());
+
+      const { events } = await response.json();
+      const displayList = [...events.slice(0, 15)];
+      while (displayList.length < 15) displayList.push(null);
+
+      grid.innerHTML = displayList.map(event => event ? `
+        <div class="card">
+          <img src="${event.image}" alt="${event.title}">
+          <div class="card-title">${event.title}</div>
+          <div class="card-meta">${event.location}</div>
+          <div class="btn-group-vertical">
+            <button class="card-btn readmore" data-desc="${encodeURIComponent(event.description)}">READ MORE</button>
+            <button class="card-btn prereg">PRE-REGISTRATION</button>
+          </div>
+        </div>` : `<div class="card empty-card"></div>`).join('');
+
+      // Read More Modal Handler
+      document.querySelectorAll('.readmore').forEach(button => {
+        button.addEventListener('click', () => {
+          const desc = decodeURIComponent(button.dataset.desc);
+          document.getElementById('descText').textContent = desc;
+          document.getElementById('descModal').style.display = 'block';
+        });
+      });
+
+      // Pre-registration Handler
+      document.querySelectorAll('.prereg').forEach(button => {
+        button.addEventListener('click', () => {
+          document.getElementById('warnOverlay').style.display = 'block';
+          document.getElementById('warnToast').style.display = 'block';
+        });
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to load events:', error);
+      grid.textContent = '⚠️ Unable to load events at the moment.';
+    }
+  }
+
+  // Initialization on DOM Ready
+  window.addEventListener('DOMContentLoaded', () => {
+    loadEvents();
+
+    // Dismiss Warning
+    document.getElementById('warnDismiss')?.addEventListener('click', () => {
+      document.getElementById('warnOverlay').style.display = 'none';
+      document.getElementById('warnToast').style.display = 'none';
+    });
+
+    // Close Modal
+    document.getElementById('descClose')?.addEventListener('click', () => {
+      document.getElementById('descModal').style.display = 'none';
+    });
+
+    // Close Modal by Outside Click
+    window.addEventListener('click', e => {
+      if (e.target.id === 'descModal') {
+        document.getElementById('descModal').style.display = 'none';
+      }
+    });
+
+    // Loader Animation
+    let pct = 80;
+    const wrapper = document.getElementById("loader-wrapper");
+    const bar = document.getElementById("progress-bar");
+    const pctText = document.getElementById("percentage");
+
+    const interval = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        bar.style.width = pct + "%";
+        pctText.textContent = pct + "%";
+      } else {
+        clearInterval(interval);
+        wrapper.style.display = "none";
+      }
+    }, 30);
+  });
+</script>
+</body>
+</html>

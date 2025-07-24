@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOME | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="user-homepage.css" />
+</head>
+<body>
+  <div class="userpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="Line2"></div>
+
+    <!-- Career Button -->
+    <div class="career-button slide-in" onclick="openCareerPopup()">
+      <div class="content">
+        <div class="state-layer">
+          <div class="hover-underline1">CAREER</div>
+        </div>
+      </div>
+    </div>
+    <div id="notificationAlert" class="notification-modal">
+      <div class="notification-box">
+        <span id="closeNotification" class="notification-close">&times;</span>
+        <div id="notificationMessage" class="notification-message"></div>
+      </div>
+    </div>
+
+    <!-- Career Popup Modal -->
+    <div id="careerPopup" class="popup-overlay">
+      <div class="popup-content">
+        <div class="navbar"></div>
+        <img class="Logo2" src="Logo2.png" alt="TUPC Logo" />
+        <div class="career-selection">
+          <span class="career-selection-span">J</span>
+          <span class="career-selection-span2">OBS</span>
+          <span class="career-selection-span">R</span>
+          <span class="career-selection-span2">ESPONSE FORM</span>
+        </div>
+        <div class="Line1-1"></div>
+        <!-- First Name -->
+        <label for="firstName" class="label-first-name">First Name:</label>
+        <input type="text" id="firstName" class="input-first-name">
+
+        <!-- Last Name -->
+        <label for="lastName" class="label-last-name">Last Name:</label>
+        <input type="text" id="lastName" class="input-last-name">
+
+        <!-- Interested -->
+        <label for="interested" class="label-interest">Are you interested?</label>
+        <select id="interested" class="select-interest">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+
+        <!-- Employment Status -->
+        <label for="employmentStatus" class="label-employment">What is your current employment status?</label>
+        <select id="employmentStatus" class="select-employment">
+          <option value="">-- Select --</option>
+          <option value="Employed">Employed</option>
+          <option value="Unemployed">UnEmployed</option>
+          <option value="UnderEmployed">UnderEmployed</option>
+        </select>
+
+        <div class="popup-buttons">
+          <button class="career-btn1" onclick="submitCareerForm()">Submit</button>
+          <button class="career-btn2" onclick="closeCareerPopup()">Close</button>
+        </div>
+      </div>
+    </div>
+
+
+    <a href="user-eventpage.html" class="event-button slide-in" style="text-decoration: none; color: inherit;">
+      <div class="content">
+        <div class="state-layer">
+          <div class="hover-underline1">EVENTS</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- ID Request Button -->
+    <div class="id-button slide-in" onclick="openIdRequestPopup()">
+      <div class="content">
+        <div class="state-layer">
+          <div class="hover-underline1">ID REQUEST</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ID Request Modal -->
+    <div id="idRequestPopup" class="ID-popup-overlay">
+      <div class="ID-popup-content">
+        <div class="navbar"></div>
+        <img class="Logo3" src="Logo2.png" alt="TUPC Logo" />
+        <div class="id-selection">ID REQUEST FORM</div>
+          <span class="id-selection-span">ID Request</span>
+          <span class="id-selection-span2">FORM</span>
+
+
+            <form id="idRequestForm" enctype="multipart/form-data" onsubmit="event.preventDefault(); submitIdRequestForm();">
+              <label>Upload Valid ID *</label>
+              <input type="file" name="idImage" required>
+
+              <label>Full Name on Official Records *</label>
+              <input type="text" name="fullName" required>
+
+              <label>Degree/Certificate & Major [BET/BTVTED] *</label>
+              <input type="text" name="degree" required>
+
+              <label>Year Graduated *</label>
+              <input type="text" name="yearGraduated" required>
+
+              <label>Student No. *</label>
+              <input type="text" name="studentNo" required>
+
+              <label>Phone No. *</label>
+              <input type="tel" name="phoneNo" required>
+
+              <label>Personal Email Address *</label>
+              <input type="email" name="email" required>
+            </form>
+
+        <div class="popup-buttons">
+          <button class="id-btn1" onclick="submitIdRequestForm()">Submit</button>
+          <button class="id-btn2" onclick="closeIdRequestPopup()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="popupMessage" class="popup-message hidden">
+      <span id="popupText"></span>
+    </div>
+
+    
+    <div class="gallery-button slide-in" onclick="window.location.href='gallery-user.html?from=user-homepage.html'">
+      <div class="content">
+        <div class="state-layer">
+          <div class="hover-underline1">GALLERY</div>
+        </div>
+      </div>
+    </div>
+
+
+    <button id="signOutBtn" class="sign-out-button slide-in">
+      <div class="content"><div class="state-layer"><div class="hover-underline1">SIGN-OUT</div></div></div>
+    </button>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+
+    <a href="user-homepage.html">
+      <img class="Logo" src="Logo.png" alt="University Logo" />
+    </a>
+
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">A</span>
+      <span class="a-l-u-m-n-i-span2">l u m n i</span>
+      <span class="a-l-u-m-n-i-span">U</span>
+      <span class="a-l-u-m-n-i-span2">s e r</span>
+    </div>
+
+    <div class="technological-university-of-the-philippines-cavite">
+      TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
+    </div>
+
+    <!-- Facebook Page Plugin -->
+    <div class="fb-wrapper">
+      <iframe 
+        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FTUPCAA&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
+        width="340" 
+        height="500" 
+        style="border:none; overflow:hidden;" 
+        scrolling="no" 
+        frameborder="0" 
+        allowfullscreen="true" 
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+      </iframe>
+    </div>
+
+    <!-- TUPCAVITE Page -->
+    <div class="fb-wrapper2">
+      <iframe 
+        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftupcavite.edu.ph&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
+        width="340" 
+        height="500" 
+        style="border:none; overflow:hidden;" 
+        scrolling="no" 
+        frameborder="0" 
+        allowfullscreen="true" 
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+      </iframe>
+    </div>
+
+    <!-- Slideshow Section -->
+    <div class="slideshow-container zoom-in">
+      <img class="slideshow-image" src="Grad1.png" alt="Grad 1" />
+      <img class="slideshow-image" src="Grad2.png" alt="Grad 2" />
+      <img class="slideshow-image" src="Grad3.png" alt="Grad 3" />
+      <img class="slideshow-image" src="Grad4.png" alt="Grad 4" />
+      <img class="slideshow-image" src="Grad5.png" alt="Grad 5" />
+      <img class="slideshow-image" src="Grad6.png" alt="Grad 6" />
+      <img class="slideshow-image" src="Grad7.png" alt="Grad 7" />
+      <img class="slideshow-image" src="Grad8.png" alt="Grad 8" />
+    </div>
+
+    <div class="commencement-description zoom-in">
+      <h2 class="school-name">Technological University of the Philippines - Cavite</h2>
+      <h3 class="event-title">40th <span>COMMENCEMENT EXERCISE</span></h3>
+      <p class="description">
+        Here are some snaps from the 40th Commencement Exercise at the Philippine International Convention Center on July 31, 2024.
+        See the magical moments of every TUPCians who reached the end of their college journey.
+        <br><br>
+        <strong>Photos by:</strong> Photo X Media<br>
+        <strong>Words by:</strong> Karen Pet Pabrowada
+      </p>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+    <div class="contact-section">
+      </a>
+    </div>
+
+
+    <div class="announcement-box">
+      <h3>ID Announcements</h3>
+      <div class="announcement-list" id="idAnnouncementList">
+        Loading...
+      </div>
+    </div>
+
+    <div class="announcement-box2">
+      <h3>Events Announcements</h3>
+      <div class="announcement-list" id="eventList">
+        Loading...
+      </div>
+    </div>
+
+    <div class="career-box">
+      <h3>Career Opportunities</h3>
+      <div class="career-list" id="careerList">
+        Loading...
+      </div>
+    </div>
+
+  <!-- External JavaScript -->
+  <script src="Homeslideshow.js"></script>
+  
+
+<script type="module">
+  import { setupSignOut } from './sign-out.js';
+  setupSignOut('user');
+
+  async function loadIdAnnouncements() {
+    const container = document.getElementById('idAnnouncementList');
+    container.innerHTML = 'Loading...';
+
+    try {
+      const res = await fetch('/api/admin/id-announcements');
+      if (!res.ok) throw new Error('Failed to load ID announcements');
+      const { announcements } = await res.json();
+
+      container.innerHTML = announcements.map(a => `
+        <div class="event-card">
+          <div class="event-header">
+            <span class="badge">ID ANNOUNCEMENT</span>
+            <span class="posted-date">Posted: ${new Date(a.datePosted).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+          <div class="event-title">${a.title}</div>
+          <p>${a.description}</p>
+        </div>
+      `).join('') || '<div>No announcements found.</div>';
+
+    } catch (err) {
+      container.innerHTML = `<div class="error">❌ Failed to load announcements</div>`;
+      console.error(err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadIdAnnouncements);
+
+  async function loadEvents() {
+    const container = document.getElementById('eventList');
+    container.innerHTML = 'Loading...';
+    try {
+      const res = await fetch('/api/events');
+      if (!res.ok) throw new Error('Failed to load events');
+      const { events } = await res.json();
+
+      container.innerHTML = events.map(e => `
+        <div class="event-card">
+          <div class="event-header">
+            <span class="badge">EVENT ANNOUNCEMENT</span>
+            <span class="posted-date">Posted: ${new Date(e.datePosted).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+          <div class="event-title">${e.title}</div>
+        </div>
+      `).join('') || '<div>No announcements found.</div>';
+
+    } catch (err) {
+      container.innerHTML = `<div class="error">❌ Failed to load announcements</div>`;
+      console.error(err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadEvents);
+
+  async function loadCareers() {
+    const listContainer = document.getElementById('careerList');
+    listContainer.innerHTML = 'Loading...';
+    try {
+      const res = await fetch('/api/careers');
+      if (!res.ok) throw new Error('Failed to load careers');
+      const { careers } = await res.json();
+      listContainer.innerHTML = careers.slice(0, 10).map(career => `
+        <div class="career-card">
+          <div class="career-header">
+            <span class="career-badge">CAREER</span>
+            Posted: ${new Date(career.datePosted).toLocaleDateString()}
+          </div>
+          <div class="career-title">${career.title}</div>
+        </div>
+      `).join('') || '<div>No announcements found.</div>';
+    } catch (err) {
+      listContainer.innerHTML = '❌ Failed to load careers';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadCareers);
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const role = sessionStorage.getItem('userRole');
+    if (!role) {
+      window.location.href = 'homepage.html';
+    } else if (role === 'admin') {
+      window.location.href = 'admin-homepage.html';
+    } else {
+      loadIdAnnouncements();  // ✅ Correct function call!
+    }
+  });
+</script>
+
+  <!-- Modal Script -->
+<script>
+  // Contact Section Animation
+document.addEventListener("DOMContentLoaded", function () {
+  const contactSection = document.querySelector('.contact-section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        contactSection.classList.add('slide-up');
+        contactSection.classList.remove('slide-down');
+      } else {
+        contactSection.classList.remove('slide-up');
+        contactSection.classList.add('slide-down');
+      }
+    });
+  }, {
+    threshold: 0.1
+  });
+
+  observer.observe(contactSection);
+});
+
+// Loading Screen Script
+document.addEventListener("DOMContentLoaded", () => {
+let percentage = 80;
+const loaderWrapper = document.getElementById("loader-wrapper");
+const progressBar = document.getElementById("progress-bar");
+const percentageText = document.getElementById("percentage");
+
+const loadingInterval = setInterval(() => {
+  if (percentage < 100) {
+    percentage++;
+        progressBar.style.width = percentage + "%";
+        percentageText.textContent = percentage + "%";
+      } else {
+        clearInterval(loadingInterval);
+        loaderWrapper.style.display = "none";
+      }
+    }, 30);
+  });
+
+  // Facebook SDK Initialization
+  window.fbAsyncInit = function () {
+    FB.init({
+      xfbml: true,
+      version: 'v17.0'
+    });
+  };
+
+  (function (d, s, id) {
+    if (d.getElementById(id)) return;
+    let js = d.createElement(s);
+    js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    d.head.appendChild(js);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Career Popup Script
+  document.addEventListener("DOMContentLoaded", () => {
+    // Open popup
+    window.openCareerPopup = function () {
+      document.getElementById('careerPopup').style.display = 'block';
+    };
+
+    // Close popup and clear the form
+    window.closeCareerPopup = function () {
+      document.getElementById('careerPopup').style.display = 'none';
+
+      // Clear the form inputs
+      document.getElementById('firstName').value = '';
+      document.getElementById('lastName').value = '';
+      document.getElementById('interested').selectedIndex = 0;
+      document.getElementById('employmentStatus').selectedIndex = 0;
+    };
+  });
+
+  function submitCareerForm() {
+    const payload = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName: document.getElementById('lastName').value.trim(),
+      interested: document.getElementById('interested').value,
+      employmentStatus: document.getElementById('employmentStatus').value
+    };
+
+    fetch('/api/responses/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(async res => {
+      const text = await res.text();
+      console.debug('Response status:', res.status);
+      console.debug('Response body:', text);
+      if (!res.ok) throw new Error(text);
+      return JSON.parse(text);
+    })
+    .then(data => {
+      showNotification(`✅ Submission successful! ID: ${data.id}`);
+      setTimeout(() => {
+        window.location.href = 'career-post.html';
+      }, 3000);
+    })
+    .catch(err => {
+      console.error('Submission failed:', err);
+      showNotification(`❌ Error saving data: ${err.message}`);
+    });
+  }
+
+  function showNotification(message) {
+    const popup = document.getElementById('notificationAlert');
+    const msg = document.getElementById('notificationMessage');
+    msg.textContent = message;
+    popup.style.display = 'flex';
+
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 3000);
+  }
+
+  document.getElementById('closeNotification').onclick = () => {
+    document.getElementById('notificationAlert').style.display = 'none';
+  };
+
+  document.getElementById('galleryBtn').onclick = () => {
+    window.location.href = 'gallery-user.html?from=user-homepage.html';
+  };
+
+// Open the ID Request Popup
+function openIdRequestPopup() {
+  document.getElementById('idRequestPopup').style.display = 'flex';
+}
+
+// Close and Clear the Form using Form Reset
+function closeIdRequestPopup() {
+  const form = document.getElementById('idRequestForm');
+  if (form) form.reset();  // ✅ Reset all form fields at once
+
+  document.getElementById('idRequestPopup').style.display = 'none';
+}
+
+function submitIdRequestForm() {
+  const formElement = document.getElementById('idRequestForm');
+  const formData = new FormData(formElement);
+
+  fetch('/api/requests/add', {
+    method: 'POST',
+    body: formData
+  })
+  .then(async res => {
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Unknown error');
+    showPopup('✅ Submission Successful!');
+    closeIdRequestPopup();
+  })
+  .catch(err => {
+    showPopup('❌ Submission failed: ' + err.message, true);
+  });
+}
+
+function showPopup(message, isError = false) {
+  const popup = document.getElementById('popupMessage');
+  const popupText = document.getElementById('popupText');
+
+  popupText.textContent = message;
+  popup.classList.remove('error', 'show');
+  if (isError) popup.classList.add('error');
+  
+  // Force reflow for animation reset
+  void popup.offsetWidth; 
+  popup.classList.add('show');
+
+  // Hide after 3 seconds
+  setTimeout(() => popup.classList.remove('show'), 3000);
+}
+
+
+function showEmployerToast(message, type = 'success') {
+  const toast = document.getElementById('employer-toast');
+  const toastMsg = document.getElementById('employer-toast-msg');
+  toastMsg.textContent = message;
+
+  toast.className = `employer-toast show ${type}`;
+  setTimeout(() => {
+    toast.className = 'employer-toast';
+  }, 3000);
+}
+
+function showLoginToast(message, type = 'success') {
+  const toast = document.getElementById('login-toast');
+  const toastMsg = document.getElementById('login-toast-message');
+  toastMsg.textContent = message;
+  toast.className = `toast show ${type}`;
+
+  setTimeout(() => {
+    toast.className = 'toast';  // Hide after 3 seconds
+  }, 3000);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+</script>
+</body>
+</html>

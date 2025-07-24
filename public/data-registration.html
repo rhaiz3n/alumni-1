@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REGISTERED | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="data-registration.css" />
+</head>
+<body>
+  <div class="registeredpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">A</span>
+      <span class="a-l-u-m-n-i-span2">l u m n i</span>
+      <span class="d-a-t-a-b-a-s-e-span">R</span>
+      <span class="d-a-t-a-b-a-s-e-span2">E G I S T E R E D</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+  <button class="fullInformation" onclick="location.href='fullinformationRegistered.html'"><span class="underline-slide">📁  Full Information Details</span></button>
+  
+  <input type="text" id="searchInput" placeholder="Search..." />
+
+  <select id="pageSelect"></select>
+
+  <table id="registeredTable" border="1">
+    <thead>
+      <tr>
+        <th>First Name</th><th>Last Name</th><th>Personal Email</th>
+        <th>Gender</th><th>Username</th><th>Passwords</th>
+      </tr>
+    </thead>
+    <tbody id="registeredTableBody"></tbody>
+  </table>
+
+<script>
+  const tbody = document.querySelector('#registeredTable tbody');
+  const pageSelect = document.getElementById('pageSelect');
+  const searchInput = document.getElementById('searchInput');
+
+  const ROWS_PER_PAGE = 100;
+  let currentPage = 1;
+  let totalPages = 1;
+
+  // Pagination & Search
+  pageSelect?.addEventListener('change', () => loadPage(+pageSelect.value, searchInput.value.trim()));
+  searchInput?.addEventListener('input', () => loadPage(1, searchInput.value.trim()));
+
+  async function loadPage(page = 1, search = '') {
+    currentPage = page;
+    const url = `/api/registration?page=${page}&limit=${ROWS_PER_PAGE}&search=${encodeURIComponent(search)}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(await res.text());
+      const { rows = [], totalPages: tp = 1 } = await res.json();
+      totalPages = tp;
+
+      // Render rows
+      tbody.innerHTML = '';
+      rows.reverse().forEach(r => {
+        const tr = document.createElement('tr');
+        ['firstName', 'lastName', 'personalEmail', 'gender', 'userName', 'passWord'].forEach(key => {
+          const td = document.createElement('td');
+          td.textContent = r[key] || '';
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      // Build pagination
+      pageSelect.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Page ${i}`;
+        if (i === currentPage) opt.selected = true;
+        pageSelect.appendChild(opt);
+      }
+    } catch (err) {
+      console.error('❌ Error loading registration data:', err);
+      alert('⚠️ Failed to load data.');
+    }
+  }
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadPage();
+    
+    // Loader animation
+    let pct = 80;
+    const loaderWrapper = document.getElementById("loader-wrapper");
+    const progressBar = document.getElementById("progress-bar");
+    const percentageText = document.getElementById("percentage");
+
+    const loadingInterval = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        progressBar.style.width = pct + "%";
+        percentageText.textContent = pct + "%";
+      } else {
+        clearInterval(loadingInterval);
+        loaderWrapper.style.display = "none";
+      }
+    }, 30);
+
+    // Redirect non-admins
+    const role = sessionStorage.getItem('userRole');
+    if (role !== 'admin') {
+      window.location.href = 'homepage.html';
+    }
+  });
+</script>
+</body>
+</html>

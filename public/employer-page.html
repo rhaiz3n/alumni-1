@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADMIN PAGE | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="employer-page.css" />
+</head>
+<body>
+  <div class="adminpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="Line2"></div>
+
+    <div class="career-button slide-in" onclick="window.location.href='career-posting.html'">
+      <div class="content"><div class="state-layer"><div class="hover-underline1">CAREER</div></div></div>
+    </div>
+
+
+    <button id="signOutBtn" class="sign-out-button slide-in">
+      <div class="content"><div class="state-layer"><div class="hover-underline1">SIGN-OUT</div></div></div>
+    </button>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+    <a href="employer-page.html">
+      <img class="Logo" src="Logo.png" alt="University Logo" />
+    </a>
+
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">E</span>
+      <span class="a-l-u-m-n-i-span2">M P L O Y E R</span>
+    </div>
+
+    <div class="technological-university-of-the-philippines-cavite">
+      TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
+    </div>
+
+    <!-- Facebook Page Plugin -->
+    <div class="fb-wrapper">
+      <iframe 
+        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FTUPCAA&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
+        width="340" 
+        height="500" 
+        style="border:none; overflow:hidden;" 
+        scrolling="no" 
+        frameborder="0" 
+        allowfullscreen="true" 
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+      </iframe>
+    </div>
+
+    <!-- TUPCAVITE Page -->
+    <div class="fb-wrapper2">
+      <iframe 
+        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftupcavite.edu.ph&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
+        width="340" 
+        height="500" 
+        style="border:none; overflow:hidden;" 
+        scrolling="no" 
+        frameborder="0" 
+        allowfullscreen="true" 
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+      </iframe>
+    </div>
+
+    <!-- Slideshow Section -->
+    <div class="slideshow-container zoom-in">
+      <img class="slideshow-image" src="Grad1.png" alt="Grad 1" />
+      <img class="slideshow-image" src="Grad2.png" alt="Grad 2" />
+      <img class="slideshow-image" src="Grad3.png" alt="Grad 3" />
+      <img class="slideshow-image" src="Grad4.png" alt="Grad 4" />
+      <img class="slideshow-image" src="Grad5.png" alt="Grad 5" />
+      <img class="slideshow-image" src="Grad6.png" alt="Grad 6" />
+      <img class="slideshow-image" src="Grad7.png" alt="Grad 7" />
+      <img class="slideshow-image" src="Grad8.png" alt="Grad 8" />
+    </div>
+
+    <div class="commencement-description zoom-in">
+      <h2 class="school-name">Technological University of the Philippines - Cavite</h2>
+      <h3 class="event-title">40th <span>COMMENCEMENT EXERCISE</span></h3>
+      <p class="description">
+        Here are some snaps from the 40th Commencement Exercise at the Philippine International Convention Center on July 31, 2024.
+        See the magical moments of every TUPCians who reached the end of their college journey.
+        <br><br>
+        <strong>Photos by:</strong> Photo X Media<br>
+        <strong>Words by:</strong> Karen Pet Pabrowada
+      </p>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+    <div class="contact-section">
+      </a>
+    </div>
+
+  <!-- External JavaScript -->
+<script src="Homeslideshow.js"></script>
+
+<script type="module">
+  import { setupSignOut } from './sign-out.js';
+  setupSignOut('employer'); // 🔒 restrict to employer only
+</script>
+
+<script>
+  // Contact Section Animation
+  document.addEventListener("DOMContentLoaded", () => {
+    const contactSection = document.querySelector('.contact-section');
+    if (contactSection) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          contactSection.classList.toggle('slide-up', entry.isIntersecting);
+          contactSection.classList.toggle('slide-down', !entry.isIntersecting);
+        });
+      }, { threshold: 0.1 });
+      observer.observe(contactSection);
+    }
+  });
+
+  // Loading Screen Animation
+  document.addEventListener("DOMContentLoaded", () => {
+    let pct = 80;
+    const loaderWrapper = document.getElementById("loader-wrapper");
+    const progressBar = document.getElementById("progress-bar");
+    const percentageText = document.getElementById("percentage");
+
+    const interval = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        progressBar.style.width = pct + "%";
+        percentageText.textContent = pct + "%";
+      } else {
+        clearInterval(interval);
+        loaderWrapper.style.display = "none";
+      }
+    }, 30);
+  });
+
+  // Facebook SDK Initialization
+  window.fbAsyncInit = function () {
+    FB.init({ xfbml: true, version: 'v17.0' });
+  };
+
+  (function (d, s, id) {
+    if (d.getElementById(id)) return;
+    const js = d.createElement(s);
+    js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    d.head.appendChild(js);
+  })(document, 'script', 'facebook-jssdk');
+
+  // Dropdown toggle
+  function toggleDropdown() {
+    document.getElementById('dropdownMenu')?.classList.toggle('show');
+  }
+
+  function navigateTo(url) {
+    window.location.href = url;
+  }
+
+  // Close dropdown if clicked outside
+  window.addEventListener('click', e => {
+    const trigger = document.querySelector('.select-trigger');
+    const menu = document.getElementById('dropdownMenu');
+    if (!trigger?.contains(e.target) && !menu?.contains(e.target)) {
+      menu?.classList.remove('show');
+    }
+  });
+
+  // Access Control
+  window.addEventListener('DOMContentLoaded', () => {
+    const role = sessionStorage.getItem('userRole');
+    if (role !== 'employer') {
+      window.location.href = 'homepage.html'; // ❌ block non-employers
+    }
+  });
+</script>
+</body>
+</head>
+</html>

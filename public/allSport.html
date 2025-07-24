@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sportfest Registrations Dashboard</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <link rel="stylesheet" href="allSport.css" />
+</head>
+<body>
+  <div class="eventpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='event-registration.html'">BACK</button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">E</span>
+      <span class="a-l-u-m-n-i-span2">v e n t</span>
+      <span class="d-a-t-a-b-a-s-e-span">S</span>
+      <span class="d-a-t-a-b-a-s-e-span2">P O R T F E S T</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+  <h2>🏅 Sport Fest Registrations</h2>
+  <input type="text" id="searchInput" placeholder="Search by name…" />
+  <select id="sportFilter">
+    <option value="ALL">All Sports</option>
+  </select>
+  <select id="pageSelect"></select>
+  <button id="printBtn">🖨️ Print Accepted Only</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>FIRST</th><th>MIDDLE</th><th>LAST</th><th>GENDER</th>
+        <th>SUFFIX</th><th>Year Grad</th><th>Sport</th>
+        <th>DATE OF SUBMITION</th><th>STATUS</th><th>RESPONSE</th>
+      </tr>
+    </thead>
+    <tbody id="athleteTableBody">
+      <tr><td colspan="10">Loading…</td></tr>
+    </tbody>
+  </table>
+
+<script>
+const tbody = document.getElementById('athleteTableBody');
+const searchInput = document.getElementById('searchInput');
+const sportFilter = document.getElementById('sportFilter');
+const pageSelect = document.getElementById('pageSelect');
+const printBtn = document.getElementById('printBtn');
+
+const ROWS_PER_PAGE = 100;
+let currentPage = 1, totalPages = 1, rows = [];
+
+function formatSportType(raw) {
+  const map = {
+    mensBasketball: "Men's Basketball",
+    womensVolleyball: "Women's Volleyball",
+    mensVolleyball: "Men's Volleyball",
+    chess: "Chess",
+    darts: "Darts"
+  };
+  return map[raw] || raw || '—';
+}
+
+function formatDate(raw) {
+  return raw ? new Date(raw).toLocaleDateString('en-US', {
+    month: 'long', day: '2-digit', year: 'numeric'
+  }) : '—';
+}
+
+async function loadDistinctSports() {
+  try {
+    const res = await fetch('/api/allsport/distinct-sports');
+    const json = await res.json();
+    json.sports.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = formatSportType(s);
+      sportFilter.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Failed to load sports:', err);
+  }
+}
+
+async function updateStatus(id, newStatus) {
+  try {
+    const res = await fetch(`/api/allsport/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (!res.ok) throw new Error('Update failed');
+
+    // ✅ Patch the local data (this avoids reloading everything)
+    const athlete = rows.find(r => r.id === id);
+    if (athlete) athlete.status = newStatus;
+
+    renderTable(); // Just re-render the table
+  } catch (err) {
+    alert('❌ ' + err.message);
+  }
+}
+
+function renderTable() {
+  const filter = sportFilter.value || 'ALL';
+  tbody.innerHTML = '';
+
+  const statusOrder = { 'PENDING': 1, 'ACCEPTED': 2, 'DECLINED': 3 };
+
+  rows
+    .filter(r => filter === 'ALL' || r.sportType === filter)
+    .sort((a, b) => {
+      const aStatus = statusOrder[(a.status || 'PENDING').toUpperCase()];
+      const bStatus = statusOrder[(b.status || 'PENDING').toUpperCase()];
+      return aStatus - bStatus;
+    })
+    .forEach(r => {
+      const status = (r.status || 'PENDING').toUpperCase();
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.firstName || ''}</td>
+        <td>${r.middleName || ''}</td>
+        <td>${r.lastName || ''}</td>
+        <td>${r.gender || ''}</td>
+        <td>${r.extension || ''}</td>
+        <td>${r.yearGraduated || ''}</td>
+        <td>${formatSportType(r.sportType)}</td>
+        <td>${formatDate(r.submittedAt)}</td>
+        <td class="status ${status}">${status}</td>
+        <td>
+          <button onclick="updateStatus(${r.id}, 'ACCEPTED')" class="accept-btn">ACCEPTED</button>
+          <button onclick="updateStatus(${r.id}, 'DECLINED')" class="decline-btn">DECLINED</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+}
+
+async function loadPage() {
+  const search = encodeURIComponent(searchInput.value.trim());
+  const url = `/api/allsport?page=${currentPage}&limit=${ROWS_PER_PAGE}${search ? `&search=${search}` : ''}`;
+  const res = await fetch(url);
+  const json = await res.json();
+  rows = json.rows;
+  totalPages = json.totalPages;
+
+  tbody.innerHTML = '';
+  rows
+  .filter(r => sportFilter.value === 'ALL' || r.sportType === sportFilter.value)
+  .sort((a, b) => {
+    const order = { 'PENDING': 1, 'ACCEPTED': 2, 'DECLINED': 3 };
+    const aStatus = (a.status || 'PENDING').toUpperCase();
+    const bStatus = (b.status || 'PENDING').toUpperCase();
+    return order[aStatus] - order[bStatus];
+  })
+  .forEach(r => {
+    const status = (r.status || 'PENDING').toUpperCase();
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.firstName || ''}</td>
+      <td>${r.middleName || ''}</td>
+      <td>${r.lastName || ''}</td>
+      <td>${r.gender || ''}</td>
+      <td>${r.extension || ''}</td>
+      <td>${r.yearGraduated || ''}</td>
+      <td>${formatSportType(r.sportType)}</td>
+      <td>${formatDate(r.submittedAt)}</td>
+      <td class="status ${status}">${status}</td>
+      <td>
+        <button onclick="updateStatus(${r.id}, 'ACCEPTED')" class="accept-btn">ACCEPTED</button>
+        <button onclick="updateStatus(${r.id}, 'DECLINED')" class="decline-btn">DECLINED</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  pageSelect.innerHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Page ${i}`;
+    if (i === currentPage) opt.selected = true;
+    pageSelect.appendChild(opt);
+  }
+}
+
+printBtn.addEventListener('click', () => {
+  document.querySelectorAll('#athleteTableBody tr').forEach(row => {
+    const status = row.querySelector('.status')?.innerText;
+    row.style.display = (status === 'ACCEPTED') ? '' : 'none';
+  });
+  window.print();
+  document.querySelectorAll('#athleteTableBody tr').forEach(r => r.style.display = '');
+});
+
+searchInput.addEventListener('input', () => { currentPage = 1; loadPage(); });
+sportFilter.addEventListener('change', () => { currentPage = 1; loadPage(); });
+pageSelect.addEventListener('change', () => { currentPage = +pageSelect.value; loadPage(); });
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadDistinctSports();
+  loadPage();
+});
+
+  // Hide loader and initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    let pct = 80;
+    const loader = document.getElementById('loader-wrapper'),
+          bar = document.getElementById('progress-bar'),
+          pctEl = document.getElementById('percentage');
+
+    const iv = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        bar.style.width = pct + '%';
+        pctEl.textContent = pct + '%';
+      } else {
+        clearInterval(iv);
+        loader.style.display = 'none';
+      }
+    }, 30);
+  });
+    const role = sessionStorage.getItem('userRole');
+  if (role !== 'admin') {
+    window.location.href = 'homepage.html';
+  }
+</script>
+</body>
+</html>

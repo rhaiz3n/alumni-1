@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Printable Homecoming Registrations</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <link rel="stylesheet" href="event-registration.css" />
+</head>
+<body>
+  <div class="eventpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='admin-homepage.html'">BACK</button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">E</span>
+      <span class="a-l-u-m-n-i-span2">v e n t</span>
+      <span class="d-a-t-a-b-a-s-e-span">H</span>
+      <span class="d-a-t-a-b-a-s-e-span2">O M E C O M I N G</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+    <h1>Homecoming Registration List</h1>
+    <button class="btn-print">🖨️ Print Approved Only</button>
+    <input type="text" id="searchInput" placeholder="Search by name…" />
+
+    <table>
+      <thead>
+        <tr>
+          <th>NAME</th><th>GENDER</th><th>PROGRAM</th><th>YEAR</th><th>ADDS-ON</th><th>RECEIPT</th><th>STATUS</th><th>RESPONSE</th><th>SUBMITTED DATE</th>
+        </tr>
+      </thead>
+      <tbody id="regBody"><tr><td colspan="8">Loading…</td></tr></tbody>
+    </table>
+
+    <!-- Modal Viewer -->
+    <div id="imgModal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeImgModal">&times;</span>
+        <img id="receiptImg" src="" alt="Receipt" />
+      </div>
+    </div>
+
+    <div id="receiptWarningPopup" class="popup-warning">
+      ⚠️ No receipt available.
+    </div>
+
+    <div class="filter-bar">
+      <select id="statusFilter">
+        <option value="ALL">STATUS</option>
+        <option value="PENDING">Pending</option>
+        <option value="ACCEPTED">Accepted</option>
+        <option value="DECLINED">Declined</option>
+      </select>
+    </div>
+    
+    <select id="pageSelect"></select>
+
+    <div class="dropdown-container">
+      <select id="sportSelect">
+        <option value="" disabled selected>Sport Fest</option>
+        <option value="mensBasketball">Men's Basketball</option>
+        <option value="womensVolleyball">Women's Volleyball</option>
+        <option value="mensVolleyball">Men's Volleyball</option>
+        <option value="chess">Chess</option>
+        <option value="darts">Darts</option>
+      </select>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.getElementById('regBody');
+  const statusFilter = document.getElementById('statusFilter');
+  const pageSelect = document.getElementById('pageSelect');
+  const searchInput = document.getElementById('searchInput'); // Make sure this exists in DOM
+  const imgModal = document.getElementById('imgModal');
+  const receiptImg = document.getElementById('receiptImg');
+  const closeImgModal = document.getElementById('closeImgModal');
+
+  let regs = [];
+  let currentPage = 1;
+  const LIMIT = 100;
+  let totalPages = 1;
+
+  // Ensure search input exists before using
+  if (!searchInput) {
+    console.warn('Warning: searchInput field not found in DOM!');
+  }
+
+  pageSelect.addEventListener('change', () => {
+    currentPage = +pageSelect.value;
+    loadPage();
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      currentPage = 1;
+      loadPage();
+    });
+  }
+
+  async function updateStatus(id, newStatus) {
+    try {
+      const res = await fetch(`/api/homeregs/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      loadPage(); // Refresh table after update
+    } catch (err) {
+      alert('❌ ' + err.message);
+    }
+  }
+
+  async function loadPage() {
+    try {
+      const searchVal = searchInput ? encodeURIComponent(searchInput.value.trim()) : '';
+      const url = `/api/homeregs?page=${currentPage}&limit=${LIMIT}` + (searchVal ? `&search=${searchVal}` : '');
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+
+      regs = data.registrations || [];
+      totalPages = data.totalPages || 1;
+
+      buildPagination();
+      renderTable();
+    } catch (err) {
+      console.error('loadPage error:', err);
+      tbody.innerHTML = `<tr><td colspan="8">❌ Failed to load data</td></tr>`;
+    }
+  }
+
+  function buildPagination() {
+    pageSelect.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `Page ${i}`;
+      if (i === currentPage) opt.selected = true;
+      pageSelect.appendChild(opt);
+    }
+  }
+
+  function renderTable() {
+    const filterValue = document.getElementById('statusFilter')?.value || 'ALL';
+    tbody.innerHTML = '';
+
+    // Sort: PENDING first, then ACCEPTED, then DECLINED (by id DESC within each group)
+    const statusOrder = { PENDING: 0, ACCEPTED: 1, DECLINED: 2 };
+    const sorted = regs.slice().sort((a, b) => {
+      const s1 = statusOrder[(a.status || 'PENDING').toUpperCase()];
+      const s2 = statusOrder[(b.status || 'PENDING').toUpperCase()];
+      if (s1 !== s2) return s1 - s2;
+      return b.id - a.id; // Newest first within same status
+    });
+
+    sorted.forEach(r => {
+      const currentStatus = r.status?.toUpperCase() || 'PENDING';
+
+      if (filterValue !== 'ALL' && currentStatus !== filterValue) return;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.firstName} ${r.middleInitial || ''} ${r.lastName}</td>
+        <td>${r.sex}</td><td>${r.program}</td><td>${r.yearGraduated}</td>
+        <td>${r.addon}</td>
+        <td><button class="view-btn">View</button></td>
+        <td class="status ${currentStatus}">${currentStatus}</td>
+        <td>
+          <button class="accept-btn">Accept</button>
+          <button class="decline-btn">Decline</button>
+        <td>${r.submittedAt ? new Date(r.submittedAt).toLocaleDateString('en-US', {
+          month: 'long',
+          day: '2-digit',
+          year: 'numeric'
+        }).toUpperCase() : 'N/A'}</td>
+        </td>`;
+
+      tbody.appendChild(tr);
+
+      tr.querySelector('.accept-btn').addEventListener('click', () => updateStatus(r.id, 'ACCEPTED'));
+      tr.querySelector('.decline-btn').addEventListener('click', () => updateStatus(r.id, 'DECLINED'));
+
+      tr.querySelector('.view-btn').addEventListener('click', () => {
+        if (!r.image) {
+          const popup = document.getElementById('receiptWarningPopup');
+          popup.classList.add('show');
+          setTimeout(() => popup.classList.remove('show'), 3500);
+          return;
+        }
+        receiptImg.src = r.image;
+        imgModal.style.display = 'flex';
+      });
+    });
+  }
+  document.getElementById('statusFilter').addEventListener('change', renderTable);
+
+
+  document.querySelector('.btn-print').addEventListener('click', () => {
+      document.querySelectorAll('#regBody tr').forEach(row => {
+        const status = row.querySelector('.status')?.innerText;
+        row.style.display = status === 'ACCEPTED' ? '' : 'none';
+      });
+      window.print();
+      document.querySelectorAll('#regBody tr').forEach(r => r.style.display = '');
+    });
+
+    closeImgModal.addEventListener('click', () => imgModal.style.display = 'none');
+    imgModal.addEventListener('click', e => {
+      if (e.target === imgModal) imgModal.style.display = 'none';
+    });
+
+    loadPage();  
+  });
+  // Hide loader and initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    let pct = 80;
+    const loader = document.getElementById('loader-wrapper'),
+          bar = document.getElementById('progress-bar'),
+          pctEl = document.getElementById('percentage');
+
+    const iv = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        bar.style.width = pct + '%';
+        pctEl.textContent = pct + '%';
+      } else {
+        clearInterval(iv);
+        loader.style.display = 'none';
+      }
+    }, 30);
+  });
+
+  // When Sport dropdown changes
+  document.getElementById('sportSelect').addEventListener('change', function () {
+    const sport = this.value;
+    const allowed = ['womensVolleyball', 'mensVolleyball', 'chess', 'darts'];
+    if (allowed.includes(sport)) {
+      const target = new URL('allsport.html', window.location.origin);
+      target.searchParams.set('sportType', sport);
+      window.location.href = target.toString();
+    } else if (sport === 'mensBasketball') {
+      window.location.href = 'mensBasketball.html';
+    }
+  });
+    const role = sessionStorage.getItem('userRole');
+  if (role !== 'admin') {
+    window.location.href = 'homepage.html';
+  }
+</script>
+</body>
+</html>

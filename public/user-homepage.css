@@ -1,0 +1,1131 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
+}
+.userpage {
+  background: #ffffff;
+  border: 1px solid #000000;
+  height: 200vh;
+  width: 100vw;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  display:block
+}
+.Navbar {
+  position: absolute;
+  width: 100%;                 
+  height: 195px;
+  display: flex;
+}
+.Line1 {
+  margin-top: -10px;
+  border-style: solid;
+  border-color: #c9c9c9;
+  border-width: 10px 0 0 0;
+  width: 100%; 
+  height: 0px; 
+  position: absolute;
+  left: 0; 
+  top: 200px;
+  transform-origin: left top; 
+  transform: rotate(0deg) scale(1, 1);
+}
+.Line2 {
+  margin-top: -10px;
+  border-style: solid;
+  border-color: #c9c9c9;
+  border-width: 10px 0 0 0;
+  width: 100%; 
+  height: 0px; 
+  position: absolute;
+  left: 0; 
+  top: 262px;
+  transform-origin: left top; 
+  transform: rotate(0deg) scale(1, 1);  
+}
+.Logo {
+  width: 160px;
+  height: 160px;
+  position: absolute;
+  left: 160px;
+  top: 15px;
+  object-fit: cover;
+}
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.zoom-in {
+  animation: zoomIn 0.8s ease-out forwards;
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes fadeInZoom {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.slide-in {
+  animation: slideIn 0.8s ease-out forwards;
+}
+/* ALUMNI TEXT */
+.a-l-u-m-n-i {
+  color: #000000;
+  text-align: left;
+  font-size: 100px;
+  font-weight: 400;
+  position: absolute;
+  left: 330px;
+  top: 70px;
+  -webkit-text-stroke: 3px #ffffff;
+  font-family: 'Alegreya', serif;
+}
+.a-l-u-m-n-i-span,
+.a-l-u-m-n-i-span2 {
+  font-family: 'Alegreya', serif;
+  font-weight: 700;
+}
+
+.technological-university-of-the-philippines-cavite {
+  color: white; 
+  text-align: center; 
+  font-family: "Alegreya-Medium", serif;
+  font-size: 50px;
+  font-weight: 500;
+  position: absolute;
+  left: 55%;
+  top: 37px;
+  transform: translateX(-50%); 
+  width: max-content;
+  -webkit-text-stroke: 1px #ffffff; 
+}
+/* BUTTONS */
+.career-button,
+.event-button,
+.gallery-button,
+.id-button {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  align-items: center;
+  justify-content: center;
+  width: 0px;
+  height: 50px;
+  position: absolute;
+  z-index: 999;
+}
+.career-button { left: 1090px; top: 200px; }
+.event-button { left: 1190px; top: 200px; }
+.gallery-button { left: 1290px; top: 200px; }
+.id-button { left: 1410px; top: 200px; }
+
+
+/* BUTTON CONTENT */
+.content {
+  background: rgba(255, 255, 255, 0);
+  border-radius: 100px;
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.state-layer {
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+/* HOVER UNDERLINE EFFECT FOR BUTTON LABELS */
+.hover-underline1 {
+  font-family: 'Albert Sans', serif;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: #000000; 
+}
+.hover-underline2 {
+  font-family: 'Albert Sans', serif;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+}
+.hover-underline1::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #990000;
+  transition: width 0.3s ease-in-out;
+}
+.hover-underline2::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #000000; 
+  transition: width 0.3s ease-in-out;
+}
+/* Hover = grow underline from left to right */
+.career-button:hover .hover-underline1::after,
+.event-button:hover .hover-underline1::after,
+.gallery-button:hover .hover-underline1::after,
+.id-button:hover .hover-underline1::after,
+.Sign-out-button:hover .hover-underline1::after{
+  width: 100%;
+}
+.career-button:hover .hover-underline2::after,
+.event-button:hover .hover-underline2::after,
+.gallery-button:hover .hover-underline2::after,
+.id-button:hover .hover-underline2::after,
+.Sign-out-button:hover .hover-underline2::after {
+  width: 100%;
+}
+#signOutBtn {
+  position: relative;   /* or absolute, depending on need */
+  top: 195px;         /* adjust this */
+  left: 1750px;       /* adjust this */
+  background-color: #e74d3c00;
+  font-size: 15px;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 999;      /* make sure it's on top */
+}
+#signOutBtn:hover .hover-underline1::after  {
+  width: 100%;
+}
+#signOutBtn:hover .hover-underline2::after {
+  width: 100%;
+}
+.school-name {
+  font-family: 'Alegreya', serif;
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 0px;
+}
+.event-title {
+  font-family: 'Alegreya', serif;
+  font-size: 60px;
+  font-weight: 700;
+  margin: 0 0 15px;
+}
+.event-title span {
+  font-family: 'Alegreya', sans-serif;
+  font-weight: 600;
+  font-size: 40px;
+}
+.description {
+  font-family: 'Sanchez', serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.6;
+  color: #111;
+}
+.Grad1 {
+  height: 660px;
+  position: relative;
+  object-fit: cover;
+  aspect-ratio: 3/2;
+}
+.commencement-description {
+  position: absolute;
+  top: 850px;
+  left: 85px;
+  max-width: 990px;
+  margin: 45px auto;
+  text-align: left;
+  font-family: 'Albert Sans', serif;
+  padding: 0 20px;
+}
+/* Slideshow Styles */
+.slideshow-container {
+  position: absolute;
+  top: 250px;
+  left: 100px;
+  width: 1000px;
+  height: 700px;
+  margin: 20px auto;
+  overflow: hidden;
+}
+.slideshow-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 990px;
+  height: 660px;
+  object-fit: cover; 
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.slideshow-image.active {
+  opacity: 1;
+  z-index: 1;
+}
+/* === Text Heading === */
+.career-selection {
+  color: #990000;
+  text-align: left;
+  position: absolute;
+  left: 100px;
+  top: 150px;
+  -webkit-text-stroke: 1px #000000;
+}
+.career-selection-span {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.career-selection-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 40px;
+  font-weight: 700;
+}
+/* === Bottom Line === */
+.Line1-1 {
+  border-top: 5px solid #000;
+  width: 515px;
+  position: absolute;
+  left: 40px;
+  top: 220px;
+}
+
+/* === Select Button Style === */
+.select {
+  background: #d8d8d8;
+  border-radius: 8px;
+  border: 3px solid #000000;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-decoration: none;
+  color: inherit;
+}
+.select:hover {
+  background: #808080;
+}
+
+.value {
+  color: #000000;
+  text-decoration: none;
+  font-family: "Albert Sans", serif;
+  font-size: 20px;
+  line-height: 100%;
+  font-weight: 400;
+  text-align: center;
+  flex: 1;
+}
+.hover-underline3 {
+  font-family: 'sanchez', serif;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff; 
+}
+.hover-underline3::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #000000;
+  transition: width 0.3s ease-in-out;
+}
+.hover-underline3:hover::after {
+  width: 100%;
+}
+.login-selection {
+  color: #990000;
+  text-align: left;
+  position: absolute;
+  left: 220px; top: 150px;
+  -webkit-text-stroke: 1px #000000;
+}
+.login-selection-span {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.login-selection-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 40px;
+  font-weight: 700;
+}
+.navbar1 {
+  background: linear-gradient(-69.27deg, rgba(136, 35, 35, 1) 50%, rgba(55, 55, 55, 1) 50%);
+  width: 600px;
+  height: 70px;
+  position: absolute;
+  border-top: 0px;
+  top: 0;
+  left: 0;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.25);
+}
+.contact-section {
+  position: absolute;
+  display: flex;
+  background-color: #882323;
+  height: 150px;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 2s ease-out, transform 2s ease-out;
+}
+.contact-section.slide-up {
+  opacity: 2;
+}
+.contact-section.slide-down {
+  opacity: 0;
+}
+#loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.loader-content {
+  text-align: center;
+  font-family: 'Alegraya', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #882323;
+  -webkit-text-stroke: 1px #000000;
+}
+.loading-span {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.loading-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 40px;
+  font-weight: 700;
+}
+.progress-container {
+  width: 300px;
+  height: 20px;
+  background: #ddd;
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #990000;
+  transition: width 0.2s ease;
+}
+.percentage {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #000;
+}
+.footer-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+.fb-wrapper, .fb-wrapper2 {
+  position: absolute;
+  border: 3px solid#ddd;
+  top: 270px;
+  left: 1100px; /* adjust as needed */
+  z-index: 10;
+}
+.fb-wrapper2 {
+  left: 1450px; /* adjust as needed */
+}
+.fb-page {          
+  width: 340px !important;     
+  height: 500px !important;   
+  border: 2px solid #ccc; 
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  z-index: 1000;
+  
+}
+.fb-xfbml-parse-ignore {
+  display: block;
+  font-family: 'Albert Sans', sans-serif;
+  text-align: center;
+  color: #333;
+}
+.admin-db-button {
+  position: absolute;
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.admin-db-button:hover {
+  background-color: #b30000;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.popup-content {
+  background: #ffffff;
+  width: 620px;
+  height: 460px;
+  position: absolute;
+  top: 20%;
+  left: 35%;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: fadeInZoom 0.5s ease-in-out;
+}
+.label-first-name {
+  font-family: 'Albert Sans', serif;
+  position: absolute;
+  top: 250px;
+  left: 30px;
+}
+.label-last-name {
+  font-family: 'Albert Sans', serif;
+  position: absolute;
+  top: 290px;
+  left: 30px;
+}
+.label-interest {
+  font-family: 'Albert Sans', serif;
+  position: absolute;
+  top: 330px;
+  left: 30px;
+}
+.label-employment {
+  font-family: 'Albert Sans', serif;
+  position: absolute;
+  top: 370px;
+  left: 30px;
+}
+/* First Name */
+.input-first-name {
+  position: absolute;
+  top: 245px;
+  left: 120px;
+  width: 250px;
+  padding: 6px;
+}
+/* Last Name */
+.input-last-name {
+  position: absolute;
+  top: 285px;
+  left: 120px;
+  width: 250px;
+  padding: 6px;
+}
+/* Are you interested? */
+.select-interest {
+  position: absolute;
+  top: 325px;
+  left: 185px;
+  width: 250px;
+  padding: 6px;
+}
+/* Employment status */
+.select-employment {
+  position: absolute;
+  top: 365px;
+  left: 345px;
+  width: 250px;
+  padding: 6px;
+}
+/* === Career Button Style === */
+.career-btn1 {
+  position: absolute;
+  top: 400px;
+  left: 20px;
+  width: 20%;
+  padding: 12px;
+  background-color: #cacaca;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: 'Albert Sans', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  text-align: center;
+}
+/* === Hover Effect: gray to red === */
+.career-btn1:hover {
+  background-color: #a94444; /* lighter red */
+}
+/* === Career Button Style === */
+.career-btn2 {
+  position: absolute;
+  top: 400px;
+  left: 150px;
+  width: 20%;
+  padding: 12px;
+  background-color: #cacaca;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: 'Albert Sans', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  text-align: center;
+}
+/* === Hover Effect: gray to red === */
+.career-btn2:hover {
+  background-color: #a94444; /* lighter red */
+}
+.navbar {
+  background: linear-gradient(-69.27deg, rgba(136, 35, 35, 1) 50%, rgba(55, 55, 55, 1) 50%);
+  width: 100%;
+  height: 70px;
+  position: absolute;
+  border-top: 0px;
+  top: 0;
+  left: 0;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.25);
+}
+.navbar-logo img {
+  height: 50px;
+  margin-right: 15px;
+}
+.navbar-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-family: 'Georgia', serif;
+  letter-spacing: 1px;
+}
+.Logo2 {
+  width: 130px;
+  height: 150px;
+  position: absolute;
+  left: 240px;
+  top: 10px;
+  object-fit: cover;
+}
+.Logo3 {
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  left: 255px;
+  top: 20px;
+  object-fit: cover;
+}
+.Line1-1 {
+  border-top: 5px solid #000;
+  width: 450px;
+  position: absolute;
+  left: 90px;
+  top: 225px;
+}
+
+
+.notification-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.notification-box {
+  top: 20px;
+  right: 20px;
+  background: #28a745;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0);
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.notification-box .notification-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.notification-box .notification-message {
+  font-size: 16px;
+  color: #ffffff;
+  margin-top: 10px;
+}
+
+
+/* === Popup Overlay === */
+.ID-popup-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none; /* Hidden by default */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* === Modal Content Box === */
+.ID-popup-content {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 10px;
+  width: 500px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: fadeInZoom 0.3s ease-in-out;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* === Header Title === */
+#idRequestPopup .id-selection {
+  font-family: 'Alegreya', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: maroon;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* === Optional Span Titles (like Career Response) === */
+#idRequestPopup .id-selection-span {
+  font-size: 26px;
+  color: #333;
+  font-weight: bold;
+  display: inline-block;
+}
+
+#idRequestPopup .id-selection-span2 {
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+/* === Form Elements === */
+#idRequestPopup label {
+  font-family: 'Albert Sans', sans-serif;
+  font-weight: 600;
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 5px;
+}
+
+#idRequestPopup input,
+#idRequestPopup select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+/* === Buttons === */
+#idRequestPopup .popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+#idRequestPopup .id-btn1,
+#idRequestPopup .id-btn2 {
+  flex: 1;
+  padding: 10px 0;
+  margin-right: 10px;
+  background-color: maroon;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-family: 'Albert Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#idRequestPopup .id-btn2 {
+  background-color: #999;
+  margin-right: 0;
+}
+
+#idRequestPopup .id-btn1:hover {
+  background-color: darkred;
+}
+
+#idRequestPopup .id-btn2:hover {
+  background-color: #555;
+}
+
+/* === Fade Animation === */
+@keyframes fadeInZoom {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.popup-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.popup-message.error {
+  background: #F44336;
+}
+
+.popup-message.show {
+  opacity: 1;
+}
+
+
+
+.announcement-box {
+  position: absolute;
+  text-align: justify;
+  font-size: small;
+  top: 1305px;
+  left: 1450px;
+  z-index: 10;
+  border: 3px solid #ccc;
+  border-radius: 1px;
+  padding: 10px;
+  background: #fff;
+  max-width: 450px;
+}
+
+.announcement-list {
+  max-height: 420px;
+  height: 500px;
+  box-shadow: #000;
+  width: 316px; /* adjust this height */
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.announcement-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.announcement-list::-webkit-scrollbar-thumb {
+  background: crimson;
+  border-radius: 5px;
+}
+
+.event-card {
+  border-bottom: 1px solid #ddd;
+  padding: 5px 0;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.event-header {
+  font-size: 0.75rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  background: crimson;
+  color: white;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.event-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+.announcement-box2 {
+  position: absolute;
+  top: 790px;
+  left: 1450px;
+  z-index: 10;
+  border: 3px solid #ccc;
+  border-radius: 1px;
+  padding: 10px;
+  background: #fff;
+  max-width: 450px;
+}
+
+.announcement-list {
+  max-height: 420px;
+    height: 500px;
+  box-shadow: #000;
+  width: 316px; /* adjust this height */
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.announcement-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.announcement-list::-webkit-scrollbar-thumb {
+  background: crimson;
+  border-radius: 5px;
+}
+
+.event-card {
+  border-bottom: 1px solid #ddd;
+  padding: 5px 0;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.event-header {
+  font-size: 0.75rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+}
+
+.badge {
+  background: crimson;
+  color: white;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.event-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+.career-box {
+  position: absolute;
+  top: 790px;
+  left: 1100px;
+  z-index: 10;
+  border: 3px solid #ccc;
+  border-radius: 1px;
+  padding: 10px;
+  background: #fff;
+  max-width: 450px;
+}
+
+.career-list {
+  max-height: 420px;
+    height: 500px;
+  box-shadow: #000;
+  width: 316px; /* adjust this height */
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.career-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.career-list::-webkit-scrollbar-thumb {
+  background: #e91e63;
+  border-radius: 5px;
+}
+
+.career-card {
+  border-bottom: 1px solid #ddd;
+  padding: 5px 0;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.career-header {
+  font-size: 0.75rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+}
+
+.career-badge {
+  background: #e91e63;
+  color: white;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.career-title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+.career-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.career-list::-webkit-scrollbar-thumb {
+  background: #e91e63;
+  border-radius: 5px;
+}
+.post-btn {
+  background: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.post-btn:hover {
+  background: #0056b3;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.close-btn {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+.modal-title {
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.modal-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.modal-form input,
+.modal-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.submit-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 15px;
+  width: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.submit-btn:hover {
+  background: #218838;
+}
+
+.result-message {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+}

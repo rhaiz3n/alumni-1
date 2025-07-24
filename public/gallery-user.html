@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF‑8" />
+  <meta name="viewport" content="width=device-width, initial‑scale=1.0"/>
+  <title>Event Gallery</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <link rel="stylesheet" href="gallery-user.css" />
+</head>
+<body>
+  <div class="eventpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="user-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" id="backBtn">BACK</button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">G</span>
+      <span class="a-l-u-m-n-i-span2">A L L E R Y</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="marquee" id="marquee"></div>
+      <div class="buttons">
+        <button id="prev"><i class="fa-solid fa-angle-left"></i></button>
+        <button id="next"><i class="fa-solid fa-angle-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="descModal" class="modal">
+      <div class="modal-content">
+        <span id="closeDesc" class="close-btn"></span>
+        <div id="modalTitle" style="font-weight:bold; margin-bottom:10px;"></div>
+        <img id="modalImg" src="" alt="Preview">
+      </div>
+    </div>
+
+    <div class="contact-section">
+      </a>
+    </div>
+
+<script>
+let scrollPos = 0, scrollSpeed = 1, ticker;
+
+async function loadGallery() {
+  try {
+    const res = await fetch('/api/gallery');
+    if (!res.ok) throw new Error(await res.text());
+    const { items } = await res.json();
+    const marquee = document.getElementById('marquee');
+    marquee.innerHTML = '';
+
+    // Duplicate list for seamless scroll effect
+    [...items, ...items].forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'marq-item';
+      div.style.backgroundImage = `url('${item.image}')`;
+      div.dataset.img = item.image;
+      div.dataset.title = item.title;
+      marquee.appendChild(div);
+    });
+
+    setupModal();
+  } catch (err) {
+    console.error('❌ Failed to load gallery:', err.message);
+  }
+}
+
+function setupModal() {
+  document.querySelectorAll('.info-btn').forEach(btn => {
+    btn.onclick = () => {
+      const parent = btn.closest('.marq-item');
+      document.getElementById('modalTitle').textContent = parent.dataset.title;
+      document.getElementById('modalImg').src = parent.dataset.img;
+      document.getElementById('descModal').style.display = 'flex';
+    };
+  });
+
+  document.getElementById('closeDesc').onclick = () =>
+    document.getElementById('descModal').style.display = 'none';
+
+  document.getElementById('descModal').onclick = e => {
+    if (e.target.id === 'descModal') e.target.style.display = 'none';
+  };
+}
+
+function startScroll() {
+  const marquee = document.getElementById('marquee');
+  cancelAnimationFrame(ticker);
+  function step() {
+    scrollPos += scrollSpeed;
+    if (scrollPos >= marquee.scrollWidth / 2) scrollPos = 0;
+    marquee.style.transform = `translateX(-${scrollPos}px)`;
+    ticker = requestAnimationFrame(step);
+  }
+  ticker = requestAnimationFrame(step);
+}
+
+document.getElementById('next').onclick = () => scrollPos += 596;
+document.getElementById('prev').onclick = () => scrollPos = Math.max(0, scrollPos - 596);
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadGallery().then(startScroll);
+});
+
+// 🔄 Contact section animation
+document.addEventListener("DOMContentLoaded", function () {
+  const contactSection = document.querySelector('.contact-section');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      contactSection.classList.toggle('slide-up', entry.isIntersecting);
+      contactSection.classList.toggle('slide-down', !entry.isIntersecting);
+    });
+  }, { threshold: 0.1 });
+  observer.observe(contactSection);
+});
+
+// 🔙 Smart back button
+document.getElementById('backBtn').addEventListener('click', () => {
+  const from = new URLSearchParams(window.location.search).get('from');
+  if (from === 'homepage.html' || from === 'user-homepage.html') {
+    window.location.href = from;
+  } else {
+    window.history.back();
+  }
+});
+</script>
+</body>
+</html>

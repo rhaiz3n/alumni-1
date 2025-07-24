@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RESPONSE | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="jobs-response.css" />
+</head>
+<body>
+  <div class="jobsresponsepage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">S</span>
+      <span class="a-l-u-m-n-i-span2">t a t u s</span>
+      <span class="d-a-t-a-b-a-s-e-span">S</span>
+      <span class="d-a-t-a-b-a-s-e-span2">U R V E Y</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+  <button id="printTableBtn">🖨️ Print Table</button>
+  <input type="text" id="searchInput" placeholder="Search..." />
+
+  <select id="pageSelect"></select>
+
+  <table id="responseTable" border="1">
+    <thead>
+      <tr>
+        <th>First Name</th><th>Last Name</th>
+        <th>Interested</th><th>Employment Status</th>
+        <th>Date Submitted</th>
+      </tr>
+    </thead>
+    <tbody id="careerTableBody"></tbody>
+  </table>
+
+  <script src="jobs-response.js"></script>
+
+<script>
+const tbody = document.querySelector('#responseTable tbody');
+const pageSelect = document.getElementById('pageSelect');
+const printBtn = document.getElementById('printTableBtn');
+const searchInput = document.getElementById('searchInput');
+
+const ROWS_PER_PAGE = 100;
+let currentPage = 1;
+let totalPages = 1;
+
+// 🖨️ Print the table
+printBtn.addEventListener('click', () => window.print());
+
+// 🔁 Page select dropdown
+pageSelect.addEventListener('change', () =>
+  loadPage(+pageSelect.value, searchInput.value.trim())
+);
+
+// 🔎 Search input
+searchInput.addEventListener('input', () =>
+  loadPage(1, searchInput.value.trim())
+);
+
+// 📥 Load and display paginated data
+async function loadPage(page = 1, search = '') {
+  currentPage = page;
+  const url = `/api/responses?page=${page}&limit=${ROWS_PER_PAGE}&search=${encodeURIComponent(search)}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(await res.text());
+    const { rows, totalPages: tp } = await res.json();
+    totalPages = tp;
+
+    // Render each row
+    tbody.innerHTML = '';
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      ['firstName', 'lastName', 'interested', 'employmentStatus', 'dateSubmitted'].forEach(key => {
+        const td = document.createElement('td');
+        if (key === 'dateSubmitted' && r[key]) {
+          const date = new Date(r[key]);
+          td.textContent = date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: '2-digit',
+            year: 'numeric'
+          }).toUpperCase(); // Example: JULY 23, 2025
+        } else {
+          td.textContent = r[key] || '';
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    // 🔁 Pagination dropdown
+    pageSelect.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `Page ${i}`;
+      if (i === currentPage) opt.selected = true;
+      pageSelect.appendChild(opt);
+    }
+  } catch (err) {
+    console.error('Error loading page:', err);
+    alert('❌ Failed to load data.');
+  }
+}
+
+// 🚀 Initial load
+window.addEventListener('DOMContentLoaded', () => loadPage());
+
+// ⏳ Loader animation
+document.addEventListener("DOMContentLoaded", () => {
+  let percentage = 80;
+  const loaderWrapper = document.getElementById("loader-wrapper");
+  const progressBar = document.getElementById("progress-bar");
+  const percentageText = document.getElementById("percentage");
+
+  const loadingInterval = setInterval(() => {
+    if (percentage < 100) {
+      percentage++;
+      progressBar.style.width = percentage + "%";
+      percentageText.textContent = percentage + "%";
+    } else {
+      clearInterval(loadingInterval);
+      loaderWrapper.style.display = "none";
+    }
+  }, 30);
+});
+
+// 🛡️ Admin page protection
+const role = sessionStorage.getItem('userRole');
+if (role !== 'admin') {
+  window.location.href = 'homepage.html';
+}
+</script>
+</body>
+</html>

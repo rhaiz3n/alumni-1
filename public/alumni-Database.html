@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALUMNI LIST | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <link rel="stylesheet" href="alumni-Database.css" />
+</head>
+<body>
+  <div class="alumnidatabasepage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">A</span>
+      <span class="a-l-u-m-n-i-span2">l u m n i</span>
+      <span class="d-a-t-a-b-a-s-e-span">D</span>
+      <span class="d-a-t-a-b-a-s-e-span2">A T A B A S E</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+
+    <button id="openModal">➕ Add Alumni</button>
+    <button id="printTableBtn">🖨️ Print Table</button>
+    <input type="text" id="searchInput" placeholder="Search..." />
+
+    <div id="excelDropZone" class="excel-drop-zone">
+      <p><strong style="color: #ffffff;">Drop your Excel file here</strong></p>
+    </div>
+
+    <select id="pageSelect"></select>
+
+    <table id="alumniTable" border="0" cellspacing="0" cellpadding="0">
+      <thead>
+        <tr>
+          <th>FIRST NAME</th><th>LAST NAME</th><th>INITIAL</th><th>SUFFIX</th>
+          <th>DATE OF BIRTH</th><th>GENDER</th>
+          <th>PHONE No</th><th>MAJOR</th><th>YEAR STARTED</th><th>GRADUATED</th>
+          <th>STUDENT No.</th>
+        </tr>
+      </thead>
+        <tbody id="alumniTbody"></tbody>
+    </table>
+
+    <div id="modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>Add Alumni Information</h2>
+        <form id="alumniForm">
+            <input id="firstName" placeholder="First Name" required />
+            <input id="lastName" placeholder="Last Name" required />
+            <input id="initial" placeholder="Initial" />
+            <input id="suffix" placeholder="Suffix" />
+            <input id="dateBirth" type="date" placeholder="Date of Birth" required />
+            <input id="gender" placeholder="Gender" />
+            <input id="phoneNo" placeholder="Phone No" />
+            <input id="major" placeholder="Major" required />
+            <input id="yearStarted" placeholder="Year Started" required />
+            <input id="graduated" placeholder="Graduated" required />
+            <input id="studentNo" placeholder="Student No." />
+          <button type="submit" class="submit-btn">Submit</button>
+          <button type="button" onclick="closeModal()" class="cancel-btn">Cancel</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal        = document.getElementById('modal');
+  const tbody        = document.querySelector('#alumniTable tbody');
+  const pageSelect   = document.getElementById('pageSelect');
+  const printBtn     = document.getElementById('printTableBtn');
+  const openBtn      = document.getElementById('openModal');
+  const searchInput  = document.getElementById('searchInput');
+  const loader       = document.getElementById('loader-wrapper');
+  const bar          = document.getElementById('progress-bar');
+  const pctEl        = document.getElementById('percentage');
+  const dz           = document.getElementById('excelDropZone');
+  const toast        = document.getElementById('toast');
+
+  const FIELDS = ['firstName', 'lastName', 'initial', 'suffix', 'dateBirth', 'gender', 'phoneNo', 'major', 'yearStarted', 'graduated', 'studentNo'];
+  const ROWS_PER_PAGE = 100;
+  let currentPage = 1, totalPages = 1;
+
+  // 🔐 Access Control
+  if (sessionStorage.getItem('userRole') !== 'admin') {
+    window.location.href = 'homepage.html';
+  }
+
+  // Loader bar animation
+  (() => {
+    let pct = 80;
+    const iv = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        bar.style.width = pct + '%';
+        pctEl.textContent = pct + '%';
+      } else {
+        clearInterval(iv);
+        loader.style.display = 'none';
+      }
+    }, 30);
+  })();
+
+  openBtn.onclick = () => modal.style.display = 'block';
+  window.closeModal = () => {
+    modal.style.display = 'none';
+    modal.querySelectorAll('input').forEach(i => i.value = '');
+  };
+
+document.getElementById('alumniForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const payload = {};
+  FIELDS.forEach(id => {
+    let val = document.getElementById(id).value.trim();
+    if (id === 'dateBirth' && val) {
+      // Keep the date in YYYY-MM-DD format for the backend
+      const d = new Date(val);
+      if (!isNaN(d)) {
+        // Format as YYYY-MM-DD for MySQL
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        val = `${year}-${month}-${day}`;
+      }
+    }
+    payload[id] = val;
+  });
+
+  try {
+    const res = await fetch('/api/alumni', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Failed to save');
+    showToast('✅ Saved successfully!');
+    e.target.reset();
+    closeModal();
+    loadPage(1, searchInput.value.trim());
+  } catch (err) {
+    showToast('❌ ' + err.message, 'error');
+  }
+};
+
+  printBtn.onclick = () => window.print();
+  pageSelect.onchange = () => loadPage(+pageSelect.value, searchInput.value.trim());
+  searchInput.oninput = () => loadPage(1, searchInput.value.trim());
+
+  async function loadPage(page = 1, search = '') {
+    currentPage = page;
+    try {
+      const res = await fetch(`/api/alumni?page=${page}&limit=${ROWS_PER_PAGE}&search=${encodeURIComponent(search)}`);
+      const { rows, totalPages: tp } = await res.json();
+      totalPages = tp;
+      tbody.innerHTML = '';
+      rows.reverse().forEach(r => {
+        const tr = document.createElement('tr');
+        FIELDS.forEach(k => {
+          const td = document.createElement('td');
+          let displayValue = r[k] || '';
+          
+          // Format date for display
+          if (k === 'dateBirth' && displayValue) {
+            try {
+              const date = new Date(displayValue);
+              if (!isNaN(date.getTime())) {
+                displayValue = date.toLocaleDateString('en-US', { 
+                  month: 'long', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                });
+              }
+            } catch (e) {
+              // Keep original value if date parsing fails
+              console.log('Date parsing failed for:', displayValue);
+            }
+          }
+          
+          td.textContent = displayValue;
+          tr.appendChild(td);
+        });
+        tbody.prepend(tr);
+      });
+
+      pageSelect.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Page ${i}`;
+        if (i === currentPage) opt.selected = true;
+        pageSelect.appendChild(opt);
+      }
+    } catch (err) {
+      console.error('❌ Load failed:', err);
+      alert('Failed to load data.');
+    }
+  }
+
+  dz.addEventListener('dragover', e => {
+    e.preventDefault();
+    dz.style.background = '#ccc';
+  });
+  dz.addEventListener('dragleave', e => {
+    e.preventDefault();
+    dz.style.background = '';
+  });
+  dz.addEventListener('drop', async e => {
+    e.preventDefault();
+    dz.style.background = '';
+    const file = e.dataTransfer.files[0];
+    if (!file?.name.match(/\.(xlsx|xls)$/i)) return alert('Not an Excel file');
+
+    const form = new FormData();
+    form.append('file', file);
+
+    try {
+      const res = await fetch('/api/alumni/upload-excel', {
+        method: 'POST',
+        body: form
+      });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || 'Failed upload');
+      showToast(`✅ Inserted ${j.inserted} rows!`);
+      loadPage(1, searchInput.value.trim());
+    } catch (err) {
+      showToast('❌ Upload error: ' + err.message, 'error');
+    }
+  });
+
+  function showToast(message, type = 'success') {
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+    setTimeout(() => {
+      toast.className = 'toast';
+    }, 3000);
+  }
+
+  loadPage();
+});
+</script>
+</body>
+</html>

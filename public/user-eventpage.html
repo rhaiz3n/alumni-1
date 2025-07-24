@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVENT | TUP - Cavite</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Font Awesome for Social Media Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="user-eventpage.css" />
+</head>
+<body>
+  <div class="eventpage">
+    <img class="Navbar" src="Navbar.png" />
+    <div class="Line1"></div>
+    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+    
+    <a href="user-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
+    <button class="back-button" onclick="location.href='user-homepage.html'"><span class="underline-slide">BACK</span></button>
+    
+    <div class="a-l-u-m-n-i slide-in">
+      <span class="a-l-u-m-n-i-span">A</span>
+      <span class="a-l-u-m-n-i-span2">l u m n i</span>
+      <span class="d-a-t-a-b-a-s-e-span">E</span>
+      <span class="d-a-t-a-b-a-s-e-span2">V E N T</span>
+    </div>
+
+    <div id="loader-wrapper">
+      <div class="loader-content">
+          <span class="loading-span">T</span>
+          <span class="loading-span2">ECHNOLOGICAL</span>
+          <span class="loading-span">U</span>
+          <span class="loading-span2">NIVERSITY OF THE</span>
+          <span class="loading-span">P</span>
+          <span class="loading-span2">HILIPPINES - </span>
+          <span class="loading-span">C</span>
+          <span class="loading-span2">AVITE</span>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="percentage" id="percentage">0%</div>
+        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+    </div>
+    
+    <section class="event-section">
+        <h2>UPCOMING EVENTS</h2>
+        <div id="eventsGrid" class="card-grid">Loading events…</div>
+    </section>
+
+    <div id="descModal" class="modal" style="display:none;">
+        <div class="modal-content">
+        <div class="navbar"></div>
+            <img class="Logo2" src="Logo2.png" alt="TUPC Logo" />
+            <div class="event-selection">
+            <span class="event-selection-span">E</span>
+            <span class="event-selection-span2">VENT</span>
+            <span class="event-selection-span">D</span>
+            <span class="event-selection-span2">ESCRIPTION</span>
+            </div>
+            <div class="Line1-1"></div>
+            <div class="event-selection2"></div>
+        <span class="close-btn" id="descClose">&times;</span>
+        <p id="descText"></p>
+        </div>
+    </div>
+
+     <!-- Trigger Button -->
+    <button id="openCategoryBtn" disabled></button>
+
+    <!-- Overlay for dimming background -->
+    <div class="toast-overlay" id="warnOverlay"></div>
+
+    <!-- Toast popup -->
+    <div class="career-warning" id="warnToast">
+      <div class="toast-header info">
+        <span class="toast-title">🎉 Choose Event Category</span>
+      </div>
+      <div class="toast-content">
+        <p>Please select the type of event you'd like to explore:</p>
+        <button class="toast-button" id="btnHomecoming">HOME COMING EVENT</button>
+        <button class="toast-button" id="btnSportfest">SPORT FEST</button>
+      </div>
+    </div>
+
+    <!-- Homecoming Modal Form -->
+    
+    <div id="homecomingModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="homecomingClose">&times;</span>
+        <h2>Homecoming Registration</h2>
+        <form id="homecomingForm" enctype="multipart/form-data">
+          <input type="text" name="firstName" placeholder="First Name" required />
+          <input type="text" name="middleInitial" placeholder="Middle Initial" maxlength="1" />
+          <input type="text" name="lastName" placeholder="Last Name" required />
+
+          <label>Sex:</label>
+          <label><input type="radio" name="sex" value="Male" required /> Male</label>
+          <label><input type="radio" name="sex" value="Female" /> Female</label>
+          <label><input type="radio" name="sex" value="Other" /> Other</label>
+
+          <label>Program:</label>
+          <select name="program" required>
+            <option value="" disabled selected>Select Program</option>
+            <option value="BET">BET</option>
+            <option value="BTVTED">BTVTED</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <input type="number" name="yearGraduated" placeholder="Year Graduated" required min="1900" max="2099" />
+
+          <hr />
+          <label>Add-on Options: Gcash No.:09********* "AL**NI"</label>
+          <label><input type="radio" name="addon" value="100 drinks" required /> ₱100 – Additional four (4) drinks</label>
+          <label><input type="radio" name="addon" value="500 drinks" /> ₱500 – Additional unlimited drinks</label>
+          <label><input type="radio" name="addon" value="no addon" /> I do not want an add-on</label>
+
+          <label>Upload a screenshot of the receipt of payment</label>
+          <input type="file" name="receipt" accept="image/png, image/jpeg" required />
+
+          <button type="submit" class="toast-button">REGISTER</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="mensBasketballPopup" class="popup-success">
+      🎉 Registration successful!
+    </div>
+
+    <div id="successPopup" class="popup-success">
+      🎉 Registration successful!
+    </div>
+
+    <div id="sportfestPopup" class="popup-success">
+      🎉 Registration successful!
+    </div>
+
+    <div id="playerLimitToast" class="toast-popup">Max 20 players reached!</div>
+    
+    <!-- Sport Fest Modal -->
+    <div id="sportfestModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="sportfestClose">&times;</span>
+        <h2>Sport Fest Registration</h2>
+        <form id="sportfestForm">
+          <label>Sport Type:</label>
+          <select id="sportType" name="sportType" required>
+            <option value="" disabled selected>Select Sport</option>
+            <option value="mensBasketball">Men's Basketball</option>
+            <option value="womensVolleyball">Women's Volleyball</option>
+            <option value="mensVolleyball">Men's Volleyball</option>
+            <option value="chess">Chess</option>
+            <option value="darts">Darts</option>
+          </select>
+          <div id="dynamicFields"></div>
+          <button type="submit" class="toast-button">SUBMIT</button>
+        </form>
+      </div>
+    </div>
+    
+
+<script>
+  // 🔘 Modal & Button Elements
+  const openCatBtn = document.getElementById('openCategoryBtn');
+  const toastOverlay = document.getElementById('warnOverlay');
+  const toast = document.getElementById('warnToast');
+  const btnHomecoming = document.getElementById('btnHomecoming');
+  const btnSportfest = document.getElementById('btnSportfest');
+  const homecomingModal = document.getElementById('homecomingModal');
+  const sportfestModal = document.getElementById('sportfestModal');
+  const homecomingClose = document.getElementById('homecomingClose');
+  const sportfestClose = document.getElementById('sportfestClose');
+
+  // 🔘 Event: Category Selector Open
+  openCatBtn.addEventListener('click', () => {
+    toastOverlay.style.display = 'block';
+    toast.style.display = 'block';
+  });
+
+  // 🔘 Event: Show Homecoming Modal
+  btnHomecoming.addEventListener('click', () => {
+    toastOverlay.style.display = 'none';
+    toast.style.display = 'none';
+    homecomingModal.style.display = 'flex';
+  });
+
+  // 🔘 Event: Show Sportfest Modal
+  btnSportfest.addEventListener('click', () => {
+    toastOverlay.style.display = 'none';
+    toast.style.display = 'none';
+    sportfestModal.style.display = 'flex';
+  });
+
+  // 🔘 Close buttons
+  homecomingClose.addEventListener('click', () => {
+    homecomingModal.style.display = 'none';
+  });
+
+  sportfestClose.addEventListener('click', () => {
+    sportfestModal.style.display = 'none';
+  });
+
+  // 🔘 Overlay click closes all modals
+  toastOverlay.addEventListener('click', () => {
+    toastOverlay.style.display = 'none';
+    toast.style.display = 'none';
+    homecomingModal.style.display = 'none';
+    sportfestModal.style.display = 'none';
+  });
+
+  // 🏀 Sport Fest Dynamic Fields
+  // 🔘 Sport Fest Dynamic Fields with Global Counter
+  let count = 0;
+
+  const sportType = document.getElementById('sportType');
+  const dynamicFields = document.getElementById('dynamicFields');
+
+  sportType.addEventListener('change', () => {
+    dynamicFields.innerHTML = '';
+    count = 0;
+
+    const v = sportType.value;
+    const input = (name, ph) => `<div><input type="text" name="${name}" placeholder="${ph}" required /></div>`;
+    let html = '';
+
+    if (v === 'mensBasketball') {
+      html += input('teamName', 'Team Name') +
+        `<label>Age Range:</label><select name="ageRange" required>
+          <option>1985–1995</option><option>1996–2015</option><option>2016–2025</option>
+        </select>
+        <p>(Min 10, Max 20 players – fill blanks with NA)</p>
+        <div id="playersContainer"></div>
+        <button type="button" id="addPlayerBtn">Add Player</button>`;
+    } else {
+      html += input('firstName', 'First Name') +
+        input('middleInitial', 'Middle Initial') +
+        input('lastName', 'Last Name') +
+        `<label>Sex</label><select name="sex" required>
+          <option>Male</option><option>Female</option><option>Other</option>
+        </select>` +
+        input('extension', 'Extension (Jr, III, etc)') +
+        input('batch', 'Batch/Year Graduated');
+    }
+
+    dynamicFields.innerHTML = html;
+
+    const playersDiv = document.getElementById('playersContainer');
+    const addBtn = document.getElementById('addPlayerBtn');
+
+    if (addBtn) {
+      addBtn.onclick = () => {
+        if (count >= 20) {
+          showPlayerLimitToast();
+          return;
+        }
+        count++;
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>Player No.${count}${count === 1 ? ' (Rep)' : ''}</strong>
+          ${input(`player${count}_fname`, 'First Name')}
+          ${input(`player${count}_mi`, 'MI')}
+          ${input(`player${count}_lname`, 'Last Name')}`;
+        playersDiv.appendChild(div);
+      };
+    }
+  });
+
+  function showPlayerLimitToast() {
+    const toast = document.getElementById('playerLimitToast');
+    toast.classList.add('show');
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000); // Toast disappears after 3 seconds
+  }
+
+  // 📨 Form Submission for Men's Basketball Only
+  const sportfestForm = document.getElementById('sportfestForm');
+  sportfestForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    const sport = data.get('sportType');
+
+    if (!sport) return alert('Please select a sport.');
+
+    // 🏀 Team Registration for Men's Basketball
+    if (sport === 'mensBasketball') {
+      const payload = {
+        teamName: data.get('teamName'),
+        ageRange: data.get('ageRange'),
+        players: []
+      };
+
+      for (let i = 1; i <= count; i++) {
+        const fn = data.get(`player${i}_fname`);
+        const mi = data.get(`player${i}_mi`);
+        const ln = data.get(`player${i}_lname`);
+
+        if (fn || mi || ln) {
+          payload.players.push({
+            firstName: fn || 'NA',
+            middleInitial: mi || '',
+            lastName: ln || 'NA'
+          });
+        }
+      }
+
+    try {
+      const res = await fetch('/api/sportfest/mensBasketball', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || res.status);
+
+      showMensBasketballPopup(true, `🎉 Registration successful ${json.playerCount} players registered.`);
+      sportfestModal.style.display = 'none';
+      form.reset();
+      dynamicFields.innerHTML = '';
+      count = 0;
+    } catch (err) {
+      console.error(err);
+      showMensBasketballPopup(false, '❌ Failed: ' + err.message);
+    }
+
+    function showMensBasketballPopup(success = true, message = "🎉 Registration successful!") {
+      const popup = document.getElementById("mensBasketballPopup");
+      popup.textContent = message;
+      popup.classList.remove("error", "show");
+      if (!success) popup.classList.add("error");
+      popup.classList.add("show");
+
+      setTimeout(() => {
+        popup.classList.remove("show");
+      }, 4000);
+    }
+      return; // Exit if it's Men's Basketball
+    }
+
+    // Helper: turn value like 'womensVolleyball' into 'Women's Volleyball'
+    function formatSportType(raw) {
+      if (!raw) return 'Unknown';
+      const map = {
+        mensBasketball: "Men's Basketball",
+        womensVolleyball: "Women's Volleyball",
+        mensVolleyball: "Men's Volleyball",
+        chess: "Chess",
+        darts: "Darts"
+      };
+      return map[raw] || raw;
+    }
+
+
+    // 🏐🏓 Solo Sport Registration (WVolleyball, MVolleyball, Chess, Darts)
+    const payload = {
+      firstName: data.get('firstName')?.trim(),
+      middleName: data.get('middleInitial')?.trim() || '',
+      lastName: data.get('lastName')?.trim(),
+      gender: data.get('sex')?.trim(),
+      extension: data.get('extension')?.trim() || '',
+      yearGraduated: data.get('batch')?.trim() || '',
+      sportType: data.get('sportType')?.trim() || '' // ✅ Make sure this line is here
+    };
+
+    if (!payload.firstName || !payload.lastName || !payload.gender) {
+      return alert('Please complete all required fields.');
+    }
+
+    try {
+      const res = await fetch('/api/allsport/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || res.status);
+      const popup = document.getElementById('sportfestPopup');
+      let emoji = '🏐'; // Default
+
+      if (sport === 'chess') emoji = '♟️';
+      if (sport === 'darts') emoji = '🎯';
+      if (sport === 'womensVolleyball') emoji = '🏐';
+      if (sport === 'mensVolleyball') emoji = '🏐';
+
+      popup.textContent = `${emoji} Successfully registered for ${sport.replace(/([a-z])([A-Z])/g, '$1 $2')}`;
+      popup.classList.add('show');
+      setTimeout(() => popup.classList.remove('show'), 4000);
+      sportfestModal.style.display = 'none';
+      form.reset();
+      dynamicFields.innerHTML = '';
+    } catch (err) {
+      console.error(err);
+      alert('❌ Error: ' + err.message);
+    }
+  });
+
+
+  // ✅ Homecoming Form Submit
+  const homecomingForm = document.getElementById('homecomingForm');
+  homecomingForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const formData = new FormData(homecomingForm);
+    try {
+      const res = await fetch('/api/homeregs', {
+        method: 'POST',
+        body: formData
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || res.status);
+      const popup = document.getElementById('successPopup');
+      popup.classList.add('show');
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 4000);
+      homecomingForm.reset();
+      homecomingModal.style.display = 'none';
+    } catch (err) {
+      console.error(err);
+      alert('Error: ' + err.message);
+    }
+  });
+
+  // 📦 Load Events from API
+  async function loadEvents() {
+    const c = document.getElementById('eventsGrid');
+    try {
+      const r = await fetch('/api/events');
+      if (!r.ok) throw new Error(await r.text());
+      const { events } = await r.json();
+      const list = events.slice(0, 15);
+      while (list.length < 15) list.push(null);
+
+      c.innerHTML = list.map(e => e ? `
+        <div class="card">
+          <img src="${e.image}" alt="">
+          <div class="card-title">${e.title}</div>
+          <div class="card-meta">${e.location}</div>
+          <div class="btn-group-vertical">
+            <button class="card-btn readmore" data-desc="${encodeURIComponent(e.description)}">READ MORE</button>
+            <button class="card-btn prereg">PRE-REGISTRATION</button>
+          </div>
+        </div>` : `<div class="card empty-card"></div>`).join('');
+
+      // Read more logic
+      document.querySelectorAll('.readmore').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const desc = decodeURIComponent(btn.dataset.desc);
+          document.getElementById('descText').textContent = desc;
+          document.getElementById('descModal').style.display = 'block';
+        });
+      });
+
+      // Pre-reg logic
+      document.querySelectorAll('.prereg').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('warnOverlay').style.display = 'block';
+          document.getElementById('warnToast').style.display = 'block';
+        });
+      });
+
+    } catch (err) {
+      console.error(err);
+      c.textContent = 'Failed to load events.';
+    }
+  }
+
+  // ⏳ Loader on Load
+  document.addEventListener("DOMContentLoaded", () => {
+    let percentage = 80;
+    const loaderWrapper = document.getElementById("loader-wrapper");
+    const progressBar = document.getElementById("progress-bar");
+    const percentageText = document.getElementById("percentage");
+
+    const loadingInterval = setInterval(() => {
+      if (percentage < 100) {
+        percentage++;
+        progressBar.style.width = percentage + "%";
+        percentageText.textContent = percentage + "%";
+      } else {
+        clearInterval(loadingInterval);
+        loaderWrapper.style.display = "none";
+      }
+    }, 30);
+  });
+
+  // 🔁 Initialize on Ready
+  window.addEventListener('DOMContentLoaded', () => {
+    loadEvents();
+
+    const warnDismiss = document.getElementById('warnDismiss');
+    if (warnDismiss) {
+      warnDismiss.addEventListener('click', () => {
+        document.getElementById('warnOverlay').style.display = 'none';
+        document.getElementById('warnToast').style.display = 'none';
+      });
+    }
+
+    const descClose = document.getElementById('descClose');
+    if (descClose) {
+      descClose.addEventListener('click', () => {
+        document.getElementById('descModal').style.display = 'none';
+      });
+    }
+
+    window.addEventListener('click', e => {
+      if (e.target.id === 'descModal') {
+        document.getElementById('descModal').style.display = 'none';
+      }
+    });
+
+    toastOverlay.style.display = 'none';
+    toast.style.display = 'none';
+    homecomingModal.style.display = 'none';
+  });
+
+  // 🧾 Add-on Logic (receipt upload toggle)
+  document.querySelectorAll('input[name="addon"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const receiptInput = document.querySelector('input[name="receipt"]');
+      if (radio.value === 'no addon' && radio.checked) {
+        receiptInput.removeAttribute('required');
+      } else {
+        receiptInput.setAttribute('required', 'required');
+      }
+    });
+  });
+    const role = sessionStorage.getItem('userRole');
+  if (!role) {
+    // ❌ User not logged in
+    window.location.href = 'homepage.html';
+  } else if (role === 'admin') {
+    // ❌ Admin trying to access user-only page
+    window.location.href = 'admin-homepage.html';
+  }
+</script>
+</body>
+</html>

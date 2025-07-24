@@ -2149,4 +2149,4 @@ app.get('/api/admin/notifications/list', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));

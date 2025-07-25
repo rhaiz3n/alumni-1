@@ -709,9 +709,6 @@ app.post('/api/employer/login', async (req, res) => {
   }
 });
 
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found' });
-});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2161,6 +2158,11 @@ app.get('/api/admin/notifications/list', async (req, res) => {
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
+});
+
+app.use((err, req, res, next) => {
+  console.error('🔥 Server Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 server.listen(PORT, () => {

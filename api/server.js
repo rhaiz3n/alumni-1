@@ -2159,6 +2159,9 @@ app.get('/api/admin/notifications/list', async (req, res) => {
   }
 });
 
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
 
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);

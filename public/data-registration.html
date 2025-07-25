@@ -74,24 +74,42 @@
   let currentPage = 1;
   let totalPages = 1;
 
-  // Pagination & Search
-  pageSelect?.addEventListener('change', () => loadPage(+pageSelect.value, searchInput.value.trim()));
-  searchInput?.addEventListener('input', () => loadPage(1, searchInput.value.trim()));
+  pageSelect?.addEventListener('change', () =>
+    loadPage(+pageSelect.value, searchInput.value.trim())
+  );
+  searchInput?.addEventListener('input', () =>
+    loadPage(1, searchInput.value.trim())
+  );
 
   async function loadPage(page = 1, search = '') {
     currentPage = page;
     const url = `/api/registration?page=${page}&limit=${ROWS_PER_PAGE}&search=${encodeURIComponent(search)}`;
+
     try {
       const res = await fetch(url);
-      if (!res.ok) throw new Error(await res.text());
-      const { rows = [], totalPages: tp = 1 } = await res.json();
+      if (!res.ok) {
+        let errorMessage = `HTTP error ${res.status}`;
+        try {
+          const errData = await res.json();
+          errorMessage = errData.error || errorMessage;
+        } catch {
+          const errText = await res.text();
+          errorMessage = errText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await res.json().catch(() => {
+        throw new Error('Invalid JSON response from server');
+      });
+
+      const { rows = [], totalPages: tp = 1 } = data;
       totalPages = tp;
 
-      // Render rows
       tbody.innerHTML = '';
-      rows.reverse().forEach(r => {
+      rows.reverse().forEach((r) => {
         const tr = document.createElement('tr');
-        ['firstName', 'lastName', 'personalEmail', 'gender', 'userName', 'passWord'].forEach(key => {
+        ['firstName', 'lastName', 'personalEmail', 'gender', 'userName', 'passWord'].forEach((key) => {
           const td = document.createElement('td');
           td.textContent = r[key] || '';
           tr.appendChild(td);
@@ -99,7 +117,6 @@
         tbody.appendChild(tr);
       });
 
-      // Build pagination
       pageSelect.innerHTML = '';
       for (let i = 1; i <= totalPages; i++) {
         const opt = document.createElement('option');
@@ -110,37 +127,11 @@
       }
     } catch (err) {
       console.error('❌ Error loading registration data:', err);
-      alert('⚠️ Failed to load data.');
+      alert('⚠️ Failed to load data: ' + err.message);
     }
   }
 
-  // Initial load
-  document.addEventListener('DOMContentLoaded', () => {
-    loadPage();
-    
-    // Loader animation
-    let pct = 80;
-    const loaderWrapper = document.getElementById("loader-wrapper");
-    const progressBar = document.getElementById("progress-bar");
-    const percentageText = document.getElementById("percentage");
-
-    const loadingInterval = setInterval(() => {
-      if (pct < 100) {
-        pct++;
-        progressBar.style.width = pct + "%";
-        percentageText.textContent = pct + "%";
-      } else {
-        clearInterval(loadingInterval);
-        loaderWrapper.style.display = "none";
-      }
-    }, 30);
-
-    // Redirect non-admins
-    const role = sessionStorage.getItem('userRole');
-    if (role !== 'admin') {
-      window.location.href = 'homepage.html';
-    }
-  });
+  document.addEventListener('DOMContentLoaded', loadPage);
 </script>
 </body>
 </html>

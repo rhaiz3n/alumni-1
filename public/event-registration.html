@@ -267,16 +267,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const sport = this.value;
     const allowed = ['womensVolleyball', 'mensVolleyball', 'chess', 'darts'];
     if (allowed.includes(sport)) {
-      const target = new URL('allsport.html', window.location.origin);
+      const target = new URL('/allsport.html', window.location.origin);
       target.searchParams.set('sportType', sport);
       window.location.href = target.toString();
     } else if (sport === 'mensBasketball') {
-      window.location.href = 'mensBasketball.html';
+      window.location.href = '/mensBasketball.html';
     }
   });
     const role = sessionStorage.getItem('userRole');
   if (role !== 'admin') {
-    window.location.href = 'homepage.html';
+    window.location.href = '/homepage.html';
   }
 </script>
 </body>

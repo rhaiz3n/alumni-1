@@ -675,7 +675,6 @@ app.post('/api/registration/login', async (req, res) => {
   }
 });
 
-const bcrypt = require('bcrypt');
 
 app.post('/api/employer/login', async (req, res) => {
   const { userId, password } = req.body;

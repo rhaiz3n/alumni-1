@@ -644,21 +644,17 @@ app.post('/api/registration/login', async (req, res) => {
 
   try {
     const [rows] = await pool.execute(
-      `SELECT * FROM registration WHERE userName = ?`,
-      [userName]
+      `SELECT * FROM registration 
+       WHERE userName = ? AND passWord = ?`,
+      [userName, passWord]
     );
 
     if (rows.length === 0) {
+      console.log('❌ Invalid credentials');
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
     const user = rows[0];
-    const passwordMatch = await bcrypt.compare(passWord, user.passWord);
-
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid username or password' });
-    }
-
     const isAdmin = userName.toLowerCase() === 'admin';
 
     req.session.user = {
@@ -675,7 +671,6 @@ app.post('/api/registration/login', async (req, res) => {
   }
 });
 
-
 app.post('/api/employer/login', async (req, res) => {
   const { userId, password } = req.body;
 
@@ -685,23 +680,20 @@ app.post('/api/employer/login', async (req, res) => {
 
   try {
     const [rows] = await pool.execute(
-      `SELECT * FROM employers WHERE preferredUserId = ?`,
-      [userId]
+      `SELECT * FROM employers 
+       WHERE preferredUserId = ? AND preferredPassword = ?`,
+      [userId, password]
     );
 
     if (rows.length === 0) {
+      console.log('❌ Invalid credentials for employer:', userId);
       return res.status(401).json({ error: 'Invalid User ID or Password' });
     }
 
     const employer = rows[0];
 
-    // Check password securely using bcrypt
-    const passwordMatch = await bcrypt.compare(password, employer.preferredPassword);
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid User ID or Password' });
-    }
-
     if (employer.status !== 'ACCEPTED') {
+      console.log(`❌ Employer status not accepted (${employer.status}) for:`, userId);
       return res.status(403).json({ error: `Your account is ${employer.status}. Access denied.` });
     }
 
@@ -711,13 +703,13 @@ app.post('/api/employer/login', async (req, res) => {
       isEmployer: true
     };
 
+    console.log('✅ Employer Login successful for:', userId);
     res.json({ success: true, message: 'Login successful. Welcome Employer!' });
   } catch (err) {
     console.error('❌ Employer Login DB Error:', err);
     res.status(500).json({ error: 'Database error' });
   }
 });
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

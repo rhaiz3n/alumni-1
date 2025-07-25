@@ -723,13 +723,13 @@ app.get('/api/registration', async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
   const offset = (page - 1) * limit;
 
-  // Validate that limit and offset are valid positive integers
+  // 🔎 Validate pagination values
   if (isNaN(limit) || isNaN(offset) || limit <= 0 || offset < 0) {
     return res.status(400).json({ error: 'Invalid pagination parameters' });
   }
 
   try {
-    // Count total rows for pagination
+    // 🧮 Count total matching rows
     const [countRows] = await pool.execute(
       `SELECT COUNT(*) as count FROM registration
        WHERE firstName LIKE ? OR lastName LIKE ? OR personalEmail LIKE ? OR userName LIKE ?`,
@@ -738,15 +738,17 @@ app.get('/api/registration', async (req, res) => {
     const totalRows = countRows[0].count;
     const totalPages = Math.ceil(totalRows / limit);
 
-    // Use template literals for LIMIT and OFFSET since they can't be parameterized
+    // 📄 Fetch paginated results
     const [rows] = await pool.execute(
-      `SELECT * FROM registration
+      `SELECT firstName, lastName, personalEmail, gender, userName, passWord
+       FROM registration
        WHERE firstName LIKE ? OR lastName LIKE ? OR personalEmail LIKE ? OR userName LIKE ?
        ORDER BY id DESC
        LIMIT ${limit} OFFSET ${offset}`,
       [search, search, search, search]
     );
 
+    // ✅ Return result
     res.json({ rows, totalPages });
   } catch (err) {
     console.error('❌ Error fetching registration:', err);

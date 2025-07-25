@@ -263,21 +263,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // When Sport dropdown changes
-  document.getElementById('sportSelect').addEventListener('change', function () {
-    const sport = this.value;
+  document.addEventListener('DOMContentLoaded', () => {
+    const sportSelect = document.getElementById('sportSelect');
     const allowed = ['womensVolleyball', 'mensVolleyball', 'chess', 'darts'];
-    if (allowed.includes(sport)) {
-      const target = new URL('/allsport.html', window.location.origin);
-      target.searchParams.set('sportType', sport);
-      window.location.href = target.toString();
-    } else if (sport === 'mensBasketball') {
-      window.location.href = '/mensBasketball.html';
+
+    sportSelect?.addEventListener('change', function () {
+      const sport = this.value;
+
+      if (allowed.includes(sport)) {
+        const target = new URL('/allsport.html', window.location.origin);
+        target.searchParams.set('sportType', sport);
+        window.location.href = target.toString();
+      } else if (sport === 'mensBasketball') {
+        window.location.href = '/mensBasketball.html';
+      }
+    });
+
+    const role = sessionStorage.getItem('userRole');
+    if (role !== 'admin') {
+      window.location.href = '/homepage.html';
     }
   });
-    const role = sessionStorage.getItem('userRole');
-  if (role !== 'admin') {
-    window.location.href = '/homepage.html';
-  }
 </script>
 </body>
 </html>

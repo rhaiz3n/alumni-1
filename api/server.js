@@ -2157,20 +2157,6 @@ app.get('/api/admin/notifications/list', async (req, res) => {
   }
 });
 
-app.get('/admin-reset', async (req, res) => {
-  const bcrypt = require('bcrypt');
-  const hash = await bcrypt.hash('admin2025', 10);
-  try {
-    await pool.execute(`
-      UPDATE registration SET passWord = ? WHERE userName = 'admin'
-    `, [hash]);
-    res.send('✅ Admin password updated to admin2025');
-  } catch (e) {
-    console.error(e);
-    res.status(500).send('❌ Error resetting password');
-  }
-});
-
 
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);

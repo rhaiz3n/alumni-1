@@ -364,7 +364,13 @@
             maxlength="25"
             oninput="this.value = formatUserId(this.value)"
           />
-          <input type="password" id="preferredPassword" placeholder="Preferred User Password">
+          <input 
+            type="password" 
+            id="preferredPassword" 
+            placeholder="Preferred User Password" 
+            maxlength="13"
+            oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
+          />
           <button type="button" id="employerSubmitBtn">Submit Registration</button>
         </form>
       </div>

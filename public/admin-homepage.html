@@ -72,6 +72,18 @@
       </div>
     </div>
 
+    <!-- Edit Button -->
+    <button onclick="toggleEdit()" class="gcash-button">GCash Payment Method</button>
+
+    <!-- Image Upload Section -->
+    <div id="editSection" style="display: none; margin-top: 10px;">
+      <input type="file" id="gcashUpload" accept="image/*" />
+      <button onclick="saveImage()" class="save-button">Save</button>
+      <button onclick="closeEdit()" class="close-button">Close</button>
+
+      <div id="previewBox" style="margin-top: 10px;"></div>
+    </div>
+
 
     <a href="admin-homepage.html">
       <img class="Logo" src="Logo.png" alt="University Logo" />
@@ -250,6 +262,27 @@
 
 <!-- Main Application Script -->
 <script>
+    function toggleEdit() {
+      const section = document.getElementById('editSection');
+      section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function closeEdit() {
+      document.getElementById('editSection').style.display = 'none';
+    }
+
+    function saveImage() {
+      const file = document.getElementById("gcashUpload").files[0];
+      if (!file) return alert("No file selected!");
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        localStorage.setItem("gcashImage", reader.result);
+        document.getElementById("previewBox").innerHTML = `<img src="${reader.result}" style="max-width:200px" />`;
+      };
+      reader.readAsDataURL(file);
+    }
+  
 document.addEventListener('DOMContentLoaded', () => {
   enforceAdminRole();
   initLoader();

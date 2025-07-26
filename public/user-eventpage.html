@@ -96,9 +96,32 @@
         <span class="close-btn" id="homecomingClose">&times;</span>
         <h2>Homecoming Registration</h2>
         <form id="homecomingForm" enctype="multipart/form-data">
-          <input type="text" name="firstName" placeholder="First Name" required />
-          <input type="text" name="middleInitial" placeholder="Middle Initial" maxlength="1" />
-          <input type="text" name="lastName" placeholder="Last Name" required />
+          <input 
+            type="text" 
+            name="firstName" 
+            id="firstName" 
+            placeholder="First Name" 
+            required 
+            maxlength="20" 
+            oninput="this.value = formatName(this.value)" 
+          />
+          <input 
+            type="text" 
+            name="middleInitial" 
+            id="middleInitial" 
+            placeholder="Middle Initial" 
+            maxlength="1" 
+            oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase()"
+          />
+          <input 
+            type="text" 
+            name="lastName" 
+            id="lastName" 
+            placeholder="Last Name" 
+            required 
+            maxlength="20" 
+            oninput="this.value = formatName(this.value)"
+          />
 
           <label>Sex:</label>
           <label><input type="radio" name="sex" value="Male" required /> Male</label>
@@ -113,15 +136,24 @@
             <option value="Other">Other</option>
           </select>
 
-          <input type="number" name="yearGraduated" placeholder="Year Graduated" required min="1900" max="2099" />
+          <input 
+            type="text" 
+            name="yearGraduated" 
+            id="yearGraduated" 
+            placeholder="Year Graduated" 
+            required 
+            maxlength="4" 
+            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)"
+          />
 
           <hr />
-          <label>Add-on Options: Gcash No.:09********* "AL**NI"</label>
+          <label>Add-on Options:</label>
           <label><input type="radio" name="addon" value="100 drinks" required /> ₱100 – Additional four (4) drinks</label>
           <label><input type="radio" name="addon" value="500 drinks" /> ₱500 – Additional unlimited drinks</label>
           <label><input type="radio" name="addon" value="no addon" /> I do not want an add-on</label>
 
           <label>Upload a screenshot of the receipt of payment</label>
+          <label>If payment has not been made, you can view it at the top of the page.</label>
           <input type="file" name="receipt" accept="image/png, image/jpeg" required />
 
           <button type="submit" class="toast-button">REGISTER</button>
@@ -141,7 +173,17 @@
       🎉 Registration successful!
     </div>
 
-    <div id="playerLimitToast" class="toast-popup">Max 20 players reached!</div>
+    <label id="lastNameLabel"></label>
+
+    <button class="gcash-button" onclick="openModal()">View Gcash Payment Method</button>
+
+    <!-- Modal Structure -->
+    <div id="gcashModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modalImageContainer">Loading...</div>
+      </div>
+    </div>
     
     <!-- Sport Fest Modal -->
     <div id="sportfestModal" class="modal">
@@ -166,6 +208,41 @@
     
 
 <script>
+  function openModal() {
+    const modal = document.getElementById('gcashModal');
+    const container = document.getElementById('modalImageContainer');
+    const image = localStorage.getItem("gcashImage");
+
+    if (image) {
+      container.innerHTML = `<img src="${image}" alt="GCash" style="max-width: 100%;" />`;
+    } else {
+      container.textContent = "No GCash image uploaded yet.";
+    }
+
+    modal.style.display = "block";
+  }
+
+  function closeModal() {
+    document.getElementById('gcashModal').style.display = "none";
+  }
+  
+
+  // Close modal when clicking outside the content
+  window.onclick = function(event) {
+    const modal = document.getElementById('gcashModal');
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  }
+
+
+  function formatName(value) {
+    // Remove numbers and special characters, allow letters and spaces only
+    value = value.replace(/[^a-zA-Z\s]/g, '');
+
+    // Capitalize first letter of each word
+    return value.replace(/\b\w/g, char => char.toUpperCase());
+  }
   // 🔘 Modal & Button Elements
   const openCatBtn = document.getElementById('openCategoryBtn');
   const toastOverlay = document.getElementById('warnOverlay');

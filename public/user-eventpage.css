@@ -485,7 +485,8 @@ html, body {
 .modal-content h2 {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   text-align: center;
   color: #222;
 }
@@ -752,4 +753,22 @@ html, body {
 .toast-popup.show {
   opacity: 1;
   transform: translateY(0);
+}
+
+
+.gcash-button {
+  position: absolute;
+  font-family: 'Alegreya', serif;
+  top: 205px;
+  left: 350px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  font-size: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 1000;
+}
+.gcash-button:hover {
+  background-color: #000000;
 }

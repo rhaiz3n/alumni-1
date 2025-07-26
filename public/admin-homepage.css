@@ -1086,3 +1086,83 @@ html, body {
   background: #ccc;
   color: #333;
 }
+
+
+/* GCash Edit Button */
+/* Admin Page - GCash Upload Section */
+
+.gcash-button {
+  position: absolute;
+  top: 200px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.gcash-button:hover {
+  background-color: #0056c4;
+  transform: scale(1.02);
+}
+
+#editSection {
+  position: relative;
+  top: 1500px;
+  background: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 400px;
+}
+
+#gcashUpload {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.save-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.save-button:hover {
+  background-color: #218838;
+}
+
+#previewBox img {
+  margin-top: 10px;
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+.close-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #c82333;
+}

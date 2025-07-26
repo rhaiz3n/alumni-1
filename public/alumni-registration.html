@@ -332,13 +332,54 @@
       </div>
 
 
+      <!-- Consent Button Trigger -->
       <div class="consent-wrapper">
         <input type="checkbox" id="consentCheckbox" />
-        <button type="button" class="check-button" onclick="location.href='consentForm.html'">
+        <button type="button" class="check-button" onclick="openConsentModal()">
           <span class="hover-underline1">
             <span class="highlight-text">I understand and agree</span> that by clicking the Register submit button below I am deemed to have read, understood, and signed this certification and data privacy consent form.
           </span>
         </button>
+      </div>
+
+      <!-- MODAL -->
+      <div id="consentModal" class="modal">
+        <div class="modal-content">
+          
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <img src="logo.png" alt="TUP Logo" class="modal-logo" />
+            <div class="modal-title-wrapper">
+              <h2>TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</h2>
+              <h3 class="modal-subtitle">A l u m n i <span class="highlight-red">Registration</span></h3>
+            </div>
+            <button class="modal-close" onclick="closeConsentModal()">×</button>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="modal-body">
+            <h4>CERTIFICATION AND DATA PRIVACY CONSENT FORM<br>FOR UNIVERSITY OF THE PHILIPPINES ALUMNI USER REGISTRATION</h4>
+            
+            <h5>I. CERTIFICATION</h5>
+            <ol>
+              <li>I am an Alumnus/Alumna of the Technological University of the Philippines - Cavite, and the information provided in this registration form is accurate, true and complete to the best of my knowledge.</li>
+              <li>I acknowledge that only one Alumni User Account will be issued per Alumnus/Alumna, and I agree not to request additional accounts or share my login details with any unauthorized person.</li>
+              <li>I accept responsibility for the proper use of the User Account and will notify the TUP-Cavite Office of Alumni Relations immediately in case of any issues or discrepancies with my Account.</li>
+            </ol>
+
+            <h5>II. DATA PRIVACY CONSENT</h5>
+            <ol start="5">
+              <li>In compliance with the Data Privacy Act of 2012 (Republic Act No. 10173), I consent to the collection, storage and processing of my personal data provided for my Alumni User registration by the TUP-Cavite Office of Alumni Relations. I understand and agree to the following:</li>
+              <li>The Personal Information provided in this form will be securely stored and processed for the purpose of issuing and managing my Alumni User Account.</li>
+              <li>My Data will be used exclusively for Alumni communication, verification of my Alumni Status, and updates regarding Alumni programs, events and other relevant University Activities.</li>
+              <li>I grant consent for the TUP-Cavite System to Process the following personal data for the purpose of my Alumni User registration.</li>
+              <li>I understand that my personal data will be kept confidential and will not be shared with third parties without my consent, except where required by law or University policy.</li>
+              <li>I have the right to access, correct and withdraw my consent concerning the processing of my personal Data at any time by contacting the TUP-Cavite Office of Alumni Relations.</li>
+              <li>I acknowledge that the TUP-Cavite Alumni User is a privilege and that any false information provided may result in the suspension or deactivation of my account without prior notice.</li>
+              <li>I accept that TUP-Cavite is not liable for any issues related to the discontinuation of this service or any other problems associated with the provision of the Alumni User service.</li>
+            </ol>
+          </div>
+        </div>
       </div>
 
       <!-- Date of Birth -->
@@ -404,6 +445,13 @@
 
   <!-- JavaScript -->
 <script>
+function openConsentModal() {
+  document.getElementById('consentModal').style.display = 'flex';
+}
+
+function closeConsentModal() {
+  document.getElementById('consentModal').style.display = 'none';
+}
 
 function formatMajor(input) {
   let value = input.value.toUpperCase();

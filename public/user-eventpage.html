@@ -206,8 +206,18 @@
       </div>
     </div>
     
-
+    <div id="sports-toast" class="sports-toast"></div>
 <script>
+  function showSportsToast(message, isSuccess = false) {
+    const toast = document.getElementById("sports-toast");
+    toast.textContent = message;
+    toast.style.backgroundColor = isSuccess ? "#28a745" : "#dc3545"; // green = success, red = error
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 4000);
+  }
   function openModal() {
     const modal = document.getElementById('gcashModal');
     const container = document.getElementById('modalImageContainer');
@@ -478,7 +488,7 @@
       dynamicFields.innerHTML = '';
     } catch (err) {
       console.error(err);
-      alert('');
+      showSportsToast('❌ Error: Something went wrong. Please try again.');
     }
   });
 
@@ -504,7 +514,7 @@
       homecomingModal.style.display = 'none';
     } catch (err) {
       console.error(err);
-      alert('Error: ' + err.message);
+      showSportsToast('❌ Error: Something went wrong. Please try again.');
     }
   });
 

@@ -324,12 +324,14 @@
             id="businessName" 
             placeholder="Business Name" 
             maxlength="40" 
+            oninput="this.value = formatBusinessName(this.value)"
           />
           <input 
             type="text" 
             id="businessAddress" 
             placeholder="Business Address" 
-            maxlength="40" 
+            maxlength="25" 
+            oninput="this.value = formatBusinessAddress(this.value)"
           />
           <input 
             type="tel" 
@@ -399,6 +401,41 @@
 
   <!-- Modal Script -->
 <script>
+  function formatBusinessAddress(value) {
+    // Remove all characters except letters, numbers, and dots
+    value = value.replace(/[^a-zA-Z0-9. ]/g, '');
+
+    // Only allow the first dot, remove extras
+    const firstDot = value.indexOf('.');
+    if (firstDot !== -1) {
+      value = value.substring(0, firstDot + 1) + value.substring(firstDot + 1).replace(/\./g, '');
+    }
+
+    // Capitalize first letter of each word
+    return value.replace(/\b\w/g, char => char.toUpperCase());
+  }
+  function formatBusinessName(value) {
+    // Allow letters, numbers, spaces, and special characters
+    value = value.replace(/[^a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g, '');
+
+    // Track special characters (excluding space)
+    const seen = {};
+    let filtered = '';
+
+    for (let char of value) {
+      if (/[^a-zA-Z0-9\s]/.test(char)) {
+        if (!seen[char]) {
+          seen[char] = true;
+          filtered += char;
+        }
+      } else {
+        filtered += char;
+      }
+    }
+
+    // Capitalize first letter of each word
+    return filtered.replace(/\b\w/g, char => char.toUpperCase());
+  }
   function formatUsername(value) {
     // Allow only letters, numbers, and dots
     value = value.replace(/[^a-zA-Z0-9.]/g, '');

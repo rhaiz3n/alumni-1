@@ -63,46 +63,120 @@
     <form id="regForm">
 
       <!-- First Name -->
-      <div class="first-name slide-in">First Name <span class="required-star">*</span></div>
+      <div class="first-name slide-in">
+        First Name <span class="required-star">*</span>
+      </div>
       <div class="first-name-typebox slide-in">
-        <input type="text" class="firstname-typebox" name="firstName" placeholder="First Name" required />
+        <input 
+          type="text" 
+          class="firstname-typebox" 
+          name="firstName" 
+          placeholder="First Name" 
+          maxlength="25" 
+          required 
+          oninput="this.value = formatName(this.value)" 
+        />
       </div>
 
-      <!-- Last Name -->
-      <div class="last-name slide-in">Last Name <span class="required-star">*</span></div>
+      <div class="last-name slide-in">
+        Last Name <span class="required-star">*</span>
+      </div>
       <div class="last-name-typebox slide-in">
-        <input type="text" class="lastname-typebox" name="lastName" placeholder="Last Name" required />
+        <input 
+          type="text" 
+          class="lastname-typebox" 
+          name="lastName" 
+          placeholder="Last Name" 
+          maxlength="25" 
+          required 
+          oninput="this.value = formatName(this.value)" 
+        />
       </div>
 
-      <!-- Initial -->
-      <div class="initial-name slide-in">Initial <span class="required-star">*</span></div>
-      <div class="initial-name-typebox slide-in">
-        <input type="text" class="initialname-typebox" name="initial" placeholder="Initial" required />
+        <!-- Initial -->
+      <div class="initial-name slide-in">
+        Initial <span class="required-star">*</span>
       </div>
+      <div class="initial-name-typebox slide-in">
+        <input 
+          type="text" 
+          class="initialname-typebox" 
+          name="initial" 
+          placeholder="Initial" 
+          maxlength="1" 
+          required 
+          oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase()" 
+        />
+      </div>
+
 
       <!-- Username -->
-      <div class="user-name slide-in">Username <span class="required-star">*</span></div>
+      <div class="user-name slide-in">
+        Username <span class="required-star">*</span>
+      </div>
       <div class="user-name-typebox slide-in">
-        <input type="text" class="username-typebox" name="userName" placeholder="Enter Username" required />
+        <input 
+          type="text" 
+          class="username-typebox" 
+          name="userName" 
+          placeholder="Enter Username" 
+          maxlength="20" 
+          required 
+          oninput="limitUsernameDigits(this)" 
+        />
       </div>
 
 
       <!-- Major -->
-      <div class="degree slide-in">Major in. (BET/BTVTED) <span class="required-star">*</span></div>
+      <div class="degree slide-in">Course & Major.[BET-COET/BTVTED-ET] <span class="required-star">*</span></div>
       <div class="degree-typebox slide-in">
-        <input type="text" class="degrees-typebox" name="major" placeholder="Degree/Certificate & Major" required />
+        <input 
+          type="text" 
+          class="degrees-typebox" 
+          name="major" 
+          placeholder="Course & Major." 
+          maxlength="9" 
+          required 
+          oninput="formatMajor(this)" 
+        />
       </div>
+
 
       <!-- Personal Email -->
-      <div class="personalEmail slide-in" style="animation-delay: 0.2s">Personal Email Address <span class="required-star">*</span></div>
+      <div class="personalEmail slide-in" style="animation-delay: 0.2s">
+        Personal Email Address <span class="required-star">*</span>
+      </div>
       <div class="personale-typebox slide-in" style="animation-delay: 0.2s">
-        <input type="email" class="personales-typebox" name="personalEmail" placeholder="Personal Email Address" required />
+        <input 
+          type="email" 
+          class="personales-typebox" 
+          name="personalEmail" 
+          id="personalEmail" 
+          placeholder="Personal Email Address" 
+          maxlength="50" 
+          required 
+          oninput="
+            this.value = this.value.replace(/\s/g, '');
+            document.getElementById('retypeEmail').value = this.value;
+          " 
+        />
       </div>
 
-      <div class="retype slide-in" style="animation-delay: 0.2s">Retype Email Address <span class="required-star">*</span></div>
-      <div class="retypee-typebox slide-in" style="animation-delay: 0.2s">
-        <input type="text" class="retypees-typebox" placeholder="Retype Email Address" />
+      <!-- Retype Email -->
+      <div class="retype slide-in" style="animation-delay: 0.2s"> Email Address <span class="required-star">*</span>
       </div>
+      <div class="retypee-typebox slide-in" style="animation-delay: 0.2s">
+        <input 
+          type="text" 
+          class="retypees-typebox" 
+          placeholder="Email Address" 
+          id="retypeEmail" 
+          maxlength="50" 
+          required 
+          readonly 
+        />
+      </div>
+
 
       <!-- Year Started -->
       <div class="year slide-in">Year Started <span class="required-star">*</span></div>
@@ -124,29 +198,54 @@
       <!-- Password -->
       <label class="passWords slide-in">Password <span class="required-star">*</span></label>
       <div class="password-wrapper slide-in">
-        <input type="password" id="password" class="password-input" name="passWord" placeholder="Enter Password" required />
+        <input 
+          type="password" 
+          id="password" 
+          class="password-input" 
+          name="passWord" 
+          placeholder="Enter Password" 
+          maxlength="15" 
+          required 
+          oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')" 
+        />
         <span id="togglePassword" class="toggle-password">☐</span>
       </div>
 
       <!-- Phone Number -->
-      <div class="phone-number slide-in" style="animation-delay: 0.2s">Phone No. <span class="required-star">*</span></div>
+      <div class="phone-number slide-in" style="animation-delay: 0.2s">
+        Phone No. <span class="required-star">*</span>
+      </div>
       <div class="phone-number-typebox slide-in" style="animation-delay: 0.2s">
         <input 
           type="tel" 
           class="phonenumber-typebox" 
-          placeholder="" 
+          placeholder="Phone No." 
           name="phoneNo"
-          pattern="[0-9]*" 
+          maxlength="12"
+          pattern="\d{13}"
           inputmode="numeric"
+          required
           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
         />
       </div>
 
+
       <!-- Full name -->
-      <div class="maiden-name slide-in" style="animation-delay: 0.2s">Maiden Name <span class="required">*</span></div>
-      <div class="maiden-name-typebox slide-in" style="animation-delay: 0.2s">
-        <input type="text" class="maidenname-typebox" placeholder="Maiden Name" name="maiden" />
+      <div class="maiden-name slide-in" style="animation-delay: 0.2s">
+        Maiden Name <span class="required">*</span>
       </div>
+      <div class="maiden-name-typebox slide-in" style="animation-delay: 0.2s">
+        <input 
+          type="text" 
+          class="maidenname-typebox" 
+          placeholder="Maiden Name" 
+          name="maiden" 
+          maxlength="15" 
+          required 
+          oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')" 
+        />
+      </div>
+
 
       <!-- Loading Screen -->
       <div id="loader-wrapper">
@@ -174,8 +273,7 @@
         <option value="" disabled selected hidden>Select Gender</option>
         <option value="MALE">MALE</option>
         <option value="FEMALE">FEMALE</option>
-        <option value="TRANSFORMER">TRANSFORMER</option>
-        <option value="AVENGERS">AVENGERS</option>
+        <option value="TRANSFORMER">Other.</option>
       </select>
 
       <!-- Civil Status -->
@@ -187,7 +285,6 @@
         <option value="SEPARATED">SEPARATED</option>
         <option value="WIDOWED">WIDOWED</option>
         <option value="Divorced">DIVORCED</option>
-        <option value="Wasted">WASTED</option>
       </select>
 
       <!-- Suffix Section -->
@@ -195,20 +292,45 @@
         <input type="checkbox" id="toggleSuffix" />
         My name does not end with a suffix. (e.g., Jr, Sr, I, II, etc.)
       </label>
-      <div class="suffix-name slide-in" style="animation-delay: 0.2s">Suffix <span class="required">*</span></div>
-      <div class="suffix-typebox slide-in" style="animation-delay: 0.2s" id="suffixBox">
-        <input type="text" class="suffix" placeholder="Suffix" name="suffix" />
+
+      <div class="suffix-name slide-in" style="animation-delay: 0.2s">
+        Suffix <span class="required">*</span>
       </div>
+      <div class="suffix-typebox slide-in" style="animation-delay: 0.2s" id="suffixBox">
+      <input 
+        type="text" 
+        class="suffix" 
+        placeholder="Suffix" 
+        name="suffix" 
+        maxlength="3" 
+        required 
+        oninput="this.value = formatsuffix(this.value)" 
+      />
+      </div>
+
+
 
       <!-- Student Number Section -->
       <label class="label-student slide-in" style="animation-delay: 0.2s">
         <input type="checkbox" id="toggleStudentNo" />
         My Student No. is no longer available
       </label>
-      <div class="student-no slide-in" style="animation-delay: 0.2s">Student No. (03**) <span class="required">*</span></div>
-      <div class="student-no-typebox slide-in" style="animation-delay: 0.2s" id="studentNoBox">
-        <input type="text" class="student" placeholder="Student No." name="studentNo" />
+
+      <div class="student-no slide-in" style="animation-delay: 0.2s">
+        Student No. (0123) <span class="required">*</span>
       </div>
+      <div class="student-no-typebox slide-in" style="animation-delay: 0.2s" id="studentNoBox">
+        <input 
+          type="text" 
+          class="student" 
+          placeholder="Student No." 
+          name="studentNo" 
+          maxlength="4" 
+          required 
+          oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+        />
+      </div>
+
 
       <div class="consent-wrapper">
         <input type="checkbox" id="consentCheckbox" />
@@ -282,6 +404,88 @@
 
   <!-- JavaScript -->
 <script>
+
+function formatMajor(input) {
+  let value = input.value.toUpperCase();
+
+  // Remove all characters except letters and hyphens
+  value = value.replace(/[^A-Z\-]/g, '');
+
+  // Allow only the first hyphen, remove any others
+  const firstDash = value.indexOf('-');
+  if (firstDash !== -1) {
+    // Keep only the first dash and remove any additional dashes
+    const beforeDash = value.slice(0, firstDash + 1);
+    const afterDash = value.slice(firstDash + 1).replace(/-/g, '');
+    value = beforeDash + afterDash;
+  }
+
+  // Limit to 9 characters total
+  input.value = value.slice(0, 9);
+}
+
+function formatName(value) {
+  // Keep only letters and spaces
+  value = value.replace(/[^a-zA-Z\s]/g, '');
+  // Capitalize first letter of each word
+  return value.replace(/\b\w/g, char => char.toUpperCase());
+}
+
+function formatsuffix(value) {
+  // Remove non-letter characters
+  value = value.replace(/[^a-zA-Z]/g, '');
+
+  // Normalize case
+  const upperValue = value.toUpperCase();
+
+  // List of valid Roman numeral suffixes
+  const validSuffixes = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+
+  // If it's a known Roman numeral suffix, return it in full caps
+  if (validSuffixes.includes(upperValue)) {
+    return upperValue;
+  }
+
+  // Otherwise, capitalize first letter only (e.g., Jr, Sr)
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+}
+
+
+function limitUsernameDigits(input) {
+  let value = input.value;
+
+  // Keep only letters, numbers, and dots
+  value = value.replace(/[^a-zA-Z0-9.]/g, '');
+
+  // Limit to only one dot
+  const firstDotIndex = value.indexOf('.');
+  if (firstDotIndex !== -1) {
+    // Remove all other dots except the first one
+    value = value.slice(0, firstDotIndex + 1) + value.slice(firstDotIndex + 1).replace(/\./g, '');
+  }
+
+  // Count digits
+  const digits = (value.match(/\d/g) || []).length;
+
+  if (digits <= 2) {
+    input.value = value;
+  } else {
+    // Allow only the first 2 digits, preserving letters and 1 dot
+    let digitCount = 0;
+    input.value = value
+      .split('')
+      .filter((char, i) => {
+        if (/\d/.test(char)) {
+          digitCount++;
+          return digitCount <= 2;
+        }
+        return true;
+      })
+      .join('');
+  }
+}
+
+
 // --- Suffix & Student No. Checkboxes ---
 const toggleSuffix = document.getElementById('toggleSuffix');
 const suffixInput = document.querySelector('#suffixBox input');

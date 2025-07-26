@@ -369,12 +369,23 @@
     document.getElementById('warnToast2').classList.remove('show');
   };
 
-  // 🌍 Visitor Count
   window.addEventListener("DOMContentLoaded", () => {
     const countEl = document.getElementById("visitor-count");
-    fetch("https://api.countapi.xyz/hit/tupcavite.edu.ph/homepage")
+
+    const isFirstVisit = !localStorage.getItem("alumni-visit");
+    const key = "alumni-visit-Rh4a1z3n"; // 🔒 private key
+    const namespace = "tupcavite";
+
+    const endpoint = isFirstVisit
+      ? `https://api.countapi.xyz/hit/${namespace}/${key}`
+      : `https://api.countapi.xyz/get/${namespace}/${key}`;
+
+    fetch(endpoint)
       .then(res => res.json())
-      .then(data => countEl.textContent = data.value)
+      .then(data => {
+        countEl.textContent = data.value;
+        if (isFirstVisit) localStorage.setItem("alumni-visit", "true");
+      })
       .catch(err => {
         console.error("Visitor API error:", err);
         countEl.textContent = "N/A";

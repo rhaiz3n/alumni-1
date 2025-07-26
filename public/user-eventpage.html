@@ -153,7 +153,7 @@
           <label><input type="radio" name="addon" value="no addon" /> I do not want an add-on</label>
 
           <label>Upload a screenshot of the receipt of payment</label>
-          <label>If payment has not been made, you can view it at the top of the page.</label>
+          <label>If payment has not been made, close this form and you can view it at the top of the page.</label>
           <input type="file" name="receipt" accept="image/png, image/jpeg" required />
 
           <button type="submit" class="toast-button">REGISTER</button>
@@ -478,7 +478,7 @@
       dynamicFields.innerHTML = '';
     } catch (err) {
       console.error(err);
-      alert('❌ Error: ' + err.message);
+      alert('');
     }
   });
 

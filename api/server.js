@@ -1371,7 +1371,7 @@ app.post('/api/allsport/add', async (req, res) => {
     const [notifResult] = await connection.execute(`
       INSERT INTO notifications (name, message, link, createdAt)
       VALUES (?, ?, ?, ?)`,
-      ['Athlete Registration', message, 'allsport.html', submittedAt]
+      ['Athlete Registration', message, 'allSport.html', submittedAt]
     );
 
     await connection.commit();
@@ -1381,7 +1381,7 @@ app.post('/api/allsport/add', async (req, res) => {
       id: notifResult.insertId,
       name: 'Athlete Registration',
       message,
-      link: 'allsport.html',
+      link: 'allSport.html',
       createdAt: submittedAt.toISOString()
     });
 

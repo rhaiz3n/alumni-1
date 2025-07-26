@@ -1161,6 +1161,7 @@ html, body {
   background: #e91e63;
   border-radius: 5px;
 }
+
 .toast, .employer-toast {
   display: none;
   transition: opacity 0.3s;

@@ -355,6 +355,7 @@
             placeholder="Company Email Address" 
             maxlength="40" 
             required
+            oninput="this.value = formatCompanyEmail(this.value)"
           />
           <input 
             type="url" 
@@ -401,6 +402,10 @@
 
   <!-- Modal Script -->
 <script>
+  function formatCompanyEmail(value) {
+    // Remove spaces only, allow everything else
+    return value.replace(/\s/g, '');
+  }
   function formatBusinessAddress(value) {
     // Remove all characters except letters, numbers, and dots
     value = value.replace(/[^a-zA-Z0-9. ]/g, '');

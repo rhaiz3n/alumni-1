@@ -51,11 +51,23 @@
         <div class="Line1-1"></div>
         <!-- First Name -->
         <label for="firstName" class="label-first-name">First Name:</label>
-        <input type="text" id="firstName" class="input-first-name">
+        <input 
+          type="text" 
+          id="firstName" 
+          class="input-first-name" 
+          maxlength="30"
+          oninput="this.value = formatName(this.value)"
+        />
 
         <!-- Last Name -->
         <label for="lastName" class="label-last-name">Last Name:</label>
-        <input type="text" id="lastName" class="input-last-name">
+        <input 
+          type="text" 
+          id="lastName" 
+          class="input-last-name" 
+          maxlength="30"
+          oninput="this.value = formatName(this.value)"
+        />
 
         <!-- Interested -->
         <label for="interested" class="label-interest">Are you interested?</label>
@@ -113,23 +125,65 @@
               <label>Upload Valid ID *</label>
               <input type="file" name="idImage" required>
 
-              <label>Full Name on Official Records *</label>
-              <input type="text" name="fullName" required>
+              <label for="fullName">Full Name on Official Records *</label>
+              <input 
+                type="text" 
+                name="fullName" 
+                id="fullName" 
+                required 
+                maxlength="30" 
+                oninput="this.value = formatName(this.value)"
+              />
 
-              <label>Degree/Certificate & Major [BET/BTVTED] *</label>
-              <input type="text" name="degree" required>
+              <label for="degree">Course Major in. [BET-COET/BTVTED-ET] *</label>
+              <input 
+                type="text" 
+                name="degree" 
+                id="degree" 
+                required 
+                maxlength="9" 
+                oninput="this.value = formatDegree(this.value)"
+              />
 
-              <label>Year Graduated *</label>
-              <input type="text" name="yearGraduated" required>
+              <label for="yearGraduated">Year Graduated *</label>
+              <input 
+                type="text" 
+                name="yearGraduated" 
+                id="yearGraduated" 
+                required 
+                maxlength="4" 
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+              />
 
-              <label>Student No. *</label>
-              <input type="text" name="studentNo" required>
+              <label for="studentNo">Student No. *</label>
+              <input 
+                type="text" 
+                name="studentNo" 
+                id="studentNo" 
+                required 
+                maxlength="4" 
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+              />
 
-              <label>Phone No. *</label>
-              <input type="tel" name="phoneNo" required>
+              <label for="phoneNo">Phone No. *</label>
+              <input 
+                type="tel" 
+                name="phoneNo" 
+                id="phoneNo" 
+                required 
+                maxlength="12" 
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+              />
 
-              <label>Personal Email Address *</label>
-              <input type="email" name="email" required>
+              <label for="email">Personal Email Address *</label>
+              <input 
+                type="email" 
+                name="email" 
+                id="email" 
+                required 
+                maxlength="40" 
+                oninput="this.value = this.value.replace(/\s/g, '')"
+              />
             </form>
 
         <div class="popup-buttons">
@@ -371,6 +425,26 @@
 
   <!-- Modal Script -->
 <script>
+  function formatDegree(value) {
+    // Allow only letters and dashes, remove others
+    value = value.replace(/[^a-zA-Z\-]/g, '');
+
+    // Only allow first dash
+    const firstDash = value.indexOf('-');
+    if (firstDash !== -1) {
+      value = value.substring(0, firstDash + 1) + value.substring(firstDash + 1).replace(/\-/g, '');
+    }
+
+    // Convert to uppercase
+    return value.toUpperCase();
+  }
+  function formatName(value) {
+    // Remove numbers and special characters, keep letters and spaces
+    value = value.replace(/[^a-zA-Z\s]/g, '');
+
+    // Capitalize the first letter of each word
+    return value.replace(/\b\w/g, char => char.toUpperCase());
+  }
   // Contact Section Animation
 document.addEventListener("DOMContentLoaded", function () {
   const contactSection = document.querySelector('.contact-section');
@@ -466,7 +540,7 @@ const loadingInterval = setInterval(() => {
       return JSON.parse(text);
     })
     .then(data => {
-      showNotification(`✅ Submission successful! ID: ${data.id}`);
+      showNotification(`✅ Submission successful!`);
       setTimeout(() => {
         window.location.href = 'career-post.html';
       }, 3000);

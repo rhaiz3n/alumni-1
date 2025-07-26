@@ -772,3 +772,13 @@ html, body {
 .gcash-button:hover {
   background-color: #000000;
 }
+.close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}

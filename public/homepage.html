@@ -308,14 +308,62 @@
         </div>
 
         <form id="employerRegForm">
-          <input type="text" id="employerName" placeholder="Employer Name">
-          <input type="text" id="businessName" placeholder="Business Name">
-          <input type="text" id="businessAddress" placeholder="Business Address">
-          <input type="tel" id="landlineNo" placeholder="Landline Number">
-          <input type="tel" id="mobileNo" placeholder="Mobile Number">
-          <input type="email" id="companyEmail" placeholder="Company Email Address">
-          <input type="url" id="companyWebsite" placeholder="Company Website">
-          <input type="text" id="preferredUserId" placeholder="Preferred User ID">
+          <input 
+            type="text" 
+            id="employerName" 
+            placeholder="Employer Name" 
+            maxlength="30" 
+            oninput="this.value = formatName(this.value)" 
+          />
+          <input 
+            type="text" 
+            id="businessName" 
+            placeholder="Business Name" 
+            maxlength="40" 
+          />
+          <input 
+            type="text" 
+            id="businessAddress" 
+            placeholder="Business Address" 
+            maxlength="40" 
+          />
+          <input 
+            type="tel" 
+            id="landlineNo" 
+            placeholder="Landline Number" 
+            inputmode="numeric" 
+            maxlength="15"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+          />
+          <input 
+            type="tel" 
+            id="mobileNo" 
+            placeholder="Mobile Number" 
+            inputmode="numeric" 
+            maxlength="12" 
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+          />
+          <input 
+            type="email" 
+            id="companyEmail" 
+            placeholder="Company Email Address" 
+            maxlength="40" 
+            required
+          />
+          <input 
+            type="url" 
+            id="companyWebsite" 
+            placeholder="Company Website" 
+            maxlength="40" 
+            oninput="this.value = this.value.replace(/\s/g, '')"
+          />
+          <input 
+            type="text" 
+            id="preferredUserId" 
+            placeholder="Preferred User ID" 
+            maxlength="25"
+            oninput="this.value = formatUserId(this.value)"
+          />
           <input type="password" id="preferredPassword" placeholder="Preferred User Password">
           <button type="button" id="employerSubmitBtn">Submit Registration</button>
         </form>
@@ -341,6 +389,41 @@
 
   <!-- Modal Script -->
 <script>
+  function formatUserId(value) {
+    // Allow only letters, digits, and dot
+    value = value.replace(/[^a-zA-Z0-9.]/g, '');
+
+    // Enforce only one dot
+    let firstDotIndex = value.indexOf('.');
+    if (firstDotIndex !== -1) {
+      value =
+        value.substring(0, firstDotIndex + 1) +
+        value.substring(firstDotIndex + 1).replace(/\./g, ''); // remove extra dots
+    }
+
+    // Allow only 4 digits total
+    let digitCount = 0;
+    value = value
+      .split('')
+      .filter(char => {
+        if (/\d/.test(char)) {
+          digitCount++;
+          return digitCount <= 4;
+        }
+        return true;
+      })
+      .join('');
+
+    return value;
+  }
+
+  function formatName(value) {
+    // Remove numbers and special characters — only allow letters and spaces
+    value = value.replace(/[^a-zA-Z\s]/g, '');
+    // Capitalize the first letter of each word
+    return value.replace(/\b\w/g, char => char.toUpperCase());
+  }
+
   // 🟢 Registration Modal Handling
   const regModal = document.getElementById("registration-modal");
   document.querySelector(".registration-button").onclick = () => regModal.style.display = "flex";

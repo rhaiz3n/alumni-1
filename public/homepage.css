@@ -1051,6 +1051,7 @@ html, body {
 }
 
 .announcement-list {
+  text-align: justify;
   max-height: 420px;
   box-shadow: #000;
   width: 316px; /* adjust this height */

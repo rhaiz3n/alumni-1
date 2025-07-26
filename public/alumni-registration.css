@@ -1065,6 +1065,7 @@ option {
   font-size: 20px;
   cursor: pointer;
 }
+
   .consent-wrapper {
     position: relative;
     top: 1220px;
@@ -1204,8 +1205,8 @@ option {
   position: relative;
 }
 
-.modal-logo {
-  height: 60px;
+.modal-logo5 {
+  height: 100px;
   margin-right: 15px;
 }
 
@@ -1214,17 +1215,17 @@ option {
 }
 
 .modal-title-wrapper h2 {
-  font-size: 14px;
-  margin: 0;
+  font-size: 20px;
+  margin-left: 05px;
   font-weight: bold;
 }
 
 .modal-subtitle {
-  font-family: 'Georgia', serif;
+  font-family: 'Sanchez', serif;
   font-size: 20px;
   font-weight: bold;
   letter-spacing: 3px;
-  margin: 5px 0 0 0;
+  margin-left: 5% 0 0 0;
   color: white;
 }
 

@@ -204,12 +204,15 @@
           class="password-input" 
           name="passWord" 
           placeholder="Enter Password" 
-          maxlength="15" 
+          maxlength="20" 
+          minlength="10"
           required 
           oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')" 
         />
         <span id="togglePassword" class="toggle-password">☐</span>
+        <small id="passwordHelp" class="password-error">Password must be at least 10 characters</small>
       </div>
+
 
       <!-- Phone Number -->
       <div class="phone-number slide-in" style="animation-delay: 0.2s">
@@ -445,6 +448,7 @@
 
   <!-- JavaScript -->
 <script>
+
 function openConsentModal() {
   document.getElementById('consentModal').style.display = 'flex';
 }
@@ -588,13 +592,25 @@ for (let y = currentYear; y >= 1900; y--) {
   yearGraduatedSelect.appendChild(opt2);
 }
 
-// --- Password Visibility Toggle ---
+// --- Password Visibility Toggle + Minimum Length Validation ---
 const passwordInput = document.getElementById('password');
 const togglePassword = document.getElementById('togglePassword');
+const passwordHelp = document.getElementById('passwordHelp');
+
+// Toggle visibility
 togglePassword.addEventListener('click', () => {
   const isPassword = passwordInput.type === 'password';
   passwordInput.type = isPassword ? 'text' : 'password';
   togglePassword.textContent = isPassword ? '🗹' : '☐';
+});
+
+// Validate minimum length
+passwordInput.addEventListener('input', () => {
+  if (passwordInput.value.length < 10) {
+    passwordHelp.style.display = 'inline';
+  } else {
+    passwordHelp.style.display = 'none';
+  }
 });
 
 // --- Loader Animation ---

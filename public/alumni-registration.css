@@ -1281,3 +1281,14 @@ option {
 .modal-body li {
   margin-bottom: 10px;
 }
+.password-error {
+  position: relative;
+  font-family: 'Albert Sans', serif;
+  top: 35px;
+  right: 255px;
+  color: red;
+  display: none;
+  text-align: left;
+  display: block;
+  font-size: 0.9em;
+}

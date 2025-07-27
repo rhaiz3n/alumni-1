@@ -341,14 +341,75 @@
         <button type="button" id="addPlayerBtn">Add Player</button>
       `;
     } else {
-      html += input('firstName', 'First Name') +
-        input('middleInitial', 'Middle Initial') +
-        input('lastName', 'Last Name') +
-        `<label>Sex</label><select name="sex" required>
-          <option>Male</option><option>Female</option><option>Other</option>
-        </select>` +
-        input('extension', 'Extension (Jr, III, etc)') +
-        input('batch', 'Batch/Year Graduated');
+      html += `
+        <div>
+          <input 
+            type="text" 
+            name="firstName" 
+            placeholder="First Name" 
+            required 
+            maxlength="20"
+            oninput="this.value = this.value.replace(/[^a-zA-Z\\s]/g, '').toLowerCase().replace(/\\b\\w/g, c => c.toUpperCase()).slice(0, 20)" 
+          />
+        </div>
+        <div>
+          <input 
+            type="text" 
+            name="middleInitial" 
+            placeholder="Middle Initial" 
+            maxlength="1" 
+            required 
+            oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0,1)" 
+          />
+        </div>
+        <div>
+          <input 
+            type="text" 
+            name="lastName" 
+            placeholder="Last Name" 
+            required 
+            maxlength="20"
+            oninput="this.value = this.value.replace(/[^a-zA-Z\\s]/g, '').toLowerCase().replace(/\\b\\w/g, c => c.toUpperCase()).slice(0, 20)" 
+          />
+        </div>
+        <label>Sex</label>
+        <select name="sex" required>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+        <div>
+          <input 
+            type="text" 
+            name="extension" 
+            placeholder="Extension (Jr, III, etc)" 
+            maxlength="3"
+            oninput="
+              let val = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+              const roman = ['I','II','III','IV','V','VI'];
+              const known = { 'JR': 'Jr', 'SR': 'Sr' };
+              this.value = roman.includes(val) ? val : (known[val] || val.charAt(0).toUpperCase() + val.slice(1).toLowerCase());
+            "
+          />
+        </div>
+        <div>
+          <input 
+            type="text" 
+            name="batch" 
+            placeholder="Batch/Year Graduated" 
+            maxlength="4" 
+            required 
+            oninput="
+              let val = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+              if (val.length < 4 || (parseInt(val, 10) >= 1990 && parseInt(val, 10) <= 2099)) {
+                this.value = val;
+              } else {
+                this.value = '';
+              }
+            "
+          />
+        </div>
+      `;
     }
 
     dynamicFields.innerHTML = html;
@@ -567,7 +628,6 @@
       alert('❌ Error: ' + err.message);
     }
   });
-
 
   // ✅ Homecoming Form Submit
   const homecomingForm = document.getElementById('homecomingForm');

@@ -319,13 +319,27 @@
     let html = '';
 
     if (v === 'mensBasketball') {
-      html += input('teamName', 'Team Name') +
-        `<label>Age Range:</label><select name="ageRange" required>
-          <option>1985–1995</option><option>1996–2015</option><option>2016–2025</option>
+      html += `
+        <label for="teamName">Team Name</label>
+        <input 
+          type="text" 
+          name="teamName" 
+          id="teamName" 
+          maxlength="20"
+          required
+          placeholder="Enter Team Name"
+          oninput="validateTeamName(this)"
+        />
+        <label>Age Range:</label>
+        <select name="ageRange" required>
+          <option>1985–1995</option>
+          <option>1996–2015</option>
+          <option>2016–2025</option>
         </select>
         <p>(Min 10, Max 20 players – fill blanks with NA)</p>
         <div id="playersContainer"></div>
-        <button type="button" id="addPlayerBtn">Add Player</button>`;
+        <button type="button" id="addPlayerBtn">Add Player</button>
+      `;
     } else {
       html += input('firstName', 'First Name') +
         input('middleInitial', 'Middle Initial') +
@@ -348,16 +362,74 @@
           showPlayerLimitToast();
           return;
         }
+
         count++;
         const div = document.createElement('div');
         div.innerHTML = `<strong>Player No.${count}${count === 1 ? ' (Rep)' : ''}</strong>
-          ${input(`player${count}_fname`, 'First Name')}
-          ${input(`player${count}_mi`, 'MI')}
-          ${input(`player${count}_lname`, 'Last Name')}`;
+          <input type="text" name="player${count}_fname" placeholder="First Name" maxlength="20" required oninput="validatePlayerName(this, 'first')" />
+          <input type="text" name="player${count}_mi" placeholder="MI" maxlength="1" required oninput="validatePlayerName(this, 'middle')" />
+          <input type="text" name="player${count}_lname" placeholder="Last Name" maxlength="20" required oninput="validatePlayerName(this, 'last')" />`;
         playersDiv.appendChild(div);
       };
     }
   });
+
+  function validatePlayerName(input, type) {
+    let value = input.value;
+
+    // Strip all non-letters/spaces
+    value = value.replace(/[^a-zA-Z ]/g, '');
+
+    if (type === 'middle') {
+      // Only one uppercase letter for MI
+      value = value.slice(0, 1).toUpperCase();
+    } else {
+      // Capitalize each word
+      value = value
+        .toLowerCase()
+        .replace(/\b\w/g, char => char.toUpperCase())
+        .slice(0, 20); // Enforce max 20 letters
+    }
+
+    input.value = value;
+  }
+
+  function validateTeamName(input) {
+    let value = input.value;
+
+    // 1. Remove invalid characters (allow A-Z, 0-9, space, .-_!#&)
+    value = value.replace(/[^a-zA-Z0-9 .\-_!#&]/g, '');
+
+    // 2. Limit digits to two but keep their position
+    let digitCount = 0;
+    let limited = '';
+    for (const char of value) {
+      if (/\d/.test(char)) {
+        if (digitCount >= 2) continue;
+        digitCount++;
+      }
+      limited += char;
+    }
+
+    // 3. Only one of each special character
+    const allowedSpecials = ['.', '-', '_', '!', '#', '&'];
+    const usedSpecials = {};
+    let final = '';
+    for (const ch of limited) {
+      if (allowedSpecials.includes(ch)) {
+        if (usedSpecials[ch]) continue;
+        usedSpecials[ch] = true;
+      }
+      final += ch;
+    }
+
+    // 4. Uppercase all and apply final 20 char limit
+    input.value = final.toUpperCase().slice(0, 20);
+  }
+
+
+
+
 
   function showPlayerLimitToast() {
     const toast = document.getElementById('playerLimitToast');
@@ -378,6 +450,10 @@
 
     if (!sport) return alert('Please select a sport.');
 
+    if (sport === 'mensBasketball' && count < 10) {
+      showSportsToast('❌ You must add at least 10 players before submitting.', false);
+      return;
+    }
     // 🏀 Team Registration for Men's Basketball
     if (sport === 'mensBasketball') {
       const payload = {

@@ -1181,3 +1181,17 @@ html, body {
 }
 
 /* etc. for warning/info */
+.password-error {
+  color: red;
+  display: none;
+  font-size: 0.9em;
+  margin-top: 4px;
+  text-align: left;
+}
+.toggle-password {
+  positio
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  margin-top: 4px;
+}

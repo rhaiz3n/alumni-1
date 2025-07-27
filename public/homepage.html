@@ -139,14 +139,14 @@
           />
           <input
             type="password"
-            name="password"
-            id="login-password"
-            class="login-input2"
+            id="preferredPassword"
+            name="preferredPassword"
             placeholder="Enter Password"
-            maxlength="15"
+            maxlength="20"
             required
-            oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
           />
+          <span id="toggleEmployerPassword" class="toggle-password">☐</span>
+          <small id="passwordHelp" class="password-error">Password must be at least 10 characters</small>
           <button type="submit" class="login-submit">Login</button>
           <div id="loginError" style="color: red; margin-top: 10px;"></div>
         </form>
@@ -762,42 +762,73 @@ document.getElementById('login-form').onsubmit = async e => {
   }
 
   // 🆕 Employer Registration (Public)
-  window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('openEmployerModal').onclick = () =>
-      document.getElementById('employerModal').style.display = 'flex';
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('openEmployerModal').onclick = () =>
+    document.getElementById('employerModal').style.display = 'flex';
 
-    document.getElementById('closeEmployerModal').onclick = () =>
-      document.getElementById('employerModal').style.display = 'none';
+  document.getElementById('closeEmployerModal').onclick = () =>
+    document.getElementById('employerModal').style.display = 'none';
 
-    document.getElementById('employerSubmitBtn').onclick = async () => {
-      const f = document.getElementById('employerRegForm');
-      const data = {
-        employerName: f.employerName.value.trim(),
-        businessName: f.businessName.value.trim(),
-        businessAddress: f.businessAddress.value.trim(),
-        landlineNo: f.landlineNo.value.trim(),
-        mobileNo: f.mobileNo.value.trim(),
-        companyEmail: f.companyEmail.value.trim(),
-        companyWebsite: f.companyWebsite.value.trim(),
-        preferredUserId: f.preferredUserId.value.trim(),
-        preferredPassword: f.preferredPassword.value.trim()
-      };
-      if (Object.values(data).some(v => !v))
-        return showEmployerToast('⚠️ Fill all employer fields', 'error');
-      if (!data.preferredUserId.endsWith('.employer'))
-        return showEmployerToast('ID must end with ".employer"', 'error');
+  // ✅ Password visibility toggle + helper setup
+  const employerPasswordInput = document.getElementById('preferredPassword');
+  const toggleEmployerPassword = document.getElementById('toggleEmployerPassword');
+  const passwordHelp = document.getElementById('passwordHelp');
 
-      const r = await fetch('/api/employer/employers', {
-        method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(data)
-      });
-      const d = await r.json();
-      if (!r.ok) return showEmployerToast('❌ ' + (d.error || 'Failed'), 'error');
-
-      showEmployerToast('✅ Employer request sent', 'success');
-      f.reset();
-      document.getElementById('employerModal').style.display = 'none';
-    };
+  toggleEmployerPassword.addEventListener('click', () => {
+    const isPassword = employerPasswordInput.type === 'password';
+    employerPasswordInput.type = isPassword ? 'text' : 'password';
+    toggleEmployerPassword.textContent = isPassword ? '🗹' : '☐';
   });
+
+  employerPasswordInput.addEventListener('input', () => {
+    if (employerPasswordInput.value.length < 10) {
+      passwordHelp.style.display = 'block';
+    } else {
+      passwordHelp.style.display = 'none';
+    }
+  });
+
+  document.getElementById('employerSubmitBtn').onclick = async () => {
+    const f = document.getElementById('employerRegForm');
+    const data = {
+      employerName: f.employerName.value.trim(),
+      businessName: f.businessName.value.trim(),
+      businessAddress: f.businessAddress.value.trim(),
+      landlineNo: f.landlineNo.value.trim(),
+      mobileNo: f.mobileNo.value.trim(),
+      companyEmail: f.companyEmail.value.trim(),
+      companyWebsite: f.companyWebsite.value.trim(),
+      preferredUserId: f.preferredUserId.value.trim(),
+      preferredPassword: f.preferredPassword.value.trim()
+    };
+
+    if (Object.values(data).some(v => !v))
+      return showEmployerToast('⚠️ Fill all employer fields', 'error');
+
+    if (!data.preferredUserId.endsWith('.employer'))
+      return showEmployerToast('ID must end with ".employer"', 'error');
+
+    // ✅ Password minimum length check
+    if (data.preferredPassword.length < 10) {
+      passwordHelp.style.display = 'block';
+      return showEmployerToast('❗ Password must be at least 10 characters', 'error');
+    }
+
+    const r = await fetch('/api/employer/employers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const d = await r.json();
+    if (!r.ok) return showEmployerToast('❌ ' + (d.error || 'Failed'), 'error');
+
+    showEmployerToast('✅ Employer request sent', 'success');
+    f.reset();
+    document.getElementById('employerModal').style.display = 'none';
+  };
+});
+
 
   // 🍿 Toast Helpers
 

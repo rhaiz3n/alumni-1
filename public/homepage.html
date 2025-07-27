@@ -139,14 +139,13 @@
           />
           <input
             type="password"
-            id="preferredPassword"
-            name="preferredPassword"
+            name="password"
+            id="login-password"
+            class="login-input2"
             placeholder="Enter Password"
-            maxlength="20"
             required
           />
-          <span id="toggleEmployerPassword" class="toggle-password">☐</span>
-          <small id="passwordHelp" class="password-error">Password must be at least 10 characters</small>
+          <span id="toggleLoginPassword" class="toggle-Lpassword">☐</span>
           <button type="submit" class="login-submit">Login</button>
           <div id="loginError" style="color: red; margin-top: 10px;"></div>
         </form>
@@ -375,9 +374,11 @@
             type="password" 
             id="preferredPassword" 
             placeholder="Preferred User Password" 
-            maxlength="15"
+            maxlength="20"
             oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
           />
+          <span id="toggleEmployerPassword" class="toggle-Epassword">☐</span>
+          <small id="passwordHelp" class="password-error">Password must be at least 10 characters</small>
           <button type="button" id="employerSubmitBtn">Submit Registration</button>
         </form>
       </div>
@@ -615,6 +616,16 @@ document.getElementById('login-form').onsubmit = async e => {
   }
 };
 
+const loginPasswordInput = document.getElementById('login-password');
+const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+
+if (loginPasswordInput && toggleLoginPassword) {
+  toggleLoginPassword.addEventListener('click', () => {
+    const isPassword = loginPasswordInput.type === 'password';
+    loginPasswordInput.type = isPassword ? 'text' : 'password';
+    toggleLoginPassword.textContent = isPassword ? '🗹' : '☐';
+  });
+}
 
   const forgotModal = document.getElementById('forgot-modal');
   document.getElementById('openForgotModal').onclick = () => forgotModal.style.display = 'block';

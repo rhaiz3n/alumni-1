@@ -525,47 +525,17 @@
 
 
     // 🏐🏓 Solo Sport Registration (WVolleyball, MVolleyball, Chess, Darts)
-    function cleanName(value) {
-      return value
-        .replace(/[^a-zA-Z\s]/g, '') // Remove non-letters
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase())
-        .slice(0, 20);
-    }
-
-    function cleanMiddleInitial(value) {
-      return value.replace(/[^a-zA-Z]/g, '').slice(0, 1).toUpperCase();
-    }
-
-    function cleanExtension(value) {
-      const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI'];
-      const val = value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
-      if (romanNumerals.includes(val)) return val;
-
-      const known = { 'JR': 'Jr', 'SR': 'Sr' };
-      return known[val] || (val.charAt(0).toUpperCase() + val.slice(1).toLowerCase());
-    }
-
-    function cleanGraduationYear(value) {
-      const digitsOnly = value.replace(/[^0-9]/g, '').slice(0, 4);
-      const year = parseInt(digitsOnly, 10);
-      if (year >= 1990 && year <= 2099) {
-        return digitsOnly;
-      }
-      return ''; // Invalid year
-    }
-
     const payload = {
-      firstName: cleanName(data.get('firstName')?.trim() || ''),
-      middleName: cleanMiddleInitial(data.get('middleInitial')?.trim() || ''),
-      lastName: cleanName(data.get('lastName')?.trim() || ''),
+      firstName: data.get('firstName')?.trim(),
+      middleName: data.get('middleInitial')?.trim() || '',
+      lastName: data.get('lastName')?.trim(),
       gender: data.get('sex')?.trim(),
-      extension: cleanExtension(data.get('extension')?.trim() || ''),
-      yearGraduated: cleanGraduationYear(data.get('batch')?.trim() || ''),
-      sportType: data.get('sportType')?.trim() || ''
+      extension: data.get('extension')?.trim() || '',
+      yearGraduated: data.get('batch')?.trim() || '',
+      sportType: data.get('sportType')?.trim() || '' // ✅ Make sure this line is here
     };
 
-    if (!payload.firstName || !payload.lastName || !payload.gender || !payload.yearGraduated) {
+    if (!payload.firstName || !payload.lastName || !payload.gender) {
       return alert('Please complete all required fields.');
     }
 
@@ -594,7 +564,7 @@
       dynamicFields.innerHTML = '';
     } catch (err) {
       console.error(err);
-      showSportsToast('❌ Error: Something went wrong. Please try again.');
+      alert('❌ Error: ' + err.message);
     }
   });
 

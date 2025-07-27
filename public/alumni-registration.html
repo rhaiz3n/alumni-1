@@ -728,6 +728,12 @@ async function submitregForm() {
     return;
   }
 
+  if (payload.passWord.length < 10) {
+    passwordHelp.style.display = 'block';
+    showErrorToast('❗ Password must be at least 10 characters');
+    return;
+  }
+
   // Disable submit button during processing
   const submitBtn = document.getElementById('submitform');
   const originalText = submitBtn.textContent;

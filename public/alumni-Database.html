@@ -76,17 +76,28 @@
       <div class="modal-content">
         <h2>Add Alumni Information</h2>
         <form id="alumniForm">
-            <input id="firstName" placeholder="First Name" required />
-            <input id="lastName" placeholder="Last Name" required />
-            <input id="initial" placeholder="Initial" />
-            <input id="suffix" placeholder="Suffix" />
+            <input id="firstName" placeholder="First Name" required oninput="this.value = formatName(this.value)" />
+
+            <input id="lastName" placeholder="Last Name" required oninput="this.value = formatName(this.value)" />
+
+            <input id="initial" placeholder="Initial" oninput="this.value = formatInitial(this.value)" />
+
+            <input id="suffix" placeholder="Suffix" oninput="this.value = formatSuffix(this.value)" />
+
             <input id="dateBirth" type="date" placeholder="Date of Birth" required />
-            <input id="gender" placeholder="Gender" />
-            <input id="phoneNo" placeholder="Phone No" />
-            <input id="major" placeholder="Major" required />
-            <input id="yearStarted" placeholder="Year Started" required />
-            <input id="graduated" placeholder="Graduated" required />
-            <input id="studentNo" placeholder="Student No." />
+
+            <input id="gender" placeholder="Gender" maxlength="6" required oninput="validateGender(this)" />
+
+            <input id="phoneNo" placeholder="Phone No" maxlength="12" required oninput="validatePhone(this)" />
+
+            <input id="major" placeholder="Major" required oninput="validateMajor(this)" maxlength="9" />
+
+            <input id="yearStarted" placeholder="Year Started" required maxlength="4" oninput="lenientYearInput(this)" />
+
+            <input id="graduated" placeholder="Graduated" required maxlength="4" oninput="lenientYearInput(this)" />
+
+            <input id="studentNo" placeholder="Student No." oninput="validateStudentNo(this)" maxlength="4" />
+
           <button type="submit" class="submit-btn">Submit</button>
           <button type="button" onclick="closeModal()" class="cancel-btn">Cancel</button>
         </form>
@@ -96,6 +107,66 @@
     <div id="toast" class="toast"></div>
     
 <script>
+  function validateStudentNo(input) {
+    input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
+  }
+  
+  function lenientYearInput(input) {
+    // Allow only digits, up to 4 characters — but don't clear prematurely
+    const digits = input.value.replace(/[^0-9]/g, '').slice(0, 4);
+    input.value = digits;
+  }
+
+  // Final validation function to use on form submission
+  function isYearValid(val) {
+    const year = parseInt(val, 10);
+    return val.length === 4 && year >= 1990 && year <= 2099;
+  }
+
+  function validateMajor(input) {
+    input.value = input.value
+      .replace(/[^a-zA-Z\-]/g, '')   // Allow only letters and dash
+      .toUpperCase()                 // All uppercase
+      .slice(0, 9);                  // Max 7 characters
+  }
+
+  function validatePhone(input) {
+    input.value = input.value.replace(/[^0-9]/g, '').slice(0, 15);
+  }
+
+  function validateGender(input) {
+    input.value = input.value
+      .replace(/[^a-zA-Z]/g, '')      // Only letters
+      .slice(0, 6)                    // Max 4 characters
+      .replace(/\b\w/g, c => c.toUpperCase()); // Capitalize first
+  }
+
+  function formatSuffix(value) {
+    const cleaned = value.replace(/[^a-zA-Z]/g, '').slice(0, 4).toLowerCase();
+    if (cleaned === 'none') return 'None';
+
+    const roman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+    const upper = cleaned.toUpperCase();
+    if (roman.includes(upper)) return upper;
+
+    const known = { 'jr': 'Jr', 'sr': 'Sr' };
+    return known[cleaned] || (cleaned.charAt(0).toUpperCase() + cleaned.slice(1));
+  }
+
+  function formatInitial(value) {
+    return value
+      .replace(/[^a-zA-Z]/g, '')  // Remove everything except letters
+      .toUpperCase()
+      .slice(0, 1);               // Max 1 character
+  }
+
+  function formatName(val) {
+    return val
+      .replace(/[^a-zA-Z\s]/g, '')        // Only letters and spaces
+      .toLowerCase()
+      .replace(/\b\w/g, c => c.toUpperCase()) // Capitalize each word
+      .slice(0, 20);                      // Max 20 characters
+  }
 document.addEventListener('DOMContentLoaded', () => {
   const modal        = document.getElementById('modal');
   const tbody        = document.querySelector('#alumniTable tbody');

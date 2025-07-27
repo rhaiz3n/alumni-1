@@ -854,7 +854,7 @@ html, body {
   background: #fff;
   padding: 20px;
   width: 500px;
-  height: 670px;
+  height: 685px;
   max-width: 90%;
   border-radius: 8px;
   animation: fadeIn 0.3s ease;
@@ -1184,8 +1184,8 @@ html, body {
 .password-error {
   position: relative;
   font-family: 'Albert Sans', serif;
-  top: 35px;
-  right: 255px;
+  top: 45px;
+  right: 0px;
   color: red;
   display: none;
   text-align: left;
@@ -1194,8 +1194,8 @@ html, body {
 }
 .toggle-Lpassword {
   position: relative;
-  top: 300px;
-  left: 300px;
+  top: 275px;
+  left: 440px;
   cursor: pointer;
   user-select: none;
   display: inline-block;
@@ -1203,8 +1203,8 @@ html, body {
 }
 .toggle-Epassword {
   position: absolute;
-  top: 300px;
-  left: 300px;
+  top: 610px;
+  left: 490px;
   cursor: pointer;
   user-select: none;
   display: inline-block;

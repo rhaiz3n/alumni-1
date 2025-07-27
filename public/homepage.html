@@ -177,7 +177,20 @@
 
             <!-- Step 4: Reset Password -->
             <div id="resetPasswordSection" style="display:none; margin-top:10px;">
-              <input type="password" id="newPassword" placeholder="Enter New Password">
+              <div style="position: relative;">
+                <input 
+                  type="password" 
+                  id="newPassword" 
+                  placeholder="Enter New Password" 
+                  maxlength="15"
+                  oninput="filterResetPassword(this)"
+                  style="padding-right: 55px;"
+                />
+                <span 
+                  id="toggleResetPassword" 
+                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"
+                >☐</span>
+              </div>
               <button id="resetPasswordBtn">Reset Password</button>
             </div>
 
@@ -374,7 +387,7 @@
             type="password" 
             id="preferredPassword" 
             placeholder="Preferred User Password" 
-            maxlength="20"
+            maxlength="15"
             oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
           />
           <span id="toggleEmployerPassword" class="toggle-Epassword">☐</span>
@@ -403,6 +416,22 @@
 
   <!-- Modal Script -->
 <script>
+  // Filters: Only letters + up to 2 digits
+  // Filter: Only letters and digits (no limit on digits)
+  function filterResetPassword(input) {
+    input.value = input.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 15);
+  }
+
+  // Toggle Password Visibility
+  const toggle = document.getElementById('toggleResetPassword');
+  const passwordInput = document.getElementById('newPassword');
+
+  toggle.addEventListener('click', () => {
+    const isHidden = passwordInput.type === 'password';
+    passwordInput.type = isHidden ? 'text' : 'password';
+    toggle.textContent = isHidden ? '🗹' : '☐';
+  });
+
   function formatCompanyEmail(value) {
     // Remove spaces only, allow everything else
     return value.replace(/\s/g, '');

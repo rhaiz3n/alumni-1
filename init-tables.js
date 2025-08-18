@@ -4,11 +4,11 @@ const admin = require('./db/mysql-admin');
 
 async function initTables() {
   try {
-    await admin.query(`CREATE DATABASE IF NOT EXISTS alumni_db`);
-    console.log("✅ Database 'alumni_db' created or already exists");
+    await admin.query(`CREATE DATABASE IF NOT EXISTS alumni1_db`);
+    console.log("✅ Database 'alumni1_db' created or already exists");
 
     const conn = await admin.getConnection();
-    await conn.changeUser({ database: 'alumni_db' });
+    await conn.changeUser({ database: 'alumni1_db' });
 
     const sql = {
       alumni: `CREATE TABLE IF NOT EXISTS alumni (

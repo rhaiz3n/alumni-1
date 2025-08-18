@@ -1,6 +1,6 @@
 // init-tables.js
 require('dotenv').config();
-const admin = require('./db/mysql-admin');
+const admin = require('./db/mysql');
 
 async function initTables() {
   try {

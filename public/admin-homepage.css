@@ -375,10 +375,17 @@ html, body {
   font-size: 14px;
   color: #555;
 }
-.fb-wrapper, .fb-wrapper2 {
+.fb-wrapper{
   position: absolute;
   border: 3px solid#ddd;
-  top: 270px;
+  top: 790px;
+  left: 1100px; /* adjust as needed */
+  z-index: 10;
+}
+.fb-wrapper2 {
+  position: absolute;
+  border: 3px solid#ddd;
+  top: 1300px;
   left: 1100px; /* adjust as needed */
   z-index: 10;
 }
@@ -542,7 +549,7 @@ html, body {
   position: absolute;
   text-align: justify;
   font-size: small;
-  top: 1305px;
+  top: 790px;
   left: 1450px;
   z-index: 10;
   border: 3px solid #ccc;
@@ -554,7 +561,7 @@ html, body {
 
 .announcement-list {
   max-height: 420px;
-  height: 500px;
+  height: 600px;
   box-shadow: #000;
   width: 316px; /* adjust this height */
   overflow-y: auto;
@@ -663,7 +670,7 @@ html, body {
 
 .announcement-box2 {
   position: absolute;
-  top: 790px;
+  top: 270px;
   left: 1450px;
   z-index: 10;
   border: 3px solid #ccc;
@@ -674,6 +681,7 @@ html, body {
 }
 
 .announcement-list {
+  text-align: justify;
   max-height: 420px;
   box-shadow: #000;
   width: 316px; /* adjust this height */
@@ -720,7 +728,7 @@ html, body {
 }
 .career-box {
   position: absolute;
-  top: 790px;
+  top: 270px;
   left: 1100px;
   z-index: 10;
   border: 3px solid #ccc;
@@ -732,7 +740,7 @@ html, body {
 
 .career-list {
   max-height: 420px;
-    height: 500px;
+  height: 500px;
   box-shadow: #000;
   width: 316px; /* adjust this height */
   overflow-y: auto;

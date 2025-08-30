@@ -209,7 +209,7 @@
           required 
           oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')" 
         />
-        <span id="togglePassword" class="toggle-password">☐</span>
+        <span id="togglePassword" class="toggle-password"></span>
         <small id="passwordHelp" class="password-error">Password must be at least 10 characters</small>
       </div>
 
@@ -601,7 +601,7 @@ const passwordHelp = document.getElementById('passwordHelp');
 togglePassword.addEventListener('click', () => {
   const isPassword = passwordInput.type === 'password';
   passwordInput.type = isPassword ? 'text' : 'password';
-  togglePassword.textContent = isPassword ? '🗹' : '☐';
+  togglePassword.textContent = isPassword ? '' : '';
 });
 
 // Validate minimum length

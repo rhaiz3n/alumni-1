@@ -9,7 +9,7 @@ html, body {
   background: #ffffff;
   border: 0px solid #000000;
   height: 210vh;
-  width: 100vw;
+  width: 100%;
   margin: 0 auto;
   justify-content: center;
   align-items: center;

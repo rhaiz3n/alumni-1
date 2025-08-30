@@ -1948,7 +1948,7 @@ app.patch('/api/employer/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   
-  if (!['PENDING', 'ACCEPTED', 'DECLINED'].includes(status)) {
+  if (!['PENDING', 'ACCEPTED', 'ARCHIVED'].includes(status)) {
     return res.status(400).json({ error: 'Invalid status' });
   }
 

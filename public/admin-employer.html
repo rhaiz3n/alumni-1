@@ -75,7 +75,7 @@
         <option value="ALL">All Statuses</option>
         <option value="PENDING">Pending</option>
         <option value="ACCEPTED">Accepted</option>
-        <option value="DECLINED">Declined</option>
+        <option value="ARCHIVED">Archived</option>
     </select>
 
     <select id="pageSelect"></select>
@@ -115,7 +115,7 @@ function renderEmployers() {
   const filterValue = document.getElementById('statusFilter').value || 'ALL';
   tbody.innerHTML = '';
 
-  const statusPriority = { 'PENDING': 1, 'ACCEPTED': 2, 'DECLINED': 3 };
+  const statusPriority = { 'PENDING': 1, 'ACCEPTED': 2, 'ARCHIVED': 3 };
 
   const sortedEmployers = allEmployers
     .filter(emp => {
@@ -153,7 +153,7 @@ function renderEmployers() {
       <td>${formatDate(emp.submittedAt)}</td>
       <td>
         <button class="accept-btn" data-id="${emp.id}">Accept</button>
-        <button class="decline-btn" data-id="${emp.id}">Decline</button>
+        <button class="decline-btn" data-id="${emp.id}">Archived</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -190,7 +190,7 @@ function attachStatusEventListeners() {
     btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ACCEPTED'));
   });
   document.querySelectorAll('.decline-btn').forEach(btn => {
-    btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'DECLINED'));
+    btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ARCHIVED'));
   });
 }
 

@@ -147,7 +147,7 @@
             placeholder="Enter Password"
             required
           />
-          <span id="toggleLoginPassword" class="toggle-Lpassword"></span>
+          <span id="toggleLoginPassword" class="toggle-Lpassword">⌣</span>
           <button type="submit" class="login-submit">Login</button>
           <div id="loginError" style="color: red; margin-top: 10px;"></div>
         </form>
@@ -191,7 +191,7 @@
                 <span 
                   id="toggleResetPassword" 
                   style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"
-                ></span>
+                >⌣</span>
               </div>
               <button id="resetPasswordBtn">Reset Password</button>
             </div>
@@ -392,7 +392,7 @@
             maxlength="15"
             oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '')"
           />
-          <span id="toggleEmployerPassword" class="toggle-Epassword"></span>
+          <span id="toggleEmployerPassword" class="toggle-Epassword">⌣</span>
           <small id="passwordHelp" class="password-error">Password must be at least 10 characters</small>
           <button type="button" id="employerSubmitBtn">Submit Registration</button>
         </form>
@@ -431,7 +431,7 @@
   toggle.addEventListener('click', () => {
     const isHidden = passwordInput.type === 'password';
     passwordInput.type = isHidden ? 'text' : 'password';
-    toggle.textContent = isHidden ? '' : '';
+    toggle.textContent = isHidden ? '👁️' : '⌣';
   });
 
   function formatCompanyEmail(value) {
@@ -654,7 +654,7 @@ if (loginPasswordInput && toggleLoginPassword) {
   toggleLoginPassword.addEventListener('click', () => {
     const isPassword = loginPasswordInput.type === 'password';
     loginPasswordInput.type = isPassword ? 'text' : 'password';
-    toggleLoginPassword.textContent = isPassword ? '' : '';
+    toggleLoginPassword.textContent = isPassword ? '👁️' : '⌣';
   });
 }
 
@@ -819,7 +819,7 @@ window.addEventListener('DOMContentLoaded', () => {
   toggleEmployerPassword.addEventListener('click', () => {
     const isPassword = employerPasswordInput.type === 'password';
     employerPasswordInput.type = isPassword ? 'text' : 'password';
-    toggleEmployerPassword.textContent = isPassword ? '' : '';
+    toggleEmployerPassword.textContent = isPassword ? '👁️' : '⌣';
   });
 
   employerPasswordInput.addEventListener('input', () => {

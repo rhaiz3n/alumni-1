@@ -10,6 +10,7 @@ const { Server } = require('socket.io');
 const pool = require('../db/mysql'); // MySQL pool (mysql2)
 const { sendOtpEmail } = require('../GmailMailer');
 
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -48,7 +49,12 @@ app.use('/uploads', express.static('uploads'));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'alumni2025',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false, // ❌ was true, set false
+  cookie: {
+    httpOnly: true,
+    secure: false,          // ❌ change to true if using HTTPS
+    maxAge: 1000 * 60 * 60  // 1 hour
+  }
 }));
 app.locals.io = io;
 
@@ -93,6 +99,7 @@ async function initTables() {
     )`,
     fullInformation: `CREATE TABLE IF NOT EXISTS fullInformation (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      userName VARCHAR(100),              -- ✅ New column to link with registration.userName
       firstName VARCHAR(100),
       lastName VARCHAR(100),
       initial VARCHAR(10),
@@ -633,8 +640,6 @@ app.post('/api/registration/add', async (req, res) => {
 
 
 // ✅ LOGIN API — Check username & password
-const bcrypt = require('bcrypt');
-
 app.post('/api/registration/login', async (req, res) => {
   const { userName, passWord } = req.body;
 
@@ -644,32 +649,148 @@ app.post('/api/registration/login', async (req, res) => {
 
   try {
     const [rows] = await pool.execute(
-      `SELECT * FROM registration 
-       WHERE userName = ? AND passWord = ?`,
+      `SELECT * FROM registration WHERE userName = ? AND passWord = ?`,
       [userName, passWord]
     );
 
     if (rows.length === 0) {
-      console.log('❌ Invalid credentials');
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
     const user = rows[0];
-    const isAdmin = userName.toLowerCase() === 'admin';
 
+    // ✅ Check if admin
+    const isAdmin = userName.toLowerCase() === "admin";
+
+    // ✅ Save session
     req.session.user = {
       id: user.id,
       userName: user.userName,
       isAdmin
     };
+    req.session.userId = user.id;
 
-    console.log('✅ Login successful for:', userName);
-    res.json({ success: true, message: 'Login successful', isAdmin });
+    // ✅ Respond with user info + admin flag
+    res.json({
+      success: true,
+      message: "Login successful",
+      isAdmin,
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        personalEmail: user.personalEmail,
+        gender: user.gender,
+        userName: user.userName
+      }
+    });
   } catch (err) {
-    console.error('❌ Login DB Error:', err);
-    res.status(500).json({ error: 'Database error' });
+    console.error("❌ Login DB Error:", err);
+    res.status(500).json({ error: "Database error" });
   }
 });
+
+// ✅ Get logged-in user info
+// Format MySQL DATE into YYYY-MM-DD
+function formatDate(date) {
+  if (!date) return null;
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+
+
+
+// ✅ New route: get logged-in user's full info
+app.get('/api/fullInformation/me', async (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  try {
+    // Get user from registration (basic info)
+    const [regRows] = await pool.execute(
+      `SELECT id, firstName, lastName, personalEmail, gender, userName 
+       FROM registration WHERE id = ?`,
+      [req.session.user.id]
+    );
+
+    if (regRows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const user = regRows[0];
+
+    // Look for extra info in fullInformation
+    const [infoRows] = await pool.execute(
+      `SELECT civilStatus, dateBirth, phoneNo, major, yearStarted, graduated, studentNo
+       FROM fullInformation
+       WHERE firstName = ? AND lastName = ? AND gender = ?`,
+      [user.firstName, user.lastName, user.gender]
+    );
+
+    let extraInfo = {};
+    if (infoRows.length > 0) {
+      extraInfo = infoRows[0];
+      if (extraInfo.dateBirth) {
+        extraInfo.dateBirth = formatDate(extraInfo.dateBirth);
+      }
+    }
+
+    res.json({ ...user, ...extraInfo });
+  } catch (err) {
+    console.error("❌ Fetch FullInformation User Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// ✅ New route: update both registration + fullInformation
+app.post('/api/fullInformation/update', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const { personalEmail, gender, phoneNo, civilStatus } = req.body;
+
+  try {
+    // Update registration
+    await pool.execute(
+      `UPDATE registration SET personalEmail=?, gender=? WHERE id=?`,
+      [personalEmail, gender, req.session.userId]
+    );
+
+    // Also try to update fullInformation if exists
+    const [regUser] = await pool.execute(
+      `SELECT firstName, lastName, gender FROM registration WHERE id=?`,
+      [req.session.userId]
+    );
+
+    if (regUser.length > 0) {
+      const { firstName, lastName, gender } = regUser[0];
+
+      await pool.execute(
+        `UPDATE fullInformation 
+         SET civilStatus = ?, phoneNo = ? 
+         WHERE firstName = ? AND lastName = ? AND gender = ?`,
+        [civilStatus || null, phoneNo || null, firstName, lastName, gender]
+      );
+    }
+
+    res.json({ success: true, message: "Profile updated!" });
+  } catch (err) {
+    console.error("❌ FullInformation Update Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
+
+
+
+
 
 app.post('/api/employer/login', async (req, res) => {
   const { userId, password } = req.body;
@@ -795,17 +916,20 @@ function validateDate(dateValue) {
   return null;
 }
 
-// Updated fullInformation route
+// Updated fullInformation route with userName
 app.post('/api/fullInformation/add', async (req, res) => {
   const {
+    userName, // ✅ new field
     firstName, lastName, initial, suffix, gender,
     civilStatus, dateBirth, maiden, phoneNo,
     major, yearStarted, graduated, studentNo
   } = req.body;
 
-  // Updated validation - allow some fields to be optional/empty
-  if (!firstName || !lastName || !gender || !major || !yearStarted || !graduated) {
-    return res.status(400).json({ error: 'Missing required fields: firstName, lastName, gender, major, yearStarted, graduated' });
+  // Validation
+  if (!userName || !firstName || !lastName || !gender || !major || !yearStarted || !graduated) {
+    return res.status(400).json({
+      error: 'Missing required fields: userName, firstName, lastName, gender, major, yearStarted, graduated'
+    });
   }
 
   try {
@@ -826,30 +950,30 @@ app.post('/api/fullInformation/add', async (req, res) => {
       return res.status(400).json({ error: 'Invalid graduated - must be a valid year' });
     }
 
-    console.log('Formatted date for database:', formattedDateBirth); // Debug log
+    console.log('Formatted date for database:', formattedDateBirth);
 
     const [result] = await pool.execute(`
       INSERT INTO fullInformation (
-        firstName, lastName, initial, suffix, gender,
+        userName, firstName, lastName, initial, suffix, gender,
         civilStatus, dateBirth, maiden, phoneNo,
         major, yearStarted, graduated, studentNo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        firstName || null,
-        lastName || null,
-        initial || null,
-        suffix || null,
-        gender || null,
-        civilStatus || null,
-        formattedDateBirth,
-        maiden || null,
-        phoneNo || null,
-        major || null,
-        validatedYearStarted,
-        validatedGraduated,
-        studentNo || null
-      ]
-    );
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      userName,
+      firstName || null,
+      lastName || null,
+      initial || null,
+      suffix || null,
+      gender || null,
+      civilStatus || null,
+      formattedDateBirth,
+      maiden || null,
+      phoneNo || null,
+      major || null,
+      validatedYearStarted,
+      validatedGraduated,
+      studentNo || null
+    ]);
 
     res.json({ success: true, id: result.insertId });
   } catch (err) {
@@ -857,6 +981,7 @@ app.post('/api/fullInformation/add', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.get('/api/fullInformation', async (req, res) => {
   const page = +req.query.page || 1;
@@ -2170,3 +2295,13 @@ app.use((err, req, res, next) => {
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+

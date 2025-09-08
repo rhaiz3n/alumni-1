@@ -272,6 +272,16 @@
         </div>
       </div>
 
+      <!-- Profile picture upload (simple) -->
+      <div class="upload-box">
+        <label for="profileImageInput">Upload Profile Picture</label>
+        <input type="file" id="profileImageInput" accept="image/*">
+        <!-- optional preview -->
+        <img id="previewImage" src="default-profile.png" alt="Preview" style="display:none; width:120px; height:120px; border-radius:50%; object-fit:cover; margin-top:8px;">
+      </div>
+
+
+
       <!-- Gender -->
       <div class="gender slide-in" style="animation-delay: 0.2s">Gender <span class="required-star">*</span></div>
       <select name="gender" id="gender" required class="slide-in" style="animation-delay: 0.2s">
@@ -843,6 +853,55 @@ document.getElementById('toastCloseBtn').addEventListener('click', () => {
     toast.className = 'toast';
   }
 });
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const profileInput = document.getElementById('profileImageInput');
+  const previewImage = document.getElementById('previewImage');
+
+  if (!profileInput) return; // not on registration page
+
+  profileInput.addEventListener('change', () => {
+    const file = profileInput.files && profileInput.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file (jpg, png, etc.)');
+      return;
+    }
+
+    // Optional: limit file size (e.g. 1.5MB)
+    const maxBytes = 1.5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      alert('Image is too large. Please select an image smaller than 1.5MB.');
+      profileInput.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result;
+      // save to localStorage (so userpage can read it)
+      try {
+        localStorage.setItem('userProfilePic', base64);
+      } catch (err) {
+        console.warn('localStorage set failed (maybe quota exceeded):', err);
+        alert('Could not save image in browser storage. Try a smaller image.');
+        return;
+      }
+
+      // show preview if present
+      if (previewImage) {
+        previewImage.src = base64;
+        previewImage.style.display = 'block';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
 </script>
 </body>
 </html>

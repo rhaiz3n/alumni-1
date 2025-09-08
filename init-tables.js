@@ -45,6 +45,7 @@ async function initTables() {
       )`,
       fullInformation: `CREATE TABLE IF NOT EXISTS fullInformation (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        userName VARCHAR(100),              -- ✅ New column to link with registration.userName
         firstName VARCHAR(100),
         lastName VARCHAR(100),
         initial VARCHAR(10),

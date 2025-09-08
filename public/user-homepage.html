@@ -276,30 +276,6 @@
       </iframe>
     </div>
 
-    <!-- Slideshow Section -->
-    <div class="slideshow-container zoom-in">
-      <img class="slideshow-image" src="Grad1.png" alt="Grad 1" />
-      <img class="slideshow-image" src="Grad2.png" alt="Grad 2" />
-      <img class="slideshow-image" src="Grad3.png" alt="Grad 3" />
-      <img class="slideshow-image" src="Grad4.png" alt="Grad 4" />
-      <img class="slideshow-image" src="Grad5.png" alt="Grad 5" />
-      <img class="slideshow-image" src="Grad6.png" alt="Grad 6" />
-      <img class="slideshow-image" src="Grad7.png" alt="Grad 7" />
-      <img class="slideshow-image" src="Grad8.png" alt="Grad 8" />
-    </div>
-
-    <div class="commencement-description zoom-in">
-      <h2 class="school-name">Technological University of the Philippines - Cavite</h2>
-      <h3 class="event-title">40th <span>COMMENCEMENT EXERCISE</span></h3>
-      <p class="description">
-        Here are some snaps from the 40th Commencement Exercise at the Philippine International Convention Center on July 31, 2024.
-        See the magical moments of every TUPCians who reached the end of their college journey.
-        <br><br>
-        <strong>Photos by:</strong> Photo X Media<br>
-        <strong>Words by:</strong> Karen Pet Pabrowada
-      </p>
-    </div>
-  </div>
 
   <!-- Contact Section -->
     <div class="contact-section">
@@ -327,6 +303,67 @@
         Loading...
       </div>
     </div>
+
+
+
+
+
+<!-- Profile picture trigger -->
+<img id="profilePic" src="default-profile.png" alt="Profile Picture" class="profile-circle" onclick="openProfileModal()">
+
+<!-- Modal -->
+<div id="modal-profile" class="modal-profile">
+  <div class="modal-profile-content">
+    <button class="modal-profile-close" onclick="closeProfileModal()">&times;</button>
+    
+    <div class="modal-top">
+      <img id="modalProfilePic" src="default-profile.png" alt="Profile" class="modal-profile-pic">
+      <h2 id="name">Loading...</h2>
+    </div>
+
+    <div class="modal-details">
+      <p><strong>Username:</strong> <span id="userName">-</span></p>
+
+      <!-- Email -->
+      <p>
+        <strong>Email:</strong> 
+        <span id="personalEmail">-</span>
+        <input type="email" id="editPersonalEmail" style="display:none;">
+      </p>
+
+      <!-- Civil Status -->
+      <p>
+        <strong>Civil Status:</strong> 
+        <span id="civilStatus">-</span>
+        <input type="text" id="editCivilStatus" style="display:none;">
+      </p>
+
+      <!-- Phone No -->
+      <p>
+        <strong>Phone No.:</strong> 
+        <span id="phoneNo">-</span>
+        <input type="text" id="editPhoneNo" style="display:none;">
+      </p>
+
+      <p><strong>Gender:</strong> <span id="gender">-</span></p>
+      <p><strong>Date of Birth:</strong> <span id="dateBirth">-</span></p>
+      <p><strong>Major:</strong> <span id="major">-</span></p>
+      <p><strong>Year Started:</strong> <span id="yearStarted">-</span></p>
+      <p><strong>Graduated:</strong> <span id="graduated">-</span></p>
+      <p><strong>Student No.:</strong> <span id="studentNo">-</span></p>
+    </div>
+
+    <div class="modal-actions">
+      <button id="editBtn" onclick="enableEdit()">Edit</button>
+      <button id="saveBtn" style="display:none;" onclick="saveProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast"></div>
+
+
 
   <!-- External JavaScript -->
   <script src="Homeslideshow.js"></script>
@@ -549,7 +586,7 @@ const loadingInterval = setInterval(() => {
     })
     .catch(err => {
       console.error('Submission failed:', err);
-      showNotification(`❌ Error saving data: ${err.message}`);
+      showNotification(`Please fill up all the requirment`);
     });
   }
 
@@ -645,6 +682,134 @@ function showLoginToast(message, type = 'success') {
 
 
 /////////////////////////////////////////////////////////////////////////////////////
+
+
+function openProfileModal() {
+  const modal = document.getElementById("modal-profile");
+  const profilePic = document.getElementById("profilePic");
+  const modalProfilePic = document.getElementById("modalProfilePic");
+
+  if (modal && profilePic && modalProfilePic) {
+    modal.style.display = "flex";
+    modalProfilePic.src = profilePic.src;
+  }
+
+  // Show loading state
+  document.getElementById('name').textContent = "Loading...";
+
+  // ✅ Fetch user full information instead of only registration
+  fetch('/api/fullInformation/me', { credentials: 'include' })
+    .then(res => {
+      if (!res.ok) throw new Error("Not logged in or no user info found");
+      return res.json();
+    })
+    .then(data => {
+      document.getElementById('name').textContent = 
+        [data.firstName, data.lastName].filter(Boolean).join(" ") || "No Name";
+
+      document.getElementById('userName').textContent = data.userName || '-';
+      document.getElementById('personalEmail').textContent = data.personalEmail || '-';
+      document.getElementById('gender').textContent = data.gender || '-';
+
+      // extra info from fullInformation
+      document.getElementById('civilStatus').textContent = data.civilStatus || '-';
+      document.getElementById('dateBirth').textContent = data.dateBirth 
+        ? new Date(data.dateBirth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+        : '-';
+      document.getElementById('phoneNo').textContent = data.phoneNo || '-';
+      document.getElementById('major').textContent = data.major || '-';
+      document.getElementById('yearStarted').textContent = data.yearStarted || '-';
+      document.getElementById('graduated').textContent = data.graduated || '-';
+      document.getElementById('studentNo').textContent = data.studentNo || '-';
+    })
+    .catch(err => {
+      console.error('❌ Error loading user info:', err);
+      document.getElementById('name').textContent = "Error loading info";
+    });
+}
+
+function closeProfileModal() {
+  document.getElementById("modal-profile").style.display = "none";
+}
+
+function enableEdit() {
+  // Email
+  document.getElementById("personalEmail").style.display = "none";
+  document.getElementById("editPersonalEmail").style.display = "inline";
+  document.getElementById("editPersonalEmail").value = document.getElementById("personalEmail").textContent;
+
+  // Civil Status
+  document.getElementById("civilStatus").style.display = "none";
+  document.getElementById("editCivilStatus").style.display = "inline";
+  document.getElementById("editCivilStatus").value = document.getElementById("civilStatus").textContent;
+
+  // Phone No
+  document.getElementById("phoneNo").style.display = "none";
+  document.getElementById("editPhoneNo").style.display = "inline";
+  document.getElementById("editPhoneNo").value = document.getElementById("phoneNo").textContent;
+
+  // Switch buttons
+  document.getElementById("editBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "inline";
+}
+
+function saveProfile() {
+  const updatedData = {
+    personalEmail: document.getElementById("editPersonalEmail").value,
+    civilStatus: document.getElementById("editCivilStatus").value,
+    phoneNo: document.getElementById("editPhoneNo").value
+  };
+
+  fetch("/api/registration/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(updatedData)
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast("Profile updated!");
+
+        // Update UI
+        document.getElementById("personalEmail").textContent = updatedData.personalEmail;
+        document.getElementById("civilStatus").textContent = updatedData.civilStatus;
+        document.getElementById("phoneNo").textContent = updatedData.phoneNo;
+
+        // Switch back to view mode
+        document.getElementById("personalEmail").style.display = "inline";
+        document.getElementById("civilStatus").style.display = "inline";
+        document.getElementById("phoneNo").style.display = "inline";
+
+        document.getElementById("editPersonalEmail").style.display = "none";
+        document.getElementById("editCivilStatus").style.display = "none";
+        document.getElementById("editPhoneNo").style.display = "none";
+
+        document.getElementById("editBtn").style.display = "inline";
+        document.getElementById("saveBtn").style.display = "none";
+      } else {
+        showToast("Error: " + data.error, true);
+      }
+    })
+    .catch(err => {
+      console.error("❌ Update error:", err);
+      showToast("Server error while updating", true);
+    });
+}
+
+
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+
+  toast.style.backgroundColor = isError ? "#d9534f" : "#28a745";
+  toast.className = "show";
+
+  setTimeout(() => {
+    toast.className = toast.className.replace("show", "");
+  }, 3000);
+}
 
 </script>
 </body>

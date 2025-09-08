@@ -58,6 +58,7 @@
   <table id="registeredTable" border="1">
     <thead>
       <tr>
+        <th>Username</th>
         <th>First Name</th><th>Last Name</th><th>Initial</th>
         <th>Suffix</th><th>Gender</th><th>Civil Status</th>
         <th>Date of Birth</th><th>Maiden</th><th>Phone No.</th>
@@ -122,10 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.innerHTML = '';
       rows.forEach(r => {
         const tr = document.createElement('tr');
-        [
-          'firstName','lastName','initial','suffix','gender','civilStatus',
-          'dateBirth','maiden','phoneNo','major','yearStarted','graduated','studentNo'
-        ].forEach(key => {
+      [
+        'userName','firstName','lastName','initial','suffix','gender','civilStatus',
+        'dateBirth','maiden','phoneNo','major','yearStarted','graduated','studentNo'
+      ].forEach(key => {
           const td = document.createElement('td');
           
           // FIXED: Format date field for display

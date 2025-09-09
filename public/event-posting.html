@@ -24,7 +24,7 @@
     
     <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
 
-    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">BACK</span></button>
+    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">←</span></button>
     
     <div class="a-l-u-m-n-i slide-in">
       <span class="a-l-u-m-n-i-span">A</span>
@@ -52,22 +52,39 @@
       </div>
     </div>
 
-    <!-- Trigger Button -->
-    <button id="openModalBtn">POST NEW EVENT</button>
+<button id="openModalBtn">POST NEW EVENT</button>
 
-    <div id="eventModal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" id="closeModalBtn">&times;</span>
-        <h1>Create Event</h1>
-        <form id="adminForm" enctype="multipart/form-data">
-          <label>Title</label><input type="text" name="title" required><br>
-          <label>Set Date and Time</label><input type="text" name="location" required><br>
-          <label>Image</label><input type="file" name="image" accept=".png,.jpg" required><br>
-          <label>Description</label><textarea name="description" rows="3" required></textarea><br>
-          <button type="submit">Publish</button>
-        </form>
-      </div>
-    </div>
+<div id="eventModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeModalBtn">&times;</span>
+    <h1>Create Event</h1>
+    <form id="adminForm" enctype="multipart/form-data">
+      <!-- Event Type Dropdown -->
+      <label for="eventType">Event Type</label>
+      <select name="eventType" id="eventType" required>
+        <option value="" disabled selected>Select Event</option>
+        <option value="homecoming">HomeComing Event</option>
+        <option value="sportfest">SportFest</option>
+      </select>
+      <br><br>
+
+      <!-- Hidden Title Field (required by DB) -->
+      <input type="hidden" name="title" id="eventTitle">
+
+      <label>Location</label>
+      <input type="text" name="location" required><br>
+
+      <label>Image</label>
+      <input type="file" name="image" accept=".png,.jpg" required><br>
+
+      <label>Description</label>
+      <textarea name="description" rows="3" required></textarea><br>
+
+      <button type="submit">Publish</button>
+    </form>
+  </div>
+</div>
+
     
     <div id="toast" class="toast"></div>
 
@@ -106,24 +123,30 @@
   document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
   window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
 
-  // Admin form submission
-  adminForm.onsubmit = async e => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/events/add', {
-        method: 'POST',
-        body: new FormData(adminForm)
-      });
-      const msg = await res.text();
-      if (!res.ok) throw new Error(msg);
-      showToast('✅ Event posted!', 'success');
-      adminForm.reset();
-      modal.style.display = 'none';
-      loadAdminEvents();
-    } catch (err) {
-      showToast('❌ Error: ' + err.message, 'error');
-    }
-  };
+// Admin form submission
+adminForm.onsubmit = async e => {
+  e.preventDefault();
+  try {
+    const res = await fetch('/api/events/add', {
+      method: 'POST',
+      body: new FormData(adminForm)
+    });
+    const msg = await res.text();
+    if (!res.ok) throw new Error(msg);
+
+    showToast('✅ Event posted!', 'success');
+    adminForm.reset();
+    modal.style.display = 'none';
+
+    // ⬇️ Instead of loadAdminEvents() just go to homepage
+    setTimeout(() => {
+      window.location.href = "admin-homepage.html";
+    }, 1000);
+
+  } catch (err) {
+    showToast('❌ Error: ' + err.message, 'error');
+  }
+};
 
   // Toast function
   function showToast(message, type = 'success') {
@@ -132,43 +155,57 @@
     setTimeout(() => toast.className = 'toast', 3000);
   }
 
-  // Load events to admin panel
-  async function loadAdminEvents() {
-    const container = document.getElementById('adminEvents');
-    container.innerHTML = 'Loading...';
+  // Auto-fill title when event type is selected
+document.getElementById("eventType").addEventListener("change", function () {
+  const hiddenTitle = document.getElementById("eventTitle");
 
-    try {
-      const res = await fetch('/api/events');
-      const { events } = await res.json();
-      const list = [...events.slice(0, 15)];
-      while (list.length < 15) list.push(null);
-
-      container.innerHTML = list.map(event => event ? `
-        <div class="card" data-id="${event.id}">
-          <img src="${event.image}" alt="">
-          <div class="card-title">${event.title}</div>
-          <div class="card-meta">${event.location}</div>
-          <div class="card-desc">${event.description}</div>
-          <div class="actions">
-            <button class="edit">EDIT</button>
-            <button class="del">DELETE</button>
-          </div>
-        </div>
-      ` : `<div class="card empty-card"></div>`).join('');
-
-      container.querySelectorAll('.edit').forEach(btn => {
-        btn.addEventListener('click', () => editEvent(btn.closest('.card')));
-      });
-
-      container.querySelectorAll('.del').forEach(btn => {
-        btn.addEventListener('click', () => deleteEvent(btn.closest('.card').dataset.id));
-      });
-
-    } catch (err) {
-      console.error(err);
-      container.textContent = '⚠️ Failed to load events.';
-    }
+  if (this.value === "homecoming") {
+    hiddenTitle.value = "HomeComing Event";
+  } else if (this.value === "sportfest") {
+    hiddenTitle.value = "SportFest";
+  } else {
+    hiddenTitle.value = "";
   }
+});
+
+// Load events to admin panel
+async function loadAdminEvents() {
+  const container = document.getElementById('adminEvents');
+  container.innerHTML = 'Loading...';
+
+  try {
+    const res = await fetch('/api/events');
+    const { events } = await res.json();
+    const list = [...events.slice(0, 15)];
+    while (list.length < 15) list.push(null);
+
+    container.innerHTML = list.map(event => event ? `
+      <div class="card" data-id="${event.id}">
+        <img src="${event.image}" alt="">
+        <div class="card-title">${event.title}</div>
+        <div class="card-meta">${event.location}</div>
+        <div class="card-desc">${event.description}</div>
+        <div class="actions">
+          <button class="edit">EDIT</button>
+          <button class="del">DELETE</button>
+        </div>
+      </div>
+    ` : `<div class="card empty-card"></div>`).join('');
+
+    container.querySelectorAll('.edit').forEach(btn => {
+      btn.addEventListener('click', () => editEvent(btn.closest('.card')));
+    });
+
+    container.querySelectorAll('.del').forEach(btn => {
+      btn.addEventListener('click', () => deleteEvent(btn.closest('.card').dataset.id));
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.textContent = '⚠️ Failed to load events.';
+  }
+}
+
 
   // Delete event confirmation modal
   function deleteEvent(id) {

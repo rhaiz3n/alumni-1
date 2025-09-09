@@ -102,33 +102,6 @@
       TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
     </div>
 
-    <!-- Facebook Page Plugin -->
-    <div class="fb-wrapper">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FTUPCAA&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="483"  
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
-
-    <!-- TUPCAVITE Page -->
-    <div class="fb-wrapper2">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftupcavite.edu.ph&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="483.5" 
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
 
     <div class="announcement-box">
       <h3>ID Announcements</h3>
@@ -223,15 +196,10 @@
     </div>
   </div>
 
-
-  <!-- Contact Section -->
-    <div class="contact-section">
-      </a>
-    </div>
+  <div id="feed"></div>
 
   <!-- External JavaScript -->
 <!-- Load external scripts -->
-<script src="Homeslideshow.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script type="module">
   import { setupSignOut } from './sign-out.js';
@@ -600,6 +568,53 @@ function initNotificationSystem() {
   const socket = io();
   socket.on('newNotification', renderNotification);
 }
+
+
+async function loadFeed() {
+  const container = document.getElementById('feed');
+  container.innerHTML = 'Loading feed...';
+
+  try {
+    // Fetch events and careers separately
+    const [eventsRes, careersRes] = await Promise.all([
+      fetch('/api/events'),
+      fetch('/api/careers')
+    ]);
+
+    const { events } = await eventsRes.json();
+    const { careers } = await careersRes.json();
+
+    // Add "type" field for clarity
+    const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
+    const formattedCareers = careers.map(c => ({ ...c, type: 'Career' }));
+
+    // Merge and sort by datePosted (newest first)
+    const feed = [...formattedEvents, ...formattedCareers]
+      .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
+
+    // Render feed
+    container.innerHTML = feed.map(post => `
+      <div class="feed-card">
+        ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+        <div class="feed-content">
+          <h2>${post.title} <small>[${post.type}]</small></h2>
+          <p>${post.description}</p>
+          <small>
+            ${post.location || post.link || ""} <br>
+            🕒 Posted on: ${new Date(post.datePosted).toLocaleString()}
+          </small>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error(err);
+    container.textContent = '⚠️ Failed to load feed.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadFeed);
+
 
 </script>
 </body>

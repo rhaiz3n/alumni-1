@@ -1,20 +1,19 @@
-html, body { 
-    margin: 0;
-    padding: 0;
-    background-color: #ffffff00;
-    overflow-x: hidden;
-    font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
 }
 .careerpage {
-    background: #ffffff00;
-    border: 0px solid #00000000;
-    height: 210vh;
-    width: 100%;
-    margin: 0 auto;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    display:block
+  background: #ffffff00;
+  border: 0px solid #000000;
+  height: 250vh;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  display: block;
 }
 .Navbar {
     position: absolute;
@@ -39,46 +38,46 @@ html, body {
     border-style: solid;
     border-color: #691313;
     border-width: 5px 0 0 0;
-    width: 80%; 
+    width: 93%; 
     height: 100%; 
     position: absolute;
-    left: 180px; 
+    left: 50px; 
     top: 330px;
     transform-origin: left top; 
     transform: rotate(0deg) scale(1, 1);
     z-index: 999px;
 }
 .label1 {
-    color: white; 
-    text-align: center; 
-    font-family: "Alegreya-Medium", serif;
-    font-size: 50px;
-    font-weight: 500;
-    position: absolute;
-    left: 55%;
-    top: 37px;
-    transform: translateX(-50%); 
-    width: max-content;
-    -webkit-text-stroke: 1px #ffffff; 
+  color: white; 
+  text-align: center; 
+  font-family: "Alegreya-Medium", serif;
+  font-size: 30px;
+  font-weight: 200;
+  position: absolute;
+  left: 50%;
+  top: 37px;
+  transform: translateX(-50%); 
+  width: max-content;
+  -webkit-text-stroke: 1px #ffffff; 
 }
 .Logo {
-    width: 160px;
-    height: 160px;
-    position: absolute;
-    left: 160px;
-    top: 15px;
-    object-fit: cover;
+  width: 160px;
+  height: 160px;
+  position: absolute;
+  left: 60px;
+  top: 15px;
+  object-fit: cover;
 }
 .a-l-u-m-n-i {
-    color: #000000;
-    text-align: left;
-    font-size: 100px;
-    font-weight: 400;
-    position: absolute;
-    left: 330px;
-    top: 70px;
-    -webkit-text-stroke: 3px #ffffff;
-    font-family: 'Alegreya', serif;
+  color: #000000;
+  text-align: left;
+  font-size: 100px;
+  font-weight: 400;
+  position: absolute;
+  left: 210px;
+  top: 70px;
+  -webkit-text-stroke: 1px #ffffff;
+  font-family: 'Alegreya', serif;
 }
 .a-l-u-m-n-i-span,
 .a-l-u-m-n-i-span2 {
@@ -92,18 +91,18 @@ html, body {
 }
 .back-button {
   position: absolute;
-  top: 200px;
-  left: 750px;
+  top: 160px;
+  left: 600px;
   background-color: #ffffff00;
   color: #ffffff;
   border: none;
-  font-size: 15px;
+  font-size: 70px;
   cursor: pointer;
   font-weight: bold;
   z-index: 1000;
 }
 .back-button:hover {
-  background-color: #000000;
+  background-color: #00000000;
 }
 
 /* Modal Background */
@@ -114,7 +113,7 @@ html, body {
     left: 0;
     top: 0;
     width: 100%;
-    height: 110%;
+    height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.6);
     transition: opacity 0.3s ease;
@@ -123,10 +122,10 @@ html, body {
 /* Modal Content Box */
 .modal-content {
     background-color: #fff;
-    margin: 10% auto;
-    padding: 25px 30px;
+    margin: 0% auto;
+    padding: 25px 40px;
     border-radius: 10px;
-    width: 90%;
+    width: 95%;
     max-width: 500px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     position: relative;
@@ -234,7 +233,8 @@ section { max-width: 1500px; margin: auto; }
 }
 h2 { 
     position: absolute;
-    top: 270px; 
+    top: 260px;
+    left: 50px; 
 }
 h1 { 
     top: 10px; 

@@ -864,7 +864,7 @@ option {
 .submitform-button {
   font-family: "Albert Sans", sans-serif;
   position: absolute;
-  top: 1750px;
+  top: 1770px;
   left: 1150px;
   padding: 10px 20px;
   font-size: 30px;
@@ -965,7 +965,7 @@ option {
 }
 .back-button {
   position: absolute;
-  bottom: 450px;
+  top: 100px;
   left: 1200px;
   background-color: #00000000;
   color: #ffffff;

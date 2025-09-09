@@ -57,18 +57,20 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .Navbar {
-    max-width: 100%;
+    max-width: 150%;
+    width: 150%;
+    left: 0%;
   }
 }
 .Line1 {
   margin-top: -10px;
   border-style: solid;
-  border-color: #c9c9c9;
+  border-color: #464646;
   border-width: 10px 0 0 0;
-  width: 100%; 
+  width: 150%; 
   height: 0px; 
   position: absolute;
-  left: 0; 
+  left: 0px; 
   top: 200px;
   transform-origin: left top; 
   transform: rotate(0deg) scale(1, 1);
@@ -76,15 +78,15 @@ html, body {
 .Line2 {
   margin-top: -10px;
   border-style: solid;
-  border-color: #c9c9c9;
+  border-color: #464646;
   border-width: 10px 0 0 0;
-  width: 100%; 
+  width: 150%; 
   height: 0px; 
   position: absolute;
-  left: 0; 
-  top: 262px;
+  left: 0px; 
+  top: 264px;
   transform-origin: left top; 
-  transform: rotate(0deg) scale(1, 1);  
+  transform: rotate(0deg) scale(1, 1);
 }
 .Logo {
   width: 160px;
@@ -161,8 +163,9 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .a-l-u-m-n-i {
-    font-size: 40px;
-    top: 40px;
+    font-size: 90px;
+    top: 35px;
+    left: 35%;
   }
 }
 
@@ -198,8 +201,9 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .technological-university-of-the-philippines-cavite {
-    font-size: 40px;
-    top: 40px;
+    font-size: 23px;
+    top: 30px;
+    left: 77%;
   }
 }
 /* BUTTONS */
@@ -239,8 +243,9 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .career-button {
-    font-size: 40px;
-    top: 40px;
+    font-size: 25px;
+    top: 200px;
+    left: 50%;
   }
 }
 /* Large monitors (>=1600px) */
@@ -264,8 +269,9 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .event-button {
-    font-size: 40px;
-    top: 40px;
+    font-size: 25px;
+    top: 200px;
+    left: 70%;
   }
 }
 /* Large monitors (>=1600px) */
@@ -289,8 +295,9 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .gallery-button {
-    font-size: 40px;
-    top: 40px;
+    font-size: 25px;
+    top: 200px;
+    left: 90%;
   }
 }
 /* Large monitors (>=1600px) */
@@ -314,8 +321,9 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .id-button {
-    font-size: 40px;
-    top: 40px;
+    font-size: 25px;
+    top: 200px;
+    left: 113%;
   }
 }
 /* Large monitors (>=1600px) */
@@ -339,8 +347,9 @@ html, body {
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .registration-button {
-    font-size: 40px;
-    top: 40px;
+    font-size: 25px;
+    top: 130px;
+    left: 100%;
   }
 }
 
@@ -675,7 +684,9 @@ margin-top: 5%;
 /* Phones (<=768px) */
 @media (max-width: 768px) {
   .login-button {
-    height: 100px;
+    font-size: 25px;
+    top: 135px;
+    left: 55%;
   }
 }
 /* Fade and Zoom Effect */
@@ -794,14 +805,14 @@ margin-top: 5%;
 /* ✅ For 1920x1080 screens (large PC monitors) */
 @media (min-width: 1600px) {
   .contact-section {
-    margin-top: 80vh;
+    margin-top: 100vh;
   }
 }
 
 /* ✅ For 1366x768 screens (common laptops) */
 @media (max-width: 1400px) {
   .contact-section {
-    margin-top: 110vh;
+    margin-top: 120vh;
   }
 }
 
@@ -1277,6 +1288,7 @@ margin-top: 5%;
   background: #fff;
   width: 450px;
   height: 450px;
+  overflow-x: hidden;
 }
 
 /* Large monitors (>=1600px) PC */
@@ -1382,6 +1394,7 @@ margin-top: 5%;
   background: #fff;
   max-width: 450px;
   height: 450px;
+  overflow-x: hidden;
 }
 
 /* ✅ For 1920x1080 screens (large PC monitors) */
@@ -1517,6 +1530,7 @@ margin-top: 5%;
   background: #fff;
   max-width: 450px;
   height: 450px;
+  overflow-x: hidden;
 }
 
 /* ✅ For 1920x1080 screens (large PC monitors) */

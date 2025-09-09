@@ -25,7 +25,7 @@
     <img class="Logo" src="Logo.png" alt="University Logo" />
 
     <button class="back-button" id="backBtn">
-      <span class="underline-slide">BACK</span>
+      <span class="underline-slide">←</span>
     </button>
     
     <div class="a-l-u-m-n-i slide-in">
@@ -54,22 +54,41 @@
       </div>
     </div>
 
-    <!-- Trigger Button -->
-    <button id="openModalBtn">POST NEW CAREER</button>
+<!-- Trigger Button -->
+<button id="openCareerModalBtn">POST NEW CAREER</button>
 
-    <div id="eventModal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" id="closeModalBtn">&times;</span>
-        <h1>Create Event</h1>
-        <form id="adminForm" enctype="multipart/form-data">
-          <label>Title: HIRING!!!</label><input type="text" name="title" required><br>
-          <label>Details</label><input type="text" name="link" required><br>
-          <label>Image</label><input type="file" name="image" accept=".png,.jpg" required><br>
-          <label>Links</label><textarea name="description" rows="3" required></textarea><br>
-          <button type="submit">Publish</button>
-        </form>
-      </div>
-    </div>
+<div id="careerModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeCareerModalBtn">&times;</span>
+    <h1>Create Career Post</h1>
+    <form id="careerForm" enctype="multipart/form-data">
+
+      <!-- Selection Dropdown -->
+      <label>Select Career Type</label>
+      <select id="careerType" required>
+        <option value="">-- Choose --</option>
+        <option value="Electrician">Electrician</option>
+        <option value="Mechanic">Mechanic</option>
+        <option value="Education">Education</option>
+      </select>
+      <br>
+
+      <!-- Hidden Title Field -->
+      <input type="hidden" name="title" id="careerTitle">
+
+      <label>Details</label>
+      <textarea name="description" rows="3" placeholder="Job description..." required></textarea><br>
+
+      <label>Apply Link</label>
+      <input type="url" name="link" placeholder="https://company.com/careers" required><br>
+
+      <label>Image</label>
+      <input type="file" name="image" accept=".png,.jpg,.jpeg" required><br>
+
+      <button type="submit">Publish</button>
+    </form>
+  </div>
+</div>
 
     <div id="toast" class="toast"></div>
     
@@ -261,6 +280,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadAdminCareers();
 });
+
+
+
+
+async function loadFeed() {
+  const container = document.getElementById('feed');
+  container.innerHTML = 'Loading feed...';
+
+  try {
+    const res = await fetch('/api/feed');
+    const { feed } = await res.json();
+
+    container.innerHTML = feed.map(post => `
+      <div class="feed-card">
+        ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+        <div class="feed-content">
+          <h2>${post.title} <small>[${post.type}]</small></h2>
+          <p>${post.description}</p>
+          <small>${post.location} • ${new Date(post.datePosted).toLocaleString()}</small>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error(err);
+    container.textContent = '⚠️ Failed to load feed.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadFeed);
 </script>
 </body>
 </html>

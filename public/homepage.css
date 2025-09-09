@@ -5,21 +5,60 @@ html, body {
   font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
 }
 .homepage {
-  background: #ffffff;
-  border: 1px solid #000000;
-  height: 200vh;
+  background: transparent;
+  border: 0;
+  height: 150vh;  /* default */
   width: 100%;
-  margin: 0 auto;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  display:block
+  margin: 0;
+  display: block;
 }
+
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .homepage {
+    height: 90vh;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .homepage {
+    height: 130vh;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .homepage {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
 .Navbar {
   position: absolute;
   width: 100%;                 
   height: 195px;
   display: flex;
+}
+@media (min-width: 1600px) {
+  .Navbar {
+    max-width: 100%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .Navbar {
+    max-width: 100%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .Navbar {
+    max-width: 100%;
+  }
 }
 .Line1 {
   margin-top: -10px;
@@ -51,7 +90,7 @@ html, body {
   width: 160px;
   height: 160px;
   position: absolute;
-  left: 160px;
+  left: 60px;
   top: 15px;
   object-fit: cover;
 }
@@ -83,34 +122,85 @@ html, body {
 }
 /* ALUMNI TEXT */
 .a-l-u-m-n-i {
-  color: #000000;
-  text-align: left;
-  font-size: 100px;
-  font-weight: 400;
   position: absolute;
-  left: 330px;
-  top: 70px;
-  -webkit-text-stroke: 3px #ffffff;
+  transform: translateX(-50%);  /* centered */
   font-family: 'Alegreya', serif;
+  font-weight: 400;
+  font-size: 100px;
+  color: #000000;
+  -webkit-text-stroke: 1px #ffffff;
+  text-align: center;
+  white-space: nowrap;
 }
+
+/* Bold highlight spans */
 .a-l-u-m-n-i-span,
 .a-l-u-m-n-i-span2 {
   font-family: 'Alegreya', serif;
   font-weight: 700;
 }
 
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .a-l-u-m-n-i {
+    font-size: 100px;
+    top: 65px;
+    left: 12%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .a-l-u-m-n-i {
+    font-size: 100px;
+    top: 65px;
+    left: 17%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .a-l-u-m-n-i {
+    font-size: 40px;
+    top: 40px;
+  }
+}
+
+
 .technological-university-of-the-philippines-cavite {
   color: white; 
   text-align: center; 
   font-family: "Alegreya-Medium", serif;
-  font-size: 50px;
-  font-weight: 500;
+  font-weight: 200;
   position: absolute;
-  left: 55%;
-  top: 37px;
   transform: translateX(-50%); 
   width: max-content;
   -webkit-text-stroke: 1px #ffffff; 
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .technological-university-of-the-philippines-cavite {
+    font-size: 50px;
+    top: 20px;
+    left: 50%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .technological-university-of-the-philippines-cavite {
+    font-size: 35px;
+    top: 30px;
+    left: 55%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .technological-university-of-the-philippines-cavite {
+    font-size: 40px;
+    top: 40px;
+  }
 }
 /* BUTTONS */
 .career-button,
@@ -128,11 +218,131 @@ html, body {
   position: absolute;
   z-index: 999;
 }
-.career-button { left: 1090px; top: 200px; }
-.event-button { left: 1190px; top: 200px; }
-.gallery-button { left: 1290px; top: 200px; }
-.id-button { left: 1410px; top: 200px; }
-.registration-button { left: 1750px; top: 125px; }
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .career-button {
+    font-size: 20px;
+    top: 200px;
+    left: 50%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .career-button {
+    font-size: 20px;
+    top: 200px;
+    left: 40%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .career-button {
+    font-size: 40px;
+    top: 40px;
+  }
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .event-button {
+    font-size: 20px;
+    top: 200px;
+    left: 60%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .event-button {
+    font-size: 20px;
+    top: 200px;
+    left: 50%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .event-button {
+    font-size: 40px;
+    top: 40px;
+  }
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .gallery-button {
+    font-size: 20px;
+    top: 200px;
+    left: 70%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .gallery-button {
+    font-size: 20px;
+    top: 200px;
+    left: 60%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .gallery-button {
+    font-size: 40px;
+    top: 40px;
+  }
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .id-button {
+    font-size: 20px;
+    top: 200px;
+    left: 82%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .id-button {
+    font-size: 20px;
+    top: 200px;
+    left: 72%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .id-button {
+    font-size: 40px;
+    top: 40px;
+  }
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .registration-button {
+    font-size: 30px;
+    top: 125px;
+    left: 90%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .registration-button {
+    font-size: 20px;
+    top: 125px;
+    left: 90%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .registration-button {
+    font-size: 40px;
+    top: 40px;
+  }
+}
 
 /* BUTTON CONTENT */
 .content {
@@ -412,16 +622,13 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;      
-  height: 100vh;     
-  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 240px;
-  padding-left: 655px;
-  z-index: 9999;
-  overflow: hidden; 
+  align-items: center;
+  z-index: 1000;
 }
 /* Login Modal Box */
 .login-modal-content {
@@ -429,6 +636,8 @@ html, body {
   width: 600px;
   height: 430px;
   position: relative;
+margin: auto;
+margin-top: 5%;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   overflow: hidden;
@@ -438,12 +647,36 @@ html, body {
   font-family: 'sanchez', sans-serif;
   border-color: #99000000;
   background-color: #cf1b1b00;
-  left: 1550px;
+  left: 70vw;
   top: 137px;
   color:  #ffffff;
   cursor: pointer;
   font-size: 16px;
   position: absolute;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .login-button {
+    font-size: 30px;
+    top: 130px;
+    left: 70%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .login-button {
+    font-size: 20px;
+    top: 135px;
+    left: 70%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .login-button {
+    height: 100px;
+  }
 }
 /* Fade and Zoom Effect */
 @keyframes fadeInZoom {
@@ -547,13 +780,37 @@ html, body {
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.25);
 }
 .contact-section {
-  position: relative;
+  position: absolute;
+  margin-top: 220vh;
+  left: 0;
   display: flex;
   background-color: #882323;
   height: 150px;
   width: 100%;
   opacity: 0;
   transition: opacity 2s ease-out, transform 2s ease-out;
+  z-index: 1000;            /* keeps it above content */
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .contact-section {
+    margin-top: 80vh;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .contact-section {
+    margin-top: 110vh;
+  }
+}
+
+/* ✅ For smaller devices (like tablets/phones) */
+@media (max-width: 768px) {
+  .contact-section {
+    margin-top: 100vh;
+    max-width: 100%;
+  }
 }
 .contact-section.slide-up {
   opacity: 2;
@@ -619,20 +876,47 @@ html, body {
 .fb-wrapper{
   position: absolute;
   border: 3px solid#ddd;
-  top: 790px;
-  left: 1100px; /* adjust as needed */
-  z-index: 10;
+  z-index: 999;
 }
 .fb-wrapper2 {
   position: absolute;
   border: 3px solid#ddd;
-  top: 1300px;
-  left: 1100px; /* adjust as needed */
-  z-index: 10;
+  z-index: 999;
+
 }
-.fb-wrapper2 {
-  left: 1450px; /* adjust as needed */
+@media (min-width: 1600px) {
+  .fb-wrapper {
+    top: 770px;
+    left: 2%;
+  }
+  .fb-wrapper2 {
+    top: 770px;
+    left: 22%;
+  }
 }
+@media (max-width: 1400px) {
+  .fb-wrapper {
+    top: 760px;
+    left: 2%;
+  }
+  .fb-wrapper2 {
+    top: 760px;
+    left: 30%;
+  }
+}
+@media (max-width: 768px) {
+  .fb-wrapper {
+    top: 790px;
+    left: 3%
+  }
+}
+@media (max-width: 768px) {
+  .fb-wrapper2 {
+    top: 790px;
+    left: 55%;
+  }
+}
+
 .fb-page {          
   width: 340px !important;     
   height: 480px !important;   
@@ -859,12 +1143,12 @@ html, body {
 /* Modal Content */
 .employer-modal .modal-content {
   background: #fff;
+  width: 600px;
+  max-height: 80vh;      /* prevents it from being too tall */
+  overflow-y: auto;      /* adds vertical scrollbar if needed */
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   padding: 20px;
-  width: 500px;
-  height: 685px;
-  max-width: 90%;
-  border-radius: 8px;
-  animation: fadeIn 0.3s ease;
   position: relative;
 }
 
@@ -906,6 +1190,7 @@ html, body {
   position: relative;
   top: 50px;
   width: 95%;
+  height: 50%;
   margin: 10px 0;
   padding: 8px;
   border-radius: 4px;
@@ -984,36 +1269,77 @@ html, body {
   transform: translateY(-10px);
 }
 .announcement-box {
-  position: absolute;
-  text-align: justify;
-  font-size: small;
-  top: 790px;
-  left: 1450px;
+  position: absolute;   
   z-index: 10;
-  border: 3px solid #ccc;
-  border-radius: 1px;
+  border: 3px solid #882323;
+  border-radius: 10px;
   padding: 10px;
   background: #fff;
-  max-width: 450px;
+  width: 450px;
+  height: 450px;
+}
+
+/* Large monitors (>=1600px) PC */
+@media (min-width: 1600px) {
+  .announcement-box {
+    top: 270px;
+    left: 48%;
+    max-width: 400px;
+    max-height: 500px;
+  }
+}
+
+/* Laptops (<=1599px)  */
+@media (max-width: 1400px) {
+  .announcement-box {
+    top: 270px;
+    left: 58%;
+    max-width: 25%; /* medium size */
+  }
+}
+
+/* Tablets & Phones (<=768px) */
+@media (max-width: 768px) {
+  .announcement-box {
+    top: 270px;
+    left: 70%;
+    max-width: 30%; /* make sure it fits */
+    max-height: 30%;/
+  }
 }
 
 .announcement-list {
-  max-height: 420px;
-  height: 600px;
-  box-shadow: #000;
-  width: 316px; /* adjust this height */
+  text-align: justify;
+  max-height: 450px;
+  max-width: 450px;
   overflow-y: auto;
   padding-right: 5px;
+  font-size: 16px; /* default */
 }
 
-.announcement-list::-webkit-scrollbar {
-  width: 5px;
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .announcement-list {
+    font-size: 18px;
+  }
 }
 
-.announcement-list::-webkit-scrollbar-thumb {
-  background: crimson;
-  border-radius: 5px;
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .announcement-list {
+    font-size: 15px;
+  }
 }
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .announcement-list {
+    font-size: 14px;
+    text-align: justify;
+    max-width: 150%; 
+  }
+}
+
 
 .event-card {
   border-bottom: 1px solid #ddd;
@@ -1047,38 +1373,114 @@ html, body {
 
 .announcement-box2 {
   position: absolute;
-  top: 270px;
-  left: 1450px;
+  top: 30%;      
+  left: 2%;     
   z-index: 10;
-  border: 3px solid #ccc;
-  border-radius: 1px;
+  border: 3px solid #882323;
+  border-radius: 10px;
   padding: 10px;
   background: #fff;
   max-width: 450px;
+  height: 450px;
 }
+
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .announcement-box2 {
+    top: 270px;
+    left: 25%;
+    max-width: 400px;
+    max-height: 500px;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .announcement-box2 {
+    top: 270px;
+    left: 30%;
+    max-width: 25%;  /* medium size */
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .announcement-box2 {
+    top: 270px;
+    left: 36%;
+    max-width: 30%; /* make sure it fits */
+    max-height: 30%;/
+  }
+}
+
 
 .announcement-list {
   text-align: justify;
-  max-height: 420px;
-  box-shadow: #000;
-  width: 316px; /* adjust this height */
+  max-height: 450px;
+  max-width: 450px;
   overflow-y: auto;
   padding-right: 5px;
+  font-size: 16px; /* default */
 }
 
-.announcement-list::-webkit-scrollbar {
-  width: 5px;
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .announcement-list {
+    font-size: 18px;
+  }
 }
 
-.announcement-list::-webkit-scrollbar-thumb {
-  background: crimson;
-  border-radius: 5px;
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .announcement-list {
+    font-size: 15px;
+  }
 }
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .announcement-list {
+    font-size: 14px;
+    text-align: justify;
+    max-width: 150%; 
+  }
+}
+
 
 .event-card {
-  border-bottom: 1px solid #ddd;
-  padding: 5px 0;
+  border-bottom: 10px solid #882323;
+  padding: 10px 0;
   font-family: 'Albert Sans', sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 450px;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .event-card {
+    font-size: 20px;
+    padding: 15px 0;
+    border-bottom: 12px solid #882323;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .event-card {
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 8px solid #882323;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .event-card {
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 6px solid #882323;
+    max-width: 66%;
+  }
 }
 
 .event-header {
@@ -1103,41 +1505,118 @@ html, body {
   font-size: 1rem;
   margin-top: 5px;
 }
+
 .career-box {
-  position: absolute;
-  top: 270px;
-  left: 1100px;
+  position: relative;
+  top: 30%;      
+  left: 2%;     
   z-index: 10;
-  border: 3px solid #ccc;
-  border-radius: 1px;
+  border: 3px solid #882323;
+  border-radius: 10px;
   padding: 10px;
   background: #fff;
   max-width: 450px;
+  height: 450px;
 }
+
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .career-box {
+    top: 270px;
+    left: 2%;
+    max-width: 400px;
+    max-height: 500px;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .career-box {
+    top: 270px;
+    left: 2%;
+    max-width: 25%;
+  }
+}
+
+/* ✅ For smaller devices (like tablets/phones) */
+@media (max-width: 768px) {
+  .career-box {
+    top: 270px;
+    left: 2%;
+    max-width: 30%; /* make sure it fits */
+  }
+}
+
 
 .career-list {
-  max-height: 420px;
-  height: 500px;
-  box-shadow: #000;
-  width: 316px; /* adjust this height */
+  text-align: justify;
+  max-height: 450px;
+  max-width: 450px;
   overflow-y: auto;
   padding-right: 5px;
+  font-size: 16px; /* default */
 }
 
-.career-list::-webkit-scrollbar {
-  width: 5px;
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .career-list {
+    font-size: 18px;
+  }
 }
 
-.career-list::-webkit-scrollbar-thumb {
-  background: #e91e63;
-  border-radius: 5px;
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .career-list {
+    font-size: 15px;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .career-list {
+    font-size: 14px;
+    text-align: justify;
+    max-width: 150%; 
+  }
 }
 
 .career-card {
-  border-bottom: 1px solid #ddd;
-  padding: 5px 0;
+  border-bottom: 10px solid #882323;
+  padding: 10px 0;
   font-family: 'Albert Sans', sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 450px;
 }
+
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .career-card {
+    font-size: 20px;
+    padding: 15px 0;
+    border-bottom: 12px solid #882323;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .career-card {
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 8px solid #882323;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .career-card {
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 6px solid #882323;
+    max-width: 90%;
+  }
+}
+
 
 .career-header {
   font-size: 0.75rem;
@@ -1211,7 +1690,7 @@ html, body {
 .toggle-Epassword {
   position: absolute;
   top: 610px;
-  left: 490px;
+  left: 550px;
   cursor: pointer;
   user-select: none;
   display: inline-block;

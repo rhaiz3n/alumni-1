@@ -19,7 +19,7 @@
       <div class="frame"></div>
       <div class="line1"></div>
       <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
-      <button class="back-button" onclick="location.href='homepage.html'"><span class="underline-slide">BACK</span></button>
+      <button class="back-button" onclick="location.href='homepage.html'"><span class="underline-slide">←</span></button>
 
       <img class="Logo" src="Logo2.png" alt="University Logo" />
       <div class="alumni zoom-in" style="animation-delay: 0.2s">
@@ -65,8 +65,7 @@
     <form id="regForm">
 
       <!-- First Name -->
-      <div class="first-name slide-in">
-        First Name <span class="required-star">*</span>
+      <div class="first-name slide-in"><span class="required-star"></span>
       </div>
       <div class="first-name-typebox slide-in">
         <input 
@@ -80,8 +79,7 @@
         />
       </div>
 
-      <div class="last-name slide-in">
-        Last Name <span class="required-star">*</span>
+      <div class="last-name slide-in"><span class="required-star"></span>
       </div>
       <div class="last-name-typebox slide-in">
         <input 
@@ -96,8 +94,7 @@
       </div>
 
         <!-- Initial -->
-      <div class="initial-name slide-in">
-        Initial <span class="required-star">*</span>
+      <div class="initial-name slide-in"><span class="required-star"></span>
       </div>
       <div class="initial-name-typebox slide-in">
         <input 
@@ -113,15 +110,14 @@
 
 
       <!-- Username -->
-      <div class="user-name slide-in">
-        Username <span class="required-star">*</span>
+      <div class="user-name slide-in"><span class="required-star"></span>
       </div>
       <div class="user-name-typebox slide-in">
         <input 
           type="text" 
           class="username-typebox" 
           name="userName" 
-          placeholder="Enter Username" 
+          placeholder="Enter Username end with .alumni" 
           maxlength="25" 
           required 
           oninput="limitUsernameDigits(this)" 
@@ -130,13 +126,13 @@
 
 
       <!-- Major -->
-      <div class="degree slide-in">Course & Major.[BET-COET/BTVTED-ET] <span class="required-star">*</span></div>
+      <div class="degree slide-in"><span class="required-star"></span></div>
       <div class="degree-typebox slide-in">
         <input 
           type="text" 
           class="degrees-typebox" 
           name="major" 
-          placeholder="Course & Major." 
+          placeholder="Course & Major. [BET/BTVTED]" 
           maxlength="9" 
           required 
           oninput="formatMajor(this)" 
@@ -145,8 +141,7 @@
 
 
       <!-- Personal Email -->
-      <div class="personalEmail slide-in" style="animation-delay: 0.2s">
-        Personal Email Address <span class="required-star">*</span>
+      <div class="personalEmail slide-in" style="animation-delay: 0.2s"><span class="required-star"></span>
       </div>
       <div class="personale-typebox slide-in" style="animation-delay: 0.2s">
         <input 
@@ -165,7 +160,7 @@
       </div>
 
       <!-- Retype Email -->
-      <div class="retype slide-in" style="animation-delay: 0.2s"> Email Address <span class="required-star">*</span>
+      <div class="retype slide-in" style="animation-delay: 0.2s"><span class="required-star"></span>
       </div>
       <div class="retypee-typebox slide-in" style="animation-delay: 0.2s">
         <input 
@@ -181,16 +176,16 @@
 
 
       <!-- Year Started -->
-      <div class="year slide-in">Year Started <span class="required-star">*</span></div>
+      <div class="year slide-in"><span class="required-star"></span></div>
       <div class="year-typebox slide-in">
         <select id="year-started" class="years-typebox" name="yearStarted" required>
-          <option value="" disabled selected hidden>Select Year</option>
+          <option value="" disabled selected hidden>Select Year Started</option>
           <!-- You can populate this with JS -->
         </select>
       </div>
 
       <!-- Year Graduated -->
-      <div class="yearg slide-in">Graduated <span class="required-star">*</span></div>
+      <div class="yearg slide-in"><span class="required-star"></span></div>
       <div class="yearg-typebox slide-in">
         <select id="year-graduated" class="yearg-typebox1" name="graduated" required>
           <option value="" disabled selected hidden>Select Year Graduated</option>
@@ -198,7 +193,7 @@
       </div>
 
       <!-- Password -->
-      <label class="passWords slide-in">Password <span class="required-star">*</span></label>
+      <label class="passWords slide-in"><span class="required-star"></span></label>
       <div class="password-wrapper slide-in">
         <input 
           type="password" 
@@ -217,8 +212,7 @@
 
 
       <!-- Phone Number -->
-      <div class="phone-number slide-in" style="animation-delay: 0.2s">
-        Phone No. <span class="required-star">*</span>
+      <div class="phone-number slide-in" style="animation-delay: 0.2s"><span class="required-star"></span>
       </div>
       <div class="phone-number-typebox slide-in" style="animation-delay: 0.2s">
         <input 
@@ -236,8 +230,7 @@
 
 
       <!-- Full name -->
-      <div class="maiden-name slide-in" style="animation-delay: 0.2s">
-        Maiden Name <span class="required">*</span>
+      <div class="maiden-name slide-in" style="animation-delay: 0.2s"><span class="required"></span>
       </div>
       <div class="maiden-name-typebox slide-in" style="animation-delay: 0.2s">
         <input 
@@ -272,18 +265,8 @@
         </div>
       </div>
 
-      <!-- Profile picture upload (simple) -->
-      <div class="upload-box">
-        <label for="profileImageInput">Upload Profile Picture</label>
-        <input type="file" id="profileImageInput" accept="image/*">
-        <!-- optional preview -->
-        <img id="previewImage" src="default-profile.png" alt="Preview" style="display:none; width:120px; height:120px; border-radius:50%; object-fit:cover; margin-top:8px;">
-      </div>
-
-
-
       <!-- Gender -->
-      <div class="gender slide-in" style="animation-delay: 0.2s">Gender <span class="required-star">*</span></div>
+      <div class="gender slide-in" style="animation-delay: 0.2s"><span class="required-star"></span></div>
       <select name="gender" id="gender" required class="slide-in" style="animation-delay: 0.2s">
         <option value="" disabled selected hidden>Select Gender</option>
         <option value="MALE">MALE</option>
@@ -292,7 +275,7 @@
       </select>
 
       <!-- Civil Status -->
-      <div class="civil-status slide-in" style="animation-delay: 0.2s">Civil Status <span class="required-star">*</span></div>
+      <div class="civil-status slide-in" style="animation-delay: 0.2s"><span class="required-star"></span></div>
       <select name="civilStatus" id="civilStatus" required class="slide-in" style="animation-delay: 0.2s">
         <option value="" disabled selected hidden>Select Civil Status</option>
         <option value="SINGLE">SINGLE</option>
@@ -308,8 +291,7 @@
         My name does not end with a suffix. (e.g., Jr, Sr, I, II, etc.)
       </label>
 
-      <div class="suffix-name slide-in" style="animation-delay: 0.2s">
-        Suffix <span class="required">*</span>
+      <div class="suffix-name slide-in" style="animation-delay: 0.2s"><span class="required"></span>
       </div>
       <div class="suffix-typebox slide-in" style="animation-delay: 0.2s" id="suffixBox">
       <input 
@@ -331,8 +313,7 @@
         My Student No. is no longer available
       </label>
 
-      <div class="student-no slide-in" style="animation-delay: 0.2s">
-        Student No. (0123) <span class="required">*</span>
+      <div class="student-no slide-in" style="animation-delay: 0.2s"><span class="required"></span>
       </div>
       <div class="student-no-typebox slide-in" style="animation-delay: 0.2s" id="studentNoBox">
         <input 
@@ -399,7 +380,7 @@
 
       <!-- Date of Birth -->
       <div class="dob-container" name="dateBirth">
-        <div class="dob-label slide-in" style="animation-delay: 0.2s">Date of Birth<span class="required-star">*</span>
+        <div class="dob-label slide-in" style="animation-delay: 0.2s"><span class="required-star"></span>
         </div>
         <div class="dob-selects">
           <select id="dob-day" name="dob-day" required class="slide-in" style="animation-delay: 0.2s">
@@ -853,55 +834,6 @@ document.getElementById('toastCloseBtn').addEventListener('click', () => {
     toast.className = 'toast';
   }
 });
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  const profileInput = document.getElementById('profileImageInput');
-  const previewImage = document.getElementById('previewImage');
-
-  if (!profileInput) return; // not on registration page
-
-  profileInput.addEventListener('change', () => {
-    const file = profileInput.files && profileInput.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file (jpg, png, etc.)');
-      return;
-    }
-
-    // Optional: limit file size (e.g. 1.5MB)
-    const maxBytes = 1.5 * 1024 * 1024;
-    if (file.size > maxBytes) {
-      alert('Image is too large. Please select an image smaller than 1.5MB.');
-      profileInput.value = '';
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target.result;
-      // save to localStorage (so userpage can read it)
-      try {
-        localStorage.setItem('userProfilePic', base64);
-      } catch (err) {
-        console.warn('localStorage set failed (maybe quota exceeded):', err);
-        alert('Could not save image in browser storage. Try a smaller image.');
-        return;
-      }
-
-      // show preview if present
-      if (previewImage) {
-        previewImage.src = base64;
-        previewImage.style.display = 'block';
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-});
-
 </script>
 </body>
 </html>

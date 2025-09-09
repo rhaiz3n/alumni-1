@@ -314,37 +314,46 @@
 <!-- Modal -->
 <div id="modal-profile" class="modal-profile">
   <div class="modal-profile-content">
+    <!-- Close Button -->
     <button class="modal-profile-close" onclick="closeProfileModal()">&times;</button>
     
+    <!-- Profile Header -->
     <div class="modal-top">
-      <img id="modalProfilePic" src="default-profile.png" alt="Profile" class="modal-profile-pic">
+      <img 
+        id="modalProfilePic" 
+        src="default-profile.png" 
+        alt="Profile" 
+        class="modal-profile-pic"
+      >
       <h2 id="name">Loading...</h2>
     </div>
-
+    
+    <!-- Profile Details -->
     <div class="modal-details">
       <p><strong>Username:</strong> <span id="userName">-</span></p>
 
       <!-- Email -->
       <p>
-        <strong>Email:</strong> 
+        <strong>Email:</strong>
         <span id="personalEmail">-</span>
         <input type="email" id="editPersonalEmail" style="display:none;">
       </p>
 
       <!-- Civil Status -->
       <p>
-        <strong>Civil Status:</strong> 
+        <strong>Civil Status:</strong>
         <span id="civilStatus">-</span>
         <input type="text" id="editCivilStatus" style="display:none;">
       </p>
 
       <!-- Phone No -->
       <p>
-        <strong>Phone No.:</strong> 
+        <strong>Phone No.:</strong>
         <span id="phoneNo">-</span>
         <input type="text" id="editPhoneNo" style="display:none;">
       </p>
 
+      <!-- Read-only fields -->
       <p><strong>Gender:</strong> <span id="gender">-</span></p>
       <p><strong>Date of Birth:</strong> <span id="dateBirth">-</span></p>
       <p><strong>Major:</strong> <span id="major">-</span></p>
@@ -353,6 +362,7 @@
       <p><strong>Student No.:</strong> <span id="studentNo">-</span></p>
     </div>
 
+    <!-- Actions -->
     <div class="modal-actions">
       <button id="editBtn" onclick="enableEdit()">Edit</button>
       <button id="saveBtn" style="display:none;" onclick="saveProfile()">Save</button>
@@ -362,7 +372,6 @@
 
 <!-- Toast Notification -->
 <div id="toast"></div>
-
 
 
   <!-- External JavaScript -->

@@ -1164,11 +1164,21 @@ app.post('/api/careers/add', authorizeAdminOrEmployer, uploadImage.single('image
   }
 });
 
+// 📌 GET: Careers List (auto-delete if older than 1 day)
 app.get('/api/careers', async (req, res) => {
   try {
-    const [rows] = await pool.query( // ✅ no .promise()
-      `SELECT id, title, description, link, datePosted, image FROM careers ORDER BY datePosted DESC`
+    // ✅ First, delete all careers older than 1 day
+    await pool.query(`
+      DELETE FROM careers 
+      WHERE TIMESTAMPDIFF(DAY, datePosted, NOW()) >= 1 
+    `);
+
+    // ✅ Then fetch the remaining careers
+    const [rows] = await pool.query(
+      `SELECT id, title, description, link, datePosted, image 
+       FROM careers ORDER BY datePosted DESC`
     );
+
     const careers = rows.map(row => ({
       id: row.id,
       title: row.title,
@@ -1177,11 +1187,14 @@ app.get('/api/careers', async (req, res) => {
       datePosted: row.datePosted,
       image: `data:image/jpeg;base64,${row.image.toString('base64')}`
     }));
+
     res.json({ careers });
   } catch (err) {
+    console.error("❌ Error in /api/careers:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.put('/api/careers/:id', async (req, res) => {
   const { id } = req.params;

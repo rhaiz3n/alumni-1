@@ -593,19 +593,28 @@ async function loadFeed() {
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
     // Render feed
-    container.innerHTML = feed.map(post => `
-      <div class="feed-card">
-        ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
-        <div class="feed-content">
-          <h2>${post.title} <small>[${post.type}]</small></h2>
-          <p>${post.description}</p>
-          <small>
-            ${post.location || post.link || ""} <br>
-            🕒 Posted on: ${new Date(post.datePosted).toLocaleString()}
-          </small>
+    container.innerHTML = feed.map(post => {
+      let extraInfo = "";
+      if (post.type === "Event") {
+        extraInfo = `📍 Location: ${post.location || "N/A"}`;
+      } else if (post.type === "Career") {
+        extraInfo = `🏢 Company Name: ${post.link || "N/A"}`;
+      }
+
+      return `
+        <div class="feed-card">
+          ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+          <div class="feed-content">
+            <h2>${post.title} <small>[${post.type}]</small></h2>
+            <p>${post.description}</p>
+            <small>
+              ${extraInfo} <br>
+              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()}
+            </small>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
   } catch (err) {
     console.error(err);
@@ -614,6 +623,7 @@ async function loadFeed() {
 }
 
 document.addEventListener('DOMContentLoaded', loadFeed);
+
 
 
 </script>

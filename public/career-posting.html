@@ -55,40 +55,43 @@
     </div>
 
 <!-- Trigger Button -->
-<button id="openCareerModalBtn">POST NEW CAREER</button>
+<button id="openModalBtn">POST NEW CAREER</button>
 
-<div id="careerModal" class="modal">
+<!-- Modal -->
+<div id="eventModal" class="modal">
   <div class="modal-content">
-    <span class="close-btn" id="closeCareerModalBtn">&times;</span>
-    <h1>Create Career Post</h1>
-    <form id="careerForm" enctype="multipart/form-data">
-
-      <!-- Selection Dropdown -->
-      <label>Select Career Type</label>
-      <select id="careerType" required>
-        <option value="">-- Choose --</option>
+    <span class="close-btn" id="closeModalBtn">&times;</span>
+    <h1>Create Career</h1>
+    <form id="adminForm" enctype="multipart/form-data">
+      <label>Career Type</label>
+      <select id="careerType" name="careerType" required>
+        <option value="">-- Select a Career --</option>
         <option value="Electrician">Electrician</option>
         <option value="Mechanic">Mechanic</option>
         <option value="Education">Education</option>
+        <option value="Software Developer">Software Developer</option>
+        <option value="Network Engineer">Network Engineer</option>
+        <option value="Telecommunications Engineer">Telecommunications Engineer</option>
+        <option value="Electrical Engineer">Electrical Engineer</option>
+        <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
       </select>
-      <br>
+      <!-- Hidden title auto-filled by JS -->
+      <input type="hidden" id="careerTitle" name="title">
 
-      <!-- Hidden Title Field -->
-      <input type="hidden" name="title" id="careerTitle">
-
-      <label>Details</label>
-      <textarea name="description" rows="3" placeholder="Job description..." required></textarea><br>
-
-      <label>Apply Link</label>
-      <input type="url" name="link" placeholder="https://company.com/careers" required><br>
+      <label>Company Name</label>
+      <input type="text" name="link" required>
 
       <label>Image</label>
-      <input type="file" name="image" accept=".png,.jpg,.jpeg" required><br>
+      <input type="file" name="image" accept=".png,.jpg" required>
+
+      <label>Description</label>
+      <textarea name="description" rows="3" required></textarea>
 
       <button type="submit">Publish</button>
     </form>
   </div>
 </div>
+
 
     <div id="toast" class="toast"></div>
     
@@ -150,8 +153,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === editModal) editModal.classList.remove('show');
   };
 
+  // 📌 Career form submit
   document.getElementById('adminForm').onsubmit = async e => {
     e.preventDefault();
+
+    // Make sure hidden title is set from dropdown
+    const careerType = document.getElementById("careerType");
+    const hiddenTitle = document.getElementById("careerTitle");
+    if (!hiddenTitle.value) {
+      alert("⚠️ Please select a career type.");
+      return;
+    }
+
     const res = await fetch('/api/careers/add', {
       method: 'POST',
       body: new FormData(e.target)
@@ -164,9 +177,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showToast('✅ Career posted!');
     e.target.reset();
+    hiddenTitle.value = ""; // reset hidden field
     modal.style.display = 'none';
     loadAdminCareers();
   };
+
+  // 📌 Auto-fill career title based on dropdown
+  document.getElementById("careerType").addEventListener("change", function () {
+    document.getElementById("careerTitle").value = this.value || "";
+  });
 
   function showToast(message) {
     toast.textContent = message;
@@ -280,36 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadAdminCareers();
 });
-
-
-
-
-async function loadFeed() {
-  const container = document.getElementById('feed');
-  container.innerHTML = 'Loading feed...';
-
-  try {
-    const res = await fetch('/api/feed');
-    const { feed } = await res.json();
-
-    container.innerHTML = feed.map(post => `
-      <div class="feed-card">
-        ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
-        <div class="feed-content">
-          <h2>${post.title} <small>[${post.type}]</small></h2>
-          <p>${post.description}</p>
-          <small>${post.location} • ${new Date(post.datePosted).toLocaleString()}</small>
-        </div>
-      </div>
-    `).join('');
-
-  } catch (err) {
-    console.error(err);
-    container.textContent = '⚠️ Failed to load feed.';
-  }
-}
-
-document.addEventListener('DOMContentLoaded', loadFeed);
 </script>
+
 </body>
 </html>

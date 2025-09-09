@@ -125,11 +125,46 @@ html, body {
     margin: 0% auto;
     padding: 25px 40px;
     border-radius: 10px;
-    width: 95%;
-    max-width: 500px;
+    max-width: 100%;
+    max-height: 100%;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     position: relative;
     animation: fadeIn 0.3s ease-in-out;
+}
+
+    /* Animation for modal content */
+    @keyframes fadeIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .modal-content {
+    font-size: 50px;
+    top: 20px;
+    left: 50%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .modal-content {
+    font-size: 20px;
+    bottom: 10px;
+    margin: auto;
+    width: 70%;
+    height: 85%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .modal-content {
+    font-size: 23px;
+    top: 30px;
+    left: 77%;
+  }
 }
 
     /* Animation for modal content */
@@ -499,4 +534,40 @@ button:hover {
     transform: scale(1);
     opacity: 1;
   }
+}
+/* Style for career type select */
+#careerType {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  appearance: none;        /* remove default browser arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover & focus effect */
+#careerType:hover {
+  border-color: #888;
+}
+
+#careerType:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+  outline: none;
+}
+
+/* Optional: add a custom arrow */
+#careerType::after {
+  content: "▼";
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: #666;
 }

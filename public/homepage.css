@@ -50,7 +50,8 @@ html, body {
 /* Laptops (<=1400px) */
 @media (max-width: 1400px) {
   .Navbar {
-    max-width: 100%;
+    max-width: 160%;
+    left: 0%;
   }
 }
 
@@ -779,7 +780,7 @@ margin-top: 5%;
   display: flex;
   background-color: #882323;
   height: 150px;
-  width: 100%;
+  width: 160%;
   opacity: 0;
   transition: opacity 2s ease-out, transform 2s ease-out;
   z-index: 1000;            /* keeps it above content */
@@ -787,7 +788,7 @@ margin-top: 5%;
 /* ✅ For 1920x1080 screens (large PC monitors) */
 @media (min-width: 1600px) {
   .contact-section {
-    margin-top: 100vh;
+    margin-top: 115vh;
   }
 }
 
@@ -1215,14 +1216,13 @@ margin-top: 5%;
 /* Large monitors (>=1600px) PC */
 @media (min-width: 1600px) {
   .announcement-box {
-    top: 270px;
-    left: 48%;
-    max-width: 400px;
-    max-height: 500px;
+    top: 1230px;
+    left: 72%;
+    max-width: 25%; /* medium size */
   }
 }
 
-/* Laptops (<=1599px)  */
+/* Laptops (<=1400px)  */
 @media (max-width: 1400px) {
   .announcement-box {
     top: 1230px;
@@ -1245,7 +1245,6 @@ margin-top: 5%;
   text-align: justify;
   max-height: 450px;
   max-width: 450px;
-  overflow-y: hidden;
   padding-right: 5px;
   font-size: 16px; /* default */
 }
@@ -1275,25 +1274,22 @@ margin-top: 5%;
 
 .announcement-box2 {
   position: absolute;
-  top: 30%;      
-  left: 2%;     
   z-index: 10;
   border: 3px solid #882323;
   border-radius: 10px;
   padding: 10px;
   background: #fff;
-  max-width: 450px;
+  width: 450px;
   height: 450px;
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 /* ✅ For 1920x1080 screens (large PC monitors) */
 @media (min-width: 1600px) {
   .announcement-box2 {
-    top: 270px;
-    left: 25%;
-    max-width: 400px;
-    max-height: 500px;
+    top: 750px;
+    left: 72%;
+    max-width: 30%;  /* medium size */
   }
 }
 
@@ -1329,7 +1325,7 @@ margin-top: 5%;
   .event-card {
     font-size: 20px;
     padding: 15px 0;
-    border-bottom: 12px solid #882323;
+    border-bottom: 4px solid #882323;
   }
 }
 
@@ -1380,13 +1376,11 @@ margin-top: 5%;
 .career-box {
   position: relative;    
   z-index: 10;
-  top: 50%;
-  left: auto;
   border: 3px solid #882323;
   border-radius: 10px;
   padding: 10px;
   background: #fff;
-  max-width: 450px;
+  width: 450px;
   height: 450px;
   overflow-x: hidden;
 }
@@ -1395,9 +1389,8 @@ margin-top: 5%;
 @media (min-width: 1600px) {
   .career-box {
     top: 270px;
-    left: 2%;
-    max-width: 400px;
-    max-height: 500px;
+    left: 72%;
+    max-width: 25%;
   }
 }
 
@@ -1405,7 +1398,7 @@ margin-top: 5%;
 @media (max-width: 1400px) {
   .career-box {
     top: 270px;
-    left: 2%;
+    left: 72%;
     max-width: 25%;
   }
 }
@@ -1424,7 +1417,6 @@ margin-top: 5%;
   text-align: justify;
   max-height: 450px;
   max-width: 450px;
-  overflow-y: auto;
   padding-right: 5px;
   font-size: 16px; /* default */
 }
@@ -1576,3 +1568,187 @@ margin-top: 5%;
 
 
 
+.gallery {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #be2e2e00;
+  overflow: hidden;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .gallery {
+    top: 270px;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .gallery {
+    top: 265px;
+
+  }
+}
+
+/* ✅ For smaller devices (like tablets/phones) */
+@media (max-width: 768px) {
+  .gallery {
+    top: 270px;
+  }
+}
+
+/* base polaroid */
+.gallery .polaroid {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.28);
+  overflow: hidden;
+  cursor: pointer;
+  --rot: -3deg;
+  transform: rotate(var(--rot));
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  animation: float 6s ease-in-out infinite;
+}
+
+.gallery .polaroid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery .polaroid:hover {
+  animation: none;
+  transform: scale(1.2) rotate(0deg);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.45);
+  z-index: 10;
+}
+
+/* floating animation */
+@keyframes float {
+  0%   { transform: translateY(0) rotate(var(--rot)); }
+  50%  { transform: translateY(-10px) rotate(calc(var(--rot) + 10deg)); }
+  100% { transform: translateY(0) rotate(var(--rot)); }
+}
+
+/* ==================== MEDIA QUERIES ==================== */
+
+/* Large PC screens ≥1600px */
+@media (min-width: 1600px) {
+  .gallery .p1 { top: 10px; left: 100px; }
+  .gallery .p2 { top: 200px; left: 400px; }
+  .gallery .p3 { top: 400px; left: 200px; }
+  .gallery .p4 { top: 100px; left: 700px; }
+  .gallery .p5 { top: 350px; left: 600px; }
+  .gallery .p6 { top: 250px; left: 950px; }
+  .gallery .p7 { top: 420px; left: 800px; }
+  .gallery .p8 { top: 150px; left: 1150px; }
+}
+
+/* Laptops ≤1400px */
+@media (max-width: 1400px) {
+  .gallery .p1 { top:20px; left: 60px; }
+  .gallery .p2 { top: 180px; left: 250px; }
+  .gallery .p3 { top: 360px; left: 110px; }
+  .gallery .p4 { top: 80px; left: 480px; }
+  .gallery .p5 { top: 400px; left: 380px; }
+  .gallery .p6 { top: 230px; left: 640px; }
+  .gallery .p7 { top: 470px; left: 630px; }
+  .gallery .p8 { top: 60px; left: 760px; }
+}
+
+/* Phones ≤768px */
+@media (max-width: 768px) {
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    height: auto;
+  }
+  .gallery .polaroid {
+    position: static; /* stack naturally */
+    width: 90%;
+    max-width: 260px;
+    animation: none;  /* no floating */
+    transform: rotate(0);
+  }
+}
+.credit-box {
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+  font-size: 20px;
+  font-style: italic;
+  color: #333;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  position: absolute;
+
+  /* Animation */
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s ease forwards;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .credit-box {
+    top: 1000px;
+    left: 50px;
+    max-width: 60%;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .credit-box {
+    top: 1030px;
+    left: 50px;
+    max-width: 60%;
+  }
+}
+
+/* ✅ For smaller devices (like tablets/phones) */
+@media (max-width: 768px) {
+  .credit-box {
+    top: 270px;
+    left: 50px;
+  }
+}
+
+.credit-box::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #c377e0, #9794fd, #5fec93, #f8de76);
+  background-size: 300% 300%;
+  z-index: -1;
+  filter: blur(6px);
+  animation: glowMove 6s infinite linear;
+  opacity: 0.7;
+}
+
+/* Fade-up effect */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Moving glowing border */
+@keyframes glowMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

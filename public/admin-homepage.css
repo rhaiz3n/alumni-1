@@ -406,7 +406,7 @@ html, body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  z-index: 999;      /* make sure it's on top */
+  z-index: 10;      /* make sure it's on top */
 }
 /* ✅ For 1920x1080 screens (large PC monitors) */
 @media (min-width: 1600px) {
@@ -588,7 +588,7 @@ html, body {
   border-radius: 6px;
   cursor: pointer;
   font-family: 'Albert Sans', sans-serif;
-  z-index: 99999;
+  z-index: 1000;
 }
 /* Large monitors (>=1600px) PC */
 @media (min-width: 1600px) {
@@ -676,91 +676,180 @@ html, body {
   right: 0;
   right: auto;
 }
+
+/* 🎭 Gallery Modal */
 .gallery-modal {
   display: none;
   position: fixed;
-  font-family: 'Albert Sans', sans-serif;
   top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.75);
+  width: 100%; height: 100%;
+  background: rgba(10, 10, 20, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  overflow: auto;
+  animation: fadeIn 0.4s ease;
 }
 
+/* 📦 Modal Content */
 .gallery-content {
-  background: #fff;
-  padding: 20px;
-  width: 90%;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  padding: 2rem;
+  border-radius: 15px;
+  width: 95%;
   max-width: 900px;
-  max-height: 90vh;
-  border-radius: 10px;
-  overflow-y: auto;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  color: #fff;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  animation: slideUp 0.5s ease;
   position: relative;
 }
 
+/* ❌ Close Button */
 .gallery-close {
   position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  background: transparent;
-  border: none;
+  top: 15px; right: 20px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
   cursor: pointer;
-  color: #555;
+  background: none;
+  border: none;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.gallery-close:hover {
+  transform: rotate(90deg);
+  color: #ff4d6d;
 }
 
+/* 📝 Heading */
+.gallery-content h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+/* 📤 Upload Form */
 .upload-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.upload-form label {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
 }
 
 .upload-form input[type="file"] {
-  padding: 5px;
-  font-size: 14px;
-}
-
-.upload-form button {
-  background-color: #686868;
-  color: #fff;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
+  padding: 8px;
+  border: 2px dashed #fff;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  color: #ddd;
+  width: 100%;
+  max-width: 400px;
   cursor: pointer;
 }
 
+.upload-form button {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(135deg, #00ff9d, #00c6ff);
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
 .upload-form button:hover {
-  background-color: #882323;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,255,157,0.6);
 }
 
+/* 🖼️ Gallery Grid */
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 1.5rem;
 }
 
+/* 📸 Gallery Items */
 .gallery-item {
   position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-
+.gallery-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+}
 .gallery-item img {
   width: 100%;
-  height: 120px;
+  height: 180px;
   object-fit: cover;
-  border-radius: 6px;
+  display: block;
+  border-bottom: 2px solid rgba(255,255,255,0.2);
 }
 
-.gallery-item .date {
-  font-size: 12px;
-  text-align: center;
-  margin-top: 5px;
-  color: #555;
+/* 🗑️ Delete Button */
+.gallery-item button {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: rgba(255,0,0,0.8);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.25s ease;
 }
+.gallery-item button:hover {
+  background: rgba(255,0,0,1);
+}
+
+/* 📅 Date */
+.gallery-date {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: #ddd;
+  background: rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+/* ✨ Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .gallery-content {
+    width: 90%;
+    padding: 1.5rem;
+  }
+  .gallery-item img {
+    height: 150px;
+  }
+}
+
 .announcement-box {
   position: absolute;   
   z-index: 10;
@@ -770,6 +859,7 @@ html, body {
   background: #fff;
   width: 450px;
   height: 450px;
+  overflow-y: auto;
 }
 
 /* Large monitors (>=1600px) PC */
@@ -805,7 +895,7 @@ html, body {
   text-align: justify;
   max-height: 450px;
   max-width: 450px;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding-right: 5px;
   font-size: 16px; /* default */
 }
@@ -933,6 +1023,7 @@ html, body {
   background: #fff;
   width: 450px;
   height: 450px;
+  overflow-y: auto;
 }
 
 /* ✅ For 1920x1080 screens (large PC monitors) */
@@ -969,7 +1060,7 @@ html, body {
   text-align: justify;
   max-height: 450px;
   max-width: 450px;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding-right: 5px;
   font-size: 16px; /* default */
 }
@@ -1011,7 +1102,7 @@ html, body {
   .event-card {
     font-size: 20px;
     padding: 15px 0;
-    border-bottom: 12px solid #882323;
+    border-bottom: 4px solid #882323;
   }
 }
 
@@ -1020,7 +1111,7 @@ html, body {
   .event-card {
     font-size: 16px;
     padding: 8px 0;
-    border-bottom: 8px solid #882323;
+    border-bottom: 2px solid #882323;
   }
 }
 
@@ -1029,7 +1120,7 @@ html, body {
   .event-card {
     font-size: 14px;
     padding: 6px 0;
-    border-bottom: 6px solid #882323;
+    border-bottom: 2px solid #882323;
     max-width: 66%;
   }
 }
@@ -1065,6 +1156,7 @@ html, body {
   background: #fff;
   width: 450px;
   height: 450px;
+  overflow-y: auto;
 }
 
 /* ✅ For 1920x1080 screens (large PC monitors) */
@@ -1099,7 +1191,7 @@ html, body {
   text-align: justify;
   max-height: 450px;
   max-width: 450px;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding-right: 5px;
   font-size: 16px; /* default */
 }
@@ -1115,6 +1207,7 @@ html, body {
 @media (max-width: 1400px) {
   .career-list {
     font-size: 15px;
+    
   }
 }
 
@@ -1141,7 +1234,7 @@ html, body {
   .career-card {
     font-size: 20px;
     padding: 15px 0;
-    border-bottom: 12px solid #882323;
+    border-bottom: 4px solid #882323;
   }
 }
 
@@ -1150,7 +1243,7 @@ html, body {
   .career-card {
     font-size: 16px;
     padding: 8px 0;
-    border-bottom: 8px solid #882323;
+    border-bottom: 2px solid #882323;
   }
 }
 
@@ -1159,7 +1252,7 @@ html, body {
   .career-card {
     font-size: 14px;
     padding: 6px 0;
-    border-bottom: 6px solid #882323;
+    border-bottom: 4px solid #882323;
     max-width: 90%;
   }
 }
@@ -1186,14 +1279,6 @@ html, body {
   font-weight: bold;
   font-size: 1rem;
   margin-top: 5px;
-}
-.career-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.career-list::-webkit-scrollbar-thumb {
-  background: #e91e63;
-  border-radius: 5px;
 }
 .post-btn {
   background: #007BFF;
@@ -1722,4 +1807,274 @@ html, body {
   .feed-content p { 
     font-size: 14px; 
   }
+}
+
+
+
+
+/* 🌟 General Modal Overlay */
+.modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(10, 10, 20, 0.8);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.4s ease;
+}
+
+/* 🎭 Modal Content */
+.modal-content {
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  padding: 2rem;
+  border-radius: 15px;
+  width: 95%;
+  max-width: 500px;
+  color: #fff;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  animation: slideUp 0.5s ease;
+  position: relative;
+}
+
+/* ❌ Close Button */
+.modal-content .close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.modal-content .close:hover {
+  transform: rotate(90deg);
+  color: #ff4d6d;
+}
+
+/* 📝 Labels */
+.modal-content form label {
+  display: block;
+  margin: 15px 0 5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  font-size: 0.95rem;
+}
+
+/* 🌟 Input Fields */
+.modal-content form input[type="text"],
+.modal-content form input[type="datetime-local"] {
+  width: 95%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  outline: none;
+  transition: all 0.3s ease;
+}
+.modal-content form input:focus {
+  background: rgba(255,255,255,0.2);
+  box-shadow: 0 0 6px #00c6ff;
+}
+
+/* 📂 Select Dropdown */
+.modal-content form select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  outline: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.modal-content form select option {
+  background: #1f1c2c;
+  color: #fff;
+}
+.modal-content form select:focus {
+  background: rgba(255,255,255,0.25);
+  box-shadow: 0 0 6px #ff8c00;
+}
+
+/* 📝 Textarea */
+.modal-content form textarea {
+  width: 95%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.95rem;
+  min-height: 100px;
+  resize: vertical;
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  outline: none;
+  transition: all 0.3s ease;
+}
+.modal-content form textarea:focus {
+  background: rgba(255,255,255,0.2);
+  box-shadow: 0 0 6px #00ff9d;
+}
+
+/* 📷 File Upload */
+.modal-content form input[type="file"] {
+  display: none;
+}
+.modal-content form .upload-label {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff8c00, #ff3c5f);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  margin-bottom: 12px;
+}
+.modal-content form .upload-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 60, 95, 0.6);
+}
+
+/* ✨ Publish Button */
+.modal-content form button {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  border: none;
+  padding: 12px 18px;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.modal-content form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 198, 255, 0.6);
+}
+
+/* 🎞 Animations */
+@keyframes fadeIn {
+  from { opacity: 0; } 
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+    padding: 1.5rem;
+  }
+}
+/* 🔔 Toast Container */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 20000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 📝 Toast Message */
+.toast {
+  min-width: 250px;
+  max-width: 320px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
+  background: #333;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateX(100%);
+  animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 3.5s;
+}
+
+/* ✅ Success */
+.toast.success {
+  background: linear-gradient(135deg, #00c853, #009624);
+}
+
+/* ⚠️ Error */
+.toast.error {
+  background: linear-gradient(135deg, #e53935, #b71c1c);
+}
+
+/* ℹ️ Info */
+.toast.info {
+  background: linear-gradient(135deg, #1e88e5, #0d47a1);
+}
+
+/* ✨ Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+/* ========================= */
+/* 🎉 Event & Career Modals  */
+/* ========================= */
+#modal-event input[type="file"],
+#modal-career input[type="file"] {
+  display: none; /* hide only inside modals */
+}
+
+#modal-event .file-label,
+#modal-career .file-label {
+  display: inline-block;
+  padding: 10px 15px;
+  background: #007bff;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 8px;
+}
+
+#modal-event .file-label:hover,
+#modal-career .file-label:hover {
+  background: #0056b3;
+}
+
+/* ========================= */
+/* 🖼️ Gallery Modal (unchanged) */
+/* ========================= */
+#galleryModal input[type="file"] {
+  display: block; /* normal file input for gallery */
+  margin-top: 10px;
 }

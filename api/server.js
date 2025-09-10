@@ -14,7 +14,7 @@ const { sendOtpEmail } = require('../GmailMailer');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 const upload = multer({ 
   storage: multer.memoryStorage(),
@@ -549,7 +549,8 @@ app.post('/api/registration/add', async (req, res) => {
     major, graduated
   } = req.body;
 
-  if (!firstName || !lastName || !personalEmail || !gender || !userName || !passWord || !major || !graduated) {
+  // 🔹 Removed gender from required fields
+  if (!firstName || !lastName || !personalEmail || !userName || !passWord || !major || !graduated) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
@@ -565,30 +566,30 @@ app.post('/api/registration/add', async (req, res) => {
       return res.status(409).json({ error: 'Username already taken. Please choose another.' });
     }
 
-    // 2️⃣ Check if alumni info already registered
+    // 2️⃣ Check if alumni info already registered (removed gender check here)
     const [duplicateRows] = await connection.execute(
-      `SELECT * FROM registration WHERE LOWER(firstName) = LOWER(?) AND LOWER(lastName) = LOWER(?) AND LOWER(gender) = LOWER(?) AND LOWER(personalEmail) = LOWER(?)`,
-      [firstName, lastName, gender, personalEmail]
+      `SELECT * FROM registration WHERE LOWER(firstName) = LOWER(?) AND LOWER(lastName) = LOWER(?) AND LOWER(personalEmail) = LOWER(?)`,
+      [firstName, lastName, personalEmail]
     );
     if (duplicateRows.length > 0) {
       return res.status(409).json({ error: 'This information has already created an account.' });
     }
 
-    // 3️⃣ Validate against alumni table
+    // 3️⃣ Validate against alumni table (removed gender check here)
     const graduatedYear = validateInteger(graduated, 'graduated');
     if (graduatedYear === null) {
       return res.status(400).json({ error: 'Graduated year must be a valid number.' });
     }
 
     const [alumniMatch] = await connection.execute(
-      `SELECT * FROM alumni WHERE LOWER(firstName) = LOWER(?) AND LOWER(lastName) = LOWER(?) AND LOWER(gender) = LOWER(?) AND LOWER(major) = LOWER(?) AND graduated = ?`,
-      [firstName, lastName, gender, major, graduatedYear]
+      `SELECT * FROM alumni WHERE LOWER(firstName) = LOWER(?) AND LOWER(lastName) = LOWER(?) AND LOWER(major) = LOWER(?) AND graduated = ?`,
+      [firstName, lastName, major, graduatedYear]
     );
     if (alumniMatch.length === 0) {
       return res.status(403).json({ error: 'Alumni record does not match our records.' });
     }
 
-    // 4️⃣ Insert registration record
+    // 4️⃣ Insert registration record (still keeps gender as requested)
     const [insertResult] = await connection.execute(
       `INSERT INTO registration (firstName, lastName, personalEmail, gender, userName, passWord) VALUES (?, ?, ?, ?, ?, ?)`,
       [firstName, lastName, personalEmail, gender, userName, passWord]
@@ -606,7 +607,7 @@ app.post('/api/registration/add', async (req, res) => {
     };
 
     await connection.execute(
-      `INSERT INTO notifications (name, link, message, createdAt) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO notifications (name, link, message, createdAt) VALUES (?, ?, ?, ?)` ,
       [notif.name, notif.link, notif.message, notif.createdAt]
     );
 
@@ -630,6 +631,7 @@ app.post('/api/registration/add', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 

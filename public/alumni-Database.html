@@ -24,7 +24,7 @@
     <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
     
     <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
-    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">BACK</span></button>
+    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">←</span></button>
     
     <div class="a-l-u-m-n-i slide-in">
       <span class="a-l-u-m-n-i-span">A</span>
@@ -65,110 +65,52 @@
     <table id="alumniTable" border="0" cellspacing="0" cellpadding="0">
       <thead>
         <tr>
-          <th>FIRST NAME</th><th>LAST NAME</th><th>INITIAL</th><th>SUFFIX</th>
-          <th>DATE OF BIRTH</th><th>GENDER</th>
-          <th>PHONE No</th><th>MAJOR</th><th>YEAR STARTED</th><th>GRADUATED</th>
-          <th>STUDENT No.</th>
+          <th>FIRST NAME</th>
+          <th>LAST NAME</th>
+          <th>INITIAL</th>
+          <th>SUFFIX</th>
+          <th>MAJOR / COURSE</th>
+          <th>GRADUATED</th>
         </tr>
       </thead>
-        <tbody id="alumniTbody"></tbody>
+      <tbody id="alumniTbody"></tbody>
     </table>
 
-    <div id="modal" class="modal-overlay">
-      <div class="modal-content">
-        <h2>Add Alumni Information</h2>
-        <form id="alumniForm">
-            <input id="firstName" placeholder="First Name" required oninput="this.value = formatName(this.value)" />
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Add Alumni</h2>
+    <form id="alumniForm">
+      
+      <label for="firstName">First Name</label>
+      <input id="firstName" name="firstName" type="text" placeholder="First Name" required>
 
-            <input id="lastName" placeholder="Last Name" required oninput="this.value = formatName(this.value)" />
+      <label for="lastName">Last Name</label>
+      <input id="lastName" name="lastName" type="text" placeholder="Last Name" required>
 
-            <input id="initial" placeholder="Initial" oninput="this.value = formatInitial(this.value)" />
+      <label for="initial">Initial</label>
+      <input id="initial" name="initial" type="text" placeholder="Initial">
 
-            <input id="suffix" placeholder="Suffix" oninput="this.value = formatSuffix(this.value)" />
+      <label for="suffix">Suffix</label>
+      <input id="suffix" name="suffix" type="text" placeholder="Suffix">
 
-            <input id="dateBirth" type="date" placeholder="Date of Birth" required />
+      <label for="major">Major / Course</label>
+      <input id="major" name="major" type="text" placeholder="Major / Course" required>
 
-            <input id="gender" placeholder="Gender" maxlength="6" required oninput="validateGender(this)" />
+      <label for="graduated">Graduated</label>
+      <input id="graduated" name="graduated" type="text" maxlength="4" placeholder="e.g. 2023" required>
 
-            <input id="phoneNo" placeholder="Phone No" maxlength="12" required oninput="validatePhone(this)" />
-
-            <input id="major" placeholder="Major" required oninput="validateMajor(this)" maxlength="9" />
-
-            <input id="yearStarted" placeholder="Year Started" required maxlength="4" oninput="lenientYearInput(this)" />
-
-            <input id="graduated" placeholder="Graduated" required maxlength="4" oninput="lenientYearInput(this)" />
-
-            <input id="studentNo" placeholder="Student No." oninput="validateStudentNo(this)" maxlength="4" />
-
-          <button type="submit" class="submit-btn">Submit</button>
-          <button type="button" onclick="closeModal()" class="cancel-btn">Cancel</button>
-        </form>
+      <div class="modal-actions">
+        <button type="submit" class="submit-btn">✅ Submit</button>
+        <button type="button" onclick="closeModal()" class="cancel-btn">❌ Cancel</button>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
 
     <div id="toast" class="toast"></div>
     
 <script>
-  function validateStudentNo(input) {
-    input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
-  }
-  
-  function lenientYearInput(input) {
-    // Allow only digits, up to 4 characters — but don't clear prematurely
-    const digits = input.value.replace(/[^0-9]/g, '').slice(0, 4);
-    input.value = digits;
-  }
-
-  // Final validation function to use on form submission
-  function isYearValid(val) {
-    const year = parseInt(val, 10);
-    return val.length === 4 && year >= 1990 && year <= 2099;
-  }
-
-  function validateMajor(input) {
-    input.value = input.value
-      .replace(/[^a-zA-Z\-]/g, '')   // Allow only letters and dash
-      .toUpperCase()                 // All uppercase
-      .slice(0, 9);                  // Max 7 characters
-  }
-
-  function validatePhone(input) {
-    input.value = input.value.replace(/[^0-9]/g, '').slice(0, 15);
-  }
-
-  function validateGender(input) {
-    input.value = input.value
-      .replace(/[^a-zA-Z]/g, '')      // Only letters
-      .slice(0, 6)                    // Max 4 characters
-      .replace(/\b\w/g, c => c.toUpperCase()); // Capitalize first
-  }
-
-  function formatSuffix(value) {
-    const cleaned = value.replace(/[^a-zA-Z]/g, '').slice(0, 4).toLowerCase();
-    if (cleaned === 'none') return 'None';
-
-    const roman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
-    const upper = cleaned.toUpperCase();
-    if (roman.includes(upper)) return upper;
-
-    const known = { 'jr': 'Jr', 'sr': 'Sr' };
-    return known[cleaned] || (cleaned.charAt(0).toUpperCase() + cleaned.slice(1));
-  }
-
-  function formatInitial(value) {
-    return value
-      .replace(/[^a-zA-Z]/g, '')  // Remove everything except letters
-      .toUpperCase()
-      .slice(0, 1);               // Max 1 character
-  }
-
-  function formatName(val) {
-    return val
-      .replace(/[^a-zA-Z\s]/g, '')        // Only letters and spaces
-      .toLowerCase()
-      .replace(/\b\w/g, c => c.toUpperCase()) // Capitalize each word
-      .slice(0, 20);                      // Max 20 characters
-  }
 document.addEventListener('DOMContentLoaded', () => {
   const modal        = document.getElementById('modal');
   const tbody        = document.querySelector('#alumniTable tbody');
@@ -182,7 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const dz           = document.getElementById('excelDropZone');
   const toast        = document.getElementById('toast');
 
-  const FIELDS = ['firstName', 'lastName', 'initial', 'suffix', 'dateBirth', 'gender', 'phoneNo', 'major', 'yearStarted', 'graduated', 'studentNo'];
+  // ✅ Only the fields boss requested
+  const FIELDS = ['firstName', 'lastName', 'initial', 'suffix', 'major', 'graduated'];
   const ROWS_PER_PAGE = 100;
   let currentPage = 1, totalPages = 1;
 
@@ -206,52 +149,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 30);
   })();
 
-  openBtn.onclick = () => modal.style.display = 'block';
+  // Open/Close Modal
+  openBtn.onclick = () => modal.style.display = 'flex';
   window.closeModal = () => {
     modal.style.display = 'none';
     modal.querySelectorAll('input').forEach(i => i.value = '');
   };
 
-document.getElementById('alumniForm').onsubmit = async (e) => {
-  e.preventDefault();
-  const payload = {};
-  FIELDS.forEach(id => {
-    let val = document.getElementById(id).value.trim();
-    if (id === 'dateBirth' && val) {
-      // Keep the date in YYYY-MM-DD format for the backend
-      const d = new Date(val);
-      if (!isNaN(d)) {
-        // Format as YYYY-MM-DD for MySQL
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        val = `${year}-${month}-${day}`;
-      }
-    }
-    payload[id] = val;
-  });
-
-  try {
-    const res = await fetch('/api/alumni', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+  // Submit Alumni Form
+  document.getElementById('alumniForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const payload = {};
+    FIELDS.forEach(id => {
+      let val = document.getElementById(id).value.trim();
+      payload[id] = val;
     });
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error || 'Failed to save');
-    showToast('✅ Saved successfully!');
-    e.target.reset();
-    closeModal();
-    loadPage(1, searchInput.value.trim());
-  } catch (err) {
-    showToast('❌ ' + err.message, 'error');
-  }
-};
 
+    try {
+      const res = await fetch('/api/alumni', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Failed to save');
+      showToast('✅ Saved successfully!');
+      e.target.reset();
+      closeModal();
+      loadPage(1, searchInput.value.trim());
+    } catch (err) {
+      showToast('❌ ' + err.message, 'error');
+    }
+  };
+
+  // Print Table
   printBtn.onclick = () => window.print();
+
+  // Pagination + Search
   pageSelect.onchange = () => loadPage(+pageSelect.value, searchInput.value.trim());
   searchInput.oninput = () => loadPage(1, searchInput.value.trim());
 
+  // Load Alumni Data
   async function loadPage(page = 1, search = '') {
     currentPage = page;
     try {
@@ -263,31 +201,13 @@ document.getElementById('alumniForm').onsubmit = async (e) => {
         const tr = document.createElement('tr');
         FIELDS.forEach(k => {
           const td = document.createElement('td');
-          let displayValue = r[k] || '';
-          
-          // Format date for display
-          if (k === 'dateBirth' && displayValue) {
-            try {
-              const date = new Date(displayValue);
-              if (!isNaN(date.getTime())) {
-                displayValue = date.toLocaleDateString('en-US', { 
-                  month: 'long', 
-                  day: 'numeric', 
-                  year: 'numeric' 
-                });
-              }
-            } catch (e) {
-              // Keep original value if date parsing fails
-              console.log('Date parsing failed for:', displayValue);
-            }
-          }
-          
-          td.textContent = displayValue;
+          td.textContent = r[k] || '';
           tr.appendChild(td);
         });
         tbody.prepend(tr);
       });
 
+      // Pagination dropdown
       pageSelect.innerHTML = '';
       for (let i = 1; i <= totalPages; i++) {
         const opt = document.createElement('option');
@@ -302,6 +222,7 @@ document.getElementById('alumniForm').onsubmit = async (e) => {
     }
   }
 
+  // Drag & Drop Excel Upload
   dz.addEventListener('dragover', e => {
     e.preventDefault();
     dz.style.background = '#ccc';
@@ -333,6 +254,7 @@ document.getElementById('alumniForm').onsubmit = async (e) => {
     }
   });
 
+  // Toast Notification
   function showToast(message, type = 'success') {
     toast.textContent = message;
     toast.className = `toast show ${type}`;
@@ -344,5 +266,6 @@ document.getElementById('alumniForm').onsubmit = async (e) => {
   loadPage();
 });
 </script>
+
 </body>
 </html>

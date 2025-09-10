@@ -24,12 +24,90 @@
     <div class="Line1"></div>
     <div class="Line2"></div>
 
-    <div class="career-button slide-in" onclick="window.location.href='career-posting.html'">
-      <div class="content"><div class="state-layer"><div class="hover-underline1">CAREER</div></div></div>
+
+    <div id="toast-container"></div>
+
+<div class="event-button slide-in" onclick="openModal('modal-event')">
+  <div class="content">
+    <div class="state-layer">
+      <div class="hover-underline1">EVENT</div>
     </div>
-        <div class="event-button slide-in" onclick="window.location.href='event-posting.html'">
-      <div class="content"><div class="state-layer"><div class="hover-underline1">EVENT</div></div></div>
+  </div>
+</div>
+
+<div id="modal-event" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <form id="eventForm" enctype="multipart/form-data">
+      <label for="title">Event Title</label>
+      <select id="title" name="title" required>
+        <option value="">-- Choose Event --</option>
+        <option value="HomeComing">HomeComing Event</option>
+        <option value="SportFest">Sport Fest</option>
+      </select>
+
+      <label for="location">Set Date, Time & Location</label>
+      <input type="text" id="location" name="location" placeholder="e.g. Sept 30, 7PM, Gymnasium" required>
+
+      <!-- ✅ Styled File Upload -->
+      <label for="eventImage" class="file-label">Upload Image</label>
+      <input type="file" id="eventImage" name="image" accept="image/*" required>
+
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3" required></textarea>
+
+      <button type="submit">Publish</button>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+
+<!-- CAREER BUTTON -->
+<div class="career-button slide-in" onclick="openModal('modal-career')">
+  <div class="content">
+    <div class="state-layer">
+      <div class="hover-underline1">CAREER</div>
     </div>
+  </div>
+</div>
+
+<div id="modal-career" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <form id="careerForm" enctype="multipart/form-data">
+      <label for="careerType">Career Type</label>
+      <select id="careerType" name="title" required>
+        <option value="">-- Select Career --</option>
+        <option value="Electrician">Electrician</option>
+        <option value="Mechanic">Mechanic</option>
+        <option value="Education">Education</option>
+        <option value="Software Developer">Software Developer</option>
+        <option value="Network Engineer">Network Engineer</option>
+        <option value="Telecommunications Engineer">Telecommunications Engineer</option>
+        <option value="Electrical Engineer">Electrical Engineer</option>
+        <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
+      </select>
+
+      <label for="careerLink">Link</label>
+      <input type="text" id="careerLink" name="link" placeholder="https://example.com">
+
+      <!-- ✅ Styled File Upload -->
+      <label for="careerImage" class="file-label">Upload Image</label>
+      <input type="file" id="careerImage" name="image" accept="image/*" required>
+
+      <label for="careerDesc">Description</label>
+      <textarea id="careerDesc" name="description" rows="3" required></textarea>
+
+      <button type="submit">Publish</button>
+    </form>
+  </div>
+</div>
+
+
 
     <div class="gallery-button slide-in" id="galleryBtn">
       <div class="content"><div class="state-layer"><div class="hover-underline1">GALLERY</div></div></div>
@@ -135,17 +213,20 @@
     </div>
 
 
-  <div class="selection-container slide-in">
-    <button type="hover-underline1" class="select-trigger" onclick="toggleDropdown()">DATA MANAGEMENT ▾</button>
-    <div class="dropdown-menu" id="dropdownMenu">
-      <div class="hover-underline1" onclick="navigateTo('alumni-Database.html')">Alumni Database</div>
-      <div class="hover-underline1" onclick="navigateTo('jobs-response.html')">Jobs Response</div>
-      <div class="hover-underline1" onclick="navigateTo('data-registration.html')">Registration</div>
-      <div class="hover-underline1" onclick="navigateTo('admin-id.html')">ID Request</div>
-      <div class="hover-underline1" onclick="navigateTo('event-registration.html')">Event Registration</div>
-      <div class="hover-underline1" onclick="navigateTo('admin-employer.html')">Employer Registration</div>
-    </div>
+<div class="selection-container slide-in">
+  <button type="button" class="select-trigger" id="dropdownBtn">
+    DATA MANAGEMENT ▾
+  </button>
+  <div class="dropdown-menu" id="dropdownMenu">
+    <div class="hover-underline1" onclick="navigateTo('alumni-Database.html')">Alumni Database</div>
+    <div class="hover-underline1" onclick="navigateTo('jobs-response.html')">Jobs Response</div>
+    <div class="hover-underline1" onclick="navigateTo('data-registration.html')">Registration</div>
+    <div class="hover-underline1" onclick="navigateTo('admin-id.html')">ID Request</div>
+    <div class="hover-underline1" onclick="navigateTo('event-registration.html')">Event Registration</div>
+    <div class="hover-underline1" onclick="navigateTo('admin-employer.html')">Employer Registration</div>
   </div>
+</div>
+
 
   <div id="inboxPanel" class="modern-inbox">
     <div class="inbox-header">Admin Inbox</div>
@@ -345,10 +426,16 @@ async function loadGallery(container) {
 }
 
 async function deleteImage(id) {
-  if (confirm('Delete this image?')) {
+  try {
     const res = await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
-    if (res.ok) loadGallery(document.getElementById('galleryGrid'));
-    else alert('Delete failed');
+    if (!res.ok) throw new Error(await res.text());
+
+    showToast("✅ Image deleted successfully!", "success");
+    loadGallery(document.getElementById('galleryGrid'));
+
+  } catch (err) {
+    console.error("❌ Delete error:", err);
+    showToast("❌ Failed to delete image", "error");
   }
 }
 
@@ -623,6 +710,156 @@ async function loadFeed() {
 }
 
 document.addEventListener('DOMContentLoaded', loadFeed);
+
+
+
+
+
+// ✅ Toast Notification Utility
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) return; // in case toast container not in DOM
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  // Remove after animation
+  setTimeout(() => {
+    toast.remove();
+  }, 4000);
+}
+
+
+
+// 🔹 Reusable modal open/close functions
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.style.display = "flex";
+}
+
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const userRole = sessionStorage.getItem("userRole"); // ✅ get role
+
+  // ================== EVENT MODAL ==================
+  const eventModal = document.getElementById('modal-event');
+  const openEventBtn = document.querySelector('.event-button');
+  const closeEventBtn = eventModal.querySelector('.close');
+  const eventForm = document.getElementById("eventForm");
+
+  // ✅ Open modal
+  openEventBtn.addEventListener("click", () => {
+    if (userRole !== "admin") {
+      showToast("⚠️ Only admins can post events.", "error");
+      return;
+    }
+    eventModal.style.display = "flex";
+  });
+
+  // ✅ Close modal
+  closeEventBtn.addEventListener("click", () => {
+    eventModal.style.display = "none";
+  });
+
+  // ✅ Close if clicking outside
+  window.addEventListener("click", (e) => {
+    if (e.target === eventModal) eventModal.style.display = "none";
+  });
+
+  // ✅ Submit Event form
+  eventForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(eventForm);
+
+    try {
+      const res = await fetch("/api/events/add", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Event creation failed");
+
+      showToast("✅ Event published successfully!", "success");
+      eventModal.style.display = "none";
+      eventForm.reset();
+
+      // 🔄 Reload only if admin
+      if (userRole === "admin") {
+        setTimeout(() => location.reload(), 1500);
+      }
+
+    } catch (err) {
+      console.error("❌ Event submission error:", err);
+      showToast("❌ " + err.message, "error");
+    }
+  });
+
+  // ================== CAREER MODAL ==================
+  const careerModal = document.getElementById('modal-career');
+  const openCareerBtn = document.querySelector('.career-button');
+  const closeCareerBtn = careerModal.querySelector('.close');
+  const careerForm = document.getElementById("careerForm");
+
+  // ✅ Open modal
+  openCareerBtn.addEventListener("click", () => {
+    if (userRole !== "admin" && userRole !== "employer") {
+      showToast("⚠️ Only admins and employers can post careers.", "error");
+      return;
+    }
+    careerModal.style.display = "flex";
+  });
+
+  // ✅ Close modal
+  closeCareerBtn.addEventListener("click", () => {
+    careerModal.style.display = "none";
+  });
+
+  // ✅ Close if clicking outside
+  window.addEventListener("click", (e) => {
+    if (e.target === careerModal) careerModal.style.display = "none";
+  });
+
+  // ✅ Submit Career form
+  careerForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(careerForm);
+
+    try {
+      const res = await fetch("/api/careers/add", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Career post failed");
+
+      showToast("✅ Career published successfully!", "success");
+      careerModal.style.display = "none";
+      careerForm.reset();
+
+      // 🔄 Reload only if admin OR employer
+      if (userRole === "admin" || userRole === "employer") {
+        setTimeout(() => location.reload(), 1500);
+      }
+
+    } catch (err) {
+      console.error("❌ Career submission error:", err);
+      showToast("❌ " + err.message, "error");
+    }
+  });
+});
+
+
 
 
 

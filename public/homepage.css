@@ -2,7 +2,7 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
+  font-family: 'Alegreya', 'Albert Sans', 'Sanchez', 'Arial', sans-serif;
 }
 .homepage {
   background: transparent;
@@ -457,24 +457,6 @@ html, body {
   object-fit: cover;
   aspect-ratio: 3/2;
 }
-/* Visitor Counter Styles */
-.visitor-counter {
-  font-family: 'sanchez', sans-serif;
-  font-size: 15px;
-  color: #000000;
-  padding: 15px 25px;
-  display: flex;
-  position: absolute;
-  top: 200px;
-  left: 10px;
-  animation: slideIn 2s ease-out forwards;
-}
-#visitor-count {
-  position: relative;
-  left: 10px;
-  font-weight: bold;
-  color: #e74c3c;
-}
 .commencement-description {
   position: absolute;
   top: 850px;
@@ -812,7 +794,7 @@ margin-top: 5%;
 /* ✅ For 1366x768 screens (common laptops) */
 @media (max-width: 1400px) {
   .contact-section {
-    margin-top: 120vh;
+    margin-top: 165vh;
   }
 }
 
@@ -883,67 +865,6 @@ margin-top: 5%;
   margin-top: 20px;
   font-size: 14px;
   color: #555;
-}
-.fb-wrapper{
-  position: absolute;
-  border: 3px solid#ddd;
-  z-index: 999;
-}
-.fb-wrapper2 {
-  position: absolute;
-  border: 3px solid#ddd;
-  z-index: 999;
-
-}
-@media (min-width: 1600px) {
-  .fb-wrapper {
-    top: 770px;
-    left: 2%;
-  }
-  .fb-wrapper2 {
-    top: 770px;
-    left: 22%;
-  }
-}
-@media (max-width: 1400px) {
-  .fb-wrapper {
-    top: 760px;
-    left: 2%;
-  }
-  .fb-wrapper2 {
-    top: 760px;
-    left: 30%;
-  }
-}
-@media (max-width: 768px) {
-  .fb-wrapper {
-    top: 790px;
-    left: 3%
-  }
-}
-@media (max-width: 768px) {
-  .fb-wrapper2 {
-    top: 790px;
-    left: 55%;
-  }
-}
-
-.fb-page {          
-  width: 340px !important;     
-  height: 480px !important;   
-  border: 2px solid #ccc; 
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  z-index: 1000;
-  
-}
-
-.fb-xfbml-parse-ignore {
-  display: block;
-  font-family: 'Albert Sans', sans-serif;
-  text-align: center;
-  color: #333;
 }
 .toast-overlay {
   position: fixed;
@@ -1304,8 +1225,8 @@ margin-top: 5%;
 /* Laptops (<=1599px)  */
 @media (max-width: 1400px) {
   .announcement-box {
-    top: 270px;
-    left: 58%;
+    top: 1230px;
+    left: 72%;
     max-width: 25%; /* medium size */
   }
 }
@@ -1324,7 +1245,7 @@ margin-top: 5%;
   text-align: justify;
   max-height: 450px;
   max-width: 450px;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding-right: 5px;
   font-size: 16px; /* default */
 }
@@ -1352,37 +1273,6 @@ margin-top: 5%;
   }
 }
 
-
-.event-card {
-  border-bottom: 1px solid #ddd;
-  padding: 5px 0;
-  font-family: 'Albert Sans', sans-serif;
-}
-
-.event-header {
-  font-size: 0.75rem;
-  color: #444;
-  display: flex;
-  align-items: center;
-}
-
-.badge {
-  background: crimson;
-  color: white;
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  border-radius: 3px;
-  margin-right: 5px;
-}
-
-.event-title {
-  font-weight: bold;
-  font-size: 1rem;
-  margin-top: 5px;
-}
-
-
 .announcement-box2 {
   position: absolute;
   top: 30%;      
@@ -1394,7 +1284,7 @@ margin-top: 5%;
   background: #fff;
   max-width: 450px;
   height: 450px;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 /* ✅ For 1920x1080 screens (large PC monitors) */
@@ -1410,8 +1300,8 @@ margin-top: 5%;
 /* ✅ For 1366x768 screens (common laptops) */
 @media (max-width: 1400px) {
   .announcement-box2 {
-    top: 270px;
-    left: 30%;
+    top: 750px;
+    left: 72%;
     max-width: 25%;  /* medium size */
   }
 }
@@ -1425,40 +1315,6 @@ margin-top: 5%;
     max-height: 30%;/
   }
 }
-
-
-.announcement-list {
-  text-align: justify;
-  max-height: 450px;
-  max-width: 450px;
-  overflow-y: auto;
-  padding-right: 5px;
-  font-size: 16px; /* default */
-}
-
-/* Large monitors (>=1600px) */
-@media (min-width: 1600px) {
-  .announcement-list {
-    font-size: 18px;
-  }
-}
-
-/* Laptops (<=1400px) */
-@media (max-width: 1400px) {
-  .announcement-list {
-    font-size: 15px;
-  }
-}
-
-/* Phones (<=768px) */
-@media (max-width: 768px) {
-  .announcement-list {
-    font-size: 14px;
-    text-align: justify;
-    max-width: 150%; 
-  }
-}
-
 
 .event-card {
   border-bottom: 10px solid #882323;
@@ -1482,7 +1338,7 @@ margin-top: 5%;
   .event-card {
     font-size: 16px;
     padding: 8px 0;
-    border-bottom: 8px solid #882323;
+    border-bottom: 2px solid #882323;
   }
 }
 
@@ -1501,6 +1357,7 @@ margin-top: 5%;
   color: #444;
   display: flex;
   align-items: center;
+  font-family: Arial, sans-serif;
 }
 
 .badge {
@@ -1517,13 +1374,14 @@ margin-top: 5%;
   font-weight: bold;
   font-size: 1rem;
   margin-top: 5px;
+  font-family: Arial, sans-serif;
 }
 
 .career-box {
-  position: relative;
-  top: 30%;      
-  left: 2%;     
+  position: relative;    
   z-index: 10;
+  top: 50%;
+  left: auto;
   border: 3px solid #882323;
   border-radius: 10px;
   padding: 10px;
@@ -1608,7 +1466,7 @@ margin-top: 5%;
   .career-card {
     font-size: 20px;
     padding: 15px 0;
-    border-bottom: 12px solid #882323;
+    border-bottom: 4px solid #882323;
   }
 }
 
@@ -1617,7 +1475,7 @@ margin-top: 5%;
   .career-card {
     font-size: 16px;
     padding: 8px 0;
-    border-bottom: 8px solid #882323;
+    border-bottom: 2px solid #882323;
   }
 }
 
@@ -1640,7 +1498,7 @@ margin-top: 5%;
 }
 
 .career-badge {
-  background: #e91e63;
+  background: crimson;
   color: white;
   padding: 2px 6px;
   font-size: 0.7rem;
@@ -1653,6 +1511,7 @@ margin-top: 5%;
   font-weight: bold;
   font-size: 1rem;
   margin-top: 5px;
+  font-family: Arial, sans-serif;
 }
 .career-list::-webkit-scrollbar {
   width: 6px;
@@ -1709,3 +1568,11 @@ margin-top: 5%;
   user-select: none;
   display: inline-block;
 }
+
+
+
+
+
+
+
+

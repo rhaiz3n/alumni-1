@@ -207,34 +207,6 @@
     <div id="toastNotification" class="toast"></div>
 
 
-    <!-- Facebook Page Plugin -->
-    <div class="fb-wrapper">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FTUPCAA&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="483" 
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
-
-    <!-- TUPCAVITE Page -->
-    <div class="fb-wrapper2">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftupcavite.edu.ph&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="483" 
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
-
     <div class="announcement-box">
       <h3>ID Announcements</h3>
       <div class="announcement-list" id="idAnnouncementList">
@@ -256,9 +228,6 @@
       </div>
     </div>
 
-  <!-- Visitor Counter -->
-  <div class="visitor-counter">No. OF SITE VISITOR: <span id="visitor-count">Loading...</span>
-  </div>
     
       <!-- Registration Button -->
     <div class="registration-button slide-in">
@@ -387,6 +356,7 @@
     <div class="contact-section">
       </a>
     </div>
+
 
 
   <!-- Modal Script -->
@@ -522,29 +492,6 @@
     document.getElementById('warnOverlay').classList.remove('show');
     document.getElementById('warnToast2').classList.remove('show');
   };
-
-  window.addEventListener("DOMContentLoaded", () => {
-    const countEl = document.getElementById("visitor-count");
-
-    const isFirstVisit = !localStorage.getItem("alumni-visit");
-    const key = "alumni-visit-Rh4a1z3n"; // 🔒 private key
-    const namespace = "tupcavite";
-
-    const endpoint = isFirstVisit
-      ? `https://api.countapi.xyz/hit/${namespace}/${key}`
-      : `https://api.countapi.xyz/get/${namespace}/${key}`;
-
-    fetch(endpoint)
-      .then(res => res.json())
-      .then(data => {
-        countEl.textContent = data.value;
-        if (isFirstVisit) localStorage.setItem("alumni-visit", "true");
-      })
-      .catch(err => {
-        console.error("Visitor API error:", err);
-        countEl.textContent = "N/A";
-      });
-  });
 
   // ✉️ Facebook SDK
   window.fbAsyncInit = () => FB.init({ xfbml: true, version: 'v17.0' });

@@ -78,35 +78,36 @@
 
 <div id="modal" class="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
+    <button class="close" onclick="closeModal()">&times;</button>
     <h2>Add Alumni</h2>
-    <form id="alumniForm">
-      
+    
+    <form id="alumniForm" class="form-grid">
       <label for="firstName">First Name</label>
-      <input id="firstName" name="firstName" type="text" placeholder="First Name" required>
+      <input type="text" id="firstName" required>
 
       <label for="lastName">Last Name</label>
-      <input id="lastName" name="lastName" type="text" placeholder="Last Name" required>
+      <input type="text" id="lastName" required>
 
       <label for="initial">Initial</label>
-      <input id="initial" name="initial" type="text" placeholder="Initial">
+      <input type="text" id="initial">
 
       <label for="suffix">Suffix</label>
-      <input id="suffix" name="suffix" type="text" placeholder="Suffix">
+      <input type="text" id="suffix">
 
       <label for="major">Major / Course</label>
-      <input id="major" name="major" type="text" placeholder="Major / Course" required>
+      <input type="text" id="major">
 
       <label for="graduated">Graduated</label>
-      <input id="graduated" name="graduated" type="text" maxlength="4" placeholder="e.g. 2023" required>
+      <input type="text" id="graduated" placeholder="e.g. 2023">
 
       <div class="modal-actions">
-        <button type="submit" class="submit-btn">✅ Submit</button>
-        <button type="button" onclick="closeModal()" class="cancel-btn">❌ Cancel</button>
+        <button type="submit" class="btn btn-submit">✔ Submit</button>
+        <button type="button" class="btn btn-cancel" onclick="closeModal()">✖ Cancel</button>
       </div>
     </form>
   </div>
 </div>
+
 
     <div id="toast" class="toast"></div>
     
@@ -149,20 +150,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 30);
   })();
 
-  // Open/Close Modal
-  openBtn.onclick = () => modal.style.display = 'flex';
-  window.closeModal = () => {
+  // ✅ Modal helpers
+  function openModal() {
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    const first = modal.querySelector('input');
+    if (first) first.focus();
+  }
+  function closeModal() {
     modal.style.display = 'none';
-    modal.querySelectorAll('input').forEach(i => i.value = '');
-  };
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
 
-  // Submit Alumni Form
+  // Open/Close triggers
+  openBtn.onclick = openModal;
+  window.closeModal = closeModal;
+
+  // Close on overlay click
+  window.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Close on Esc key
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // ✅ Submit Alumni Form
   document.getElementById('alumniForm').onsubmit = async (e) => {
     e.preventDefault();
     const payload = {};
     FIELDS.forEach(id => {
-      let val = document.getElementById(id).value.trim();
-      payload[id] = val;
+      payload[id] = document.getElementById(id).value.trim();
     });
 
     try {
@@ -182,14 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Print Table
+  // ✅ Print Table
   printBtn.onclick = () => window.print();
 
-  // Pagination + Search
+  // ✅ Pagination + Search
   pageSelect.onchange = () => loadPage(+pageSelect.value, searchInput.value.trim());
   searchInput.oninput = () => loadPage(1, searchInput.value.trim());
 
-  // Load Alumni Data
+  // ✅ Load Alumni Data
   async function loadPage(page = 1, search = '') {
     currentPage = page;
     try {
@@ -222,8 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Drag & Drop Excel Upload
-  dz.addEventListener('dragover', e => {
+ dz.addEventListener('dragover', e => {
     e.preventDefault();
     dz.style.background = '#ccc';
   });
@@ -254,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Toast Notification
+  // ✅ Toast Notification
   function showToast(message, type = 'success') {
     toast.textContent = message;
     toast.className = `toast show ${type}`;

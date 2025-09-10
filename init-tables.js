@@ -11,20 +11,14 @@ async function initTables() {
     await conn.changeUser({ database: 'alumni_db' });
 
     const sql = {
-      alumni: `CREATE TABLE IF NOT EXISTS alumni (
+      alumni: `CREATE TABLE alumni (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        firstName VARCHAR(100),
-        lastName VARCHAR(100),
+        firstName VARCHAR(100) NOT NULL,
+        lastName VARCHAR(100) NOT NULL,
         initial VARCHAR(10),
         suffix VARCHAR(10),
-        civilStatus VARCHAR(50),
-        dateBirth DATE,
-        gender VARCHAR(20),
-        phoneNo VARCHAR(50),
         major VARCHAR(100),
-        yearStarted YEAR,
-        graduated YEAR,
-        studentNo VARCHAR(50)
+        graduated YEAR
       )`,
       responses: `CREATE TABLE IF NOT EXISTS responses (
         id INT AUTO_INCREMENT PRIMARY KEY,

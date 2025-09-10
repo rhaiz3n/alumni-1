@@ -14,7 +14,7 @@ const { sendOtpEmail } = require('../GmailMailer');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 const upload = multer({ 
   storage: multer.memoryStorage(),
@@ -221,8 +221,6 @@ async function initTables() {
   }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ➕ API: Add alumni
-// 📥 Add new alumni
 app.post('/api/alumni', async (req, res) => {
   try {
     const b = req.body;
@@ -233,23 +231,14 @@ app.post('/api/alumni', async (req, res) => {
       b.lastName || null,
       b.initial || null,
       b.suffix || null,
-      b.civilStatus || null,
-      b.dateBirth || null,
-      b.gender || null,
-      b.phoneNo || null,
       b.major || null,
-      b.yearStarted || null,
-      b.graduated || null,
-      b.studentNo || null
+      b.graduated || null
     ];
 
     const [result] = await pool.execute(`
       INSERT INTO alumni (
-        firstName, lastName, initial, suffix,
-        civilStatus, dateBirth, gender,
-        phoneNo, major, yearStarted,
-        graduated, studentNo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        firstName, lastName, initial, suffix, major, graduated
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `, values);
 
     res.json({ id: result.insertId });
@@ -259,31 +248,46 @@ app.post('/api/alumni', async (req, res) => {
   }
 });
 
-// 📦 Upload Excel for alumni
-// Helper function to parse various date formats
-// Improved date parsing function
+// 📅 Improved date parsing for Excel uploads
 function parseDate(dateValue) {
-  if (!dateValue) return null; // Return null, not undefined
-  
-  // If it's a string like "March 20 2002", parse it manually
-  if (typeof dateValue === 'string') {
+  if (!dateValue) return null;
+
+  // If it's already a JS Date object
+  if (dateValue instanceof Date && !isNaN(dateValue)) {
+    return dateValue.toISOString().split("T")[0]; // YYYY-MM-DD
+  }
+
+  // If it's an Excel serial number (e.g., 37358)
+  if (typeof dateValue === "number") {
+    const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Excel base date
+    const parsedDate = new Date(excelEpoch.getTime() + dateValue * 86400000);
+    return parsedDate.toISOString().split("T")[0];
+  }
+
+  // If it's a string
+  if (typeof dateValue === "string") {
+    // Normalize (remove commas, trim spaces)
+    dateValue = dateValue.replace(/,/g, "").trim();
+
+    // Try parsing with Date()
+    const tryDate = new Date(dateValue);
+    if (!isNaN(tryDate)) {
+      return tryDate.toISOString().split("T")[0];
+    }
+
+    // Handle formats like "March 20 2002"
     const monthNames = {
-      'January': '01', 'February': '02', 'March': '03', 'April': '04',
-      'May': '05', 'June': '06', 'July': '07', 'August': '08',
-      'September': '09', 'October': '10', 'November': '11', 'December': '12'
+      January: "01", February: "02", March: "03", April: "04",
+      May: "05", June: "06", July: "07", August: "08",
+      September: "09", October: "10", November: "11", December: "12"
     };
-    
-    // Match pattern like "March 20 2002"
+
     const match = dateValue.match(/^(\w+)\s+(\d{1,2})\s+(\d{4})$/);
     if (match) {
-      const monthName = match[1];
-      const day = match[2].padStart(2, '0');
-      const year = match[3];
+      const [ , monthName, day, year ] = match;
       const month = monthNames[monthName];
-      
       if (month) {
-        const result = `${year}-${month}-${day}`;
-        return result;
+        return `${year}-${month}-${day.padStart(2, "0")}`;
       }
     }
   }
@@ -300,33 +304,23 @@ function parseDate(dateValue) {
   return null; // Return null instead of undefined
 }
 
-// Updated Excel upload route
+// 📦 Upload Excel for alumni (6 fields only)
 app.post('/api/alumni/upload-excel', upload.single('file'), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
-    if (!req.file.buffer) {
-      return res.status(400).json({ error: 'File buffer not available. Check multer configuration.' });
-    }
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     let wb, sheet, rows;
     try {
-    wb = XLSX.read(req.file.buffer, { 
-      type: 'buffer', 
-      cellDates: false, // Don't auto-convert to Date objects
-      raw: false // Get formatted strings
-    });
+      wb = XLSX.read(req.file.buffer, { type: 'buffer', raw: false });
       sheet = wb.Sheets[wb.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(sheet, { raw: false }); // raw: false to get formatted strings
+      rows = XLSX.utils.sheet_to_json(sheet, { raw: false });
     } catch (xlsxError) {
       console.error('XLSX parsing error:', xlsxError);
       return res.status(400).json({ error: 'Invalid Excel file format' });
     }
 
     if (!rows || rows.length === 0) {
-      return res.status(400).json({ error: 'Excel file is empty or has no valid data' });
+      return res.status(400).json({ error: 'Excel file is empty' });
     }
 
     console.log(`Processing ${rows.length} rows from Excel file`);
@@ -336,40 +330,29 @@ app.post('/api/alumni/upload-excel', upload.single('file'), async (req, res) => 
 
     const stmt = `
       INSERT INTO alumni (
-        firstName, lastName, initial, suffix,
-        civilStatus, dateBirth, gender,
-        phoneNo, major, yearStarted, graduated, studentNo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        firstName, lastName, initial, suffix, major, graduated
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `;
 
     let insertedCount = 0;
     let errors = [];
 
-    // In your Excel upload route, update the row processing:
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       try {
-        const dateBirth = parseDate(row['Date of Birth'] || row['dateBirth']);
-        
         const values = [
-          row['First Name'] || row['firstName'] || null,
-          row['Last Name'] || row['lastName'] || null,
-          row['Initial'] || row['initial'] || null,
-          row['Suffix'] || row['suffix'] || null,
-          row['Civil Status'] || row['civilStatus'] || null,
-          dateBirth || null, // Make sure this is null, not undefined
-          row['Gender'] || row['gender'] || null,
-          row['Phone No.'] || row['Phone No'] || row['phoneNo'] || null,
-          row['Major'] || row['major'] || null,
-          row['Year Started'] != null ? String(row['Year Started']) : (row['yearStarted'] ? String(row['yearStarted']) : null),
-          row['Graduated'] != null ? String(row['Graduated']) : (row['graduated'] ? String(row['graduated']) : null),
-          row['Student No.'] || row['Student No'] || row['studentNo'] || null
+          row['First Name'] || row['FIRST NAME'] || row['firstName'] || null,
+          row['Last Name']  || row['LAST NAME']  || row['lastName']  || null,
+          row['Initial']    || row['INITIAL']    || row['initial']   || null,
+          row['Suffix']     || row['SUFFIX']     || row['suffix']    || null,
+          row['Major']      || row['COURSE']      || row['Major / Course'] || row['major'] || null,
+          row['Graduated']  || row['GRADUATED']  || row['graduated'] || null
         ];
 
         await connection.execute(stmt, values);
         insertedCount++;
       } catch (rowError) {
-        console.error(`Error inserting row ${i + 1}:`, rowError.message);
+        console.error(`❌ Error inserting row ${i + 1}:`, rowError.message);
         errors.push(`Row ${i + 1}: ${rowError.message}`);
       }
     }
@@ -377,18 +360,14 @@ app.post('/api/alumni/upload-excel', upload.single('file'), async (req, res) => 
     await connection.commit();
     connection.release();
 
-    res.json({ 
-      success: true, 
-      totalRows: rows.length,
-      inserted: insertedCount,
-      errors: errors.length > 0 ? errors : undefined
-    });
+    res.json({ success: true, totalRows: rows.length, inserted: insertedCount, errors });
 
   } catch (err) {
     console.error('Excel upload error:', err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // 📄 Paginated & searchable alumni fetch - FIXED VERSION
 app.get('/api/alumni', async (req, res) => {
@@ -1060,23 +1039,43 @@ app.post('/api/events/add', uploadImage.single('image'), async (req, res) => {
 // 📌 GET: Events List
 app.get('/api/events', async (req, res) => {
   try {
+    // Auto-delete events older than 7 days
+    await pool.query(`
+      DELETE FROM events 
+      WHERE datePosted < NOW() - INTERVAL 7 DAY
+    `);
+
+    // Fetch events (those less than 7 days old remain)
     const [rows] = await pool.query(
       `SELECT id, title, description, location, datePosted, image 
        FROM events ORDER BY datePosted DESC`
     );
-    const events = rows.map(row => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      location: row.location,
-      datePosted: row.datePosted,
-      image: `data:image/jpeg;base64,${row.image.toString('base64')}`
-    }));
+
+    const events = rows.map(row => {
+      const datePosted = new Date(row.datePosted);
+      const now = new Date();
+
+      // Calculate age in days
+      const ageDays = Math.floor((now - datePosted) / (1000 * 60 * 60 * 24));
+
+      return {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        location: row.location,
+        datePosted,
+        image: `data:image/jpeg;base64,${row.image.toString('base64')}`,
+        isGray: ageDays >= 5 // mark gray if older than 5 days
+      };
+    });
+
     res.json({ events });
   } catch (err) {
+    console.error("Error fetching events:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // 📌 PUT: Edit Event
 app.put('/api/events/:id', async (req, res) => {

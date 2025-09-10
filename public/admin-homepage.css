@@ -437,65 +437,6 @@ html, body {
 #signOutBtn:hover .hover-underline2::after {
   width: 100%;
 }
-.school-name {
-  font-family: 'Alegreya', serif;
-  font-size: 40px;
-  font-weight: 700;
-  margin-bottom: 0px;
-}
-.event-title {
-  font-family: 'Alegreya', serif;
-  font-size: 60px;
-  font-weight: 700;
-  margin: 0 0 15px;
-}
-.event-title span {
-  font-family: 'Alegreya', sans-serif;
-  font-weight: 600;
-  font-size: 40px;
-}
-.description {
-  font-family: 'Sanchez', serif;
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 1.6;
-  color: #111;
-}
-.Grad1 {
-  height: 660px;
-  position: relative;
-  object-fit: cover;
-  aspect-ratio: 3/2;
-}
-/* Visitor Counter Styles */
-.visitor-counter {
-  font-family: 'sanchez', sans-serif;
-  font-size: 15px;
-  color: #000000;
-  padding: 15px 25px;
-  display: flex;
-  position: absolute;
-  top: 205px;
-  left: 10px;
-  animation: slideIn 2s ease-out forwards;
-}
-#visitor-count {
-  position: absolute;
-  left: 195px;
-  font-weight: bold;
-  color: #e74c3c;
-}
-.commencement-description {
-  position: absolute;
-  top: 850px;
-  left: 85px;
-  max-width: 990px;
-  margin: 45px auto;
-  text-align: left;
-  font-family: 'Albert Sans', serif;
-  padding: 0 20px;
-}
-
 #loader-wrapper {
   position: fixed;
   top: 0;

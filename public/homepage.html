@@ -510,16 +510,6 @@
     document.getElementById('warnToast2').classList.remove('show');
   };
 
-  // ✉️ Facebook SDK
-  window.fbAsyncInit = () => FB.init({ xfbml: true, version: 'v17.0' });
-  (function(d, s, id){
-    if (d.getElementById(id)) return;
-    let js = d.createElement(s);
-    js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    d.head.appendChild(js);
-  })(document, 'script', 'facebook-jssdk');
-
   // 🚪 Login Modal + Form
   const loginModal = document.getElementById('login-modal');
   document.getElementById('open-login-modal').onclick = () => loginModal.style.display = 'block';

@@ -5,21 +5,61 @@ html, body {
   font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
 }
 .userpage {
-  background: #ffffff00;
-  border: 0px solid #000000;
-  height: 150vh;
+  background: transparent;
+  border: 0;
+  height: 100%;  /* default */
   width: 100%;
-  margin: 0 auto;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+  margin: 0;
   display: block;
+}
+
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .userpage {
+    height: 90vh;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .userpage {
+    height: 130vh;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .userpage {
+    height: 90vh;
+    width: 100%;
+  }
 }
 .Navbar {
   position: absolute;
   width: 100%;                 
   height: 195px;
   display: flex;
+}
+@media (min-width: 1600px) {
+  .Navbar {
+    max-width: 100%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .Navbar {
+    max-width: 100%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .Navbar {
+    max-width: 150%;
+    width: 150%;
+    left: 0%;
+  }
 }
 .Line1 {
   margin-top: -10px;
@@ -87,34 +127,86 @@ html, body {
 }
 /* ALUMNI TEXT */
 .a-l-u-m-n-i {
-  color: #000000;
-  text-align: left;
-  font-size: 100px;
-  font-weight: 400;
   position: absolute;
-  left: 210px;
-  top: 70px;
-  -webkit-text-stroke: 1px #ffffff;
+  transform: translateX(-50%);  /* centered */
   font-family: 'Alegreya', serif;
+  font-weight: 400;
+  font-size: 100px;
+  color: #000000;
+  -webkit-text-stroke: 1px #ffffff;
+  text-align: center;
+  white-space: nowrap;
 }
+
+/* Bold highlight spans */
 .a-l-u-m-n-i-span,
 .a-l-u-m-n-i-span2 {
   font-family: 'Alegreya', serif;
   font-weight: 700;
 }
 
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .a-l-u-m-n-i {
+    font-size: 100px;
+    top: 65px;
+    left: 12%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .a-l-u-m-n-i {
+    font-size: 80px;
+    top: 65px;
+    left: 17%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .a-l-u-m-n-i {
+    font-size: 90px;
+    top: 35px;
+    left: 35%;
+  }
+}
+
 .technological-university-of-the-philippines-cavite {
   color: white; 
   text-align: center; 
   font-family: "Alegreya-Medium", serif;
-  font-size: 30px;
   font-weight: 200;
   position: absolute;
-  left: 50%;
-  top: 37px;
   transform: translateX(-50%); 
   width: max-content;
   -webkit-text-stroke: 1px #ffffff; 
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .technological-university-of-the-philippines-cavite {
+    font-size: 50px;
+    top: 20px;
+    left: 50%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .technological-university-of-the-philippines-cavite {
+    font-size: 35px;
+    top: 30px;
+    left: 55%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .technological-university-of-the-philippines-cavite {
+    font-size: 23px;
+    top: 30px;
+    left: 77%;
+  }
 }
 /* BUTTONS */
 .career-button,
@@ -129,13 +221,111 @@ html, body {
   width: 0px;
   height: 50px;
   position: absolute;
-  z-index: 999;
 }
-.career-button { left: 40vw; top: 200px; }
-.event-button { left: 50vw; top: 200px; }
-.gallery-button { left: 60vw; top: 200px; }
-.id-button { left: 70vw; top: 200px; }
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .career-button {
+    font-size: 25px;
+    top: 200px;
+    left: 30%;
+  }
+}
 
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .career-button {
+    font-size: 20px;
+    top: 200px;
+    left: 30%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .career-button {
+    font-size: 25px;
+    top: 200px;
+    left: 50%;
+  }
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .event-button {
+    font-size: 25px;
+    top: 200px;
+    left: 40%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .event-button {
+    font-size: 20px;
+    top: 200px;
+    left: 40%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .event-button {
+    font-size: 25px;
+    top: 200px;
+    left: 70%;
+  }
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .gallery-button {
+    font-size: 25px;
+    top: 200px;
+    left: 50%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .gallery-button {
+    font-size: 20px;
+    top: 200px;
+    left: 50%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .gallery-button {
+    font-size: 25px;
+    top: 200px;
+    left: 90%;
+  }
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .id-button {
+    font-size: 25px;
+    top: 200px;
+    left: 65%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .id-button {
+    font-size: 20px;
+    top: 200px;
+    left: 65%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .id-button {
+    font-size: 25px;
+    top: 200px;
+    left: 113%;
+  }
+}
 
 /* BUTTON CONTENT */
 .content {
@@ -212,7 +402,7 @@ html, body {
   width: 100%;
 }
 #signOutBtn {
-  position: relative;   /* or absolute, depending on need */
+  position: absolute;   /* or absolute, depending on need */
   top: 20px;         /* adjust this */
   left: 1200px;       /* adjust this */
   background-color: #ffffff;
@@ -222,7 +412,30 @@ html, body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  z-index: 999;      /* make sure it's on top */
+  z-index: 10;      /* make sure it's on top */
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  #signOutBtn {
+    top: 100px;
+    left: 85%;
+    font-size: 25px;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  #signOutBtn {
+    top: 100px;
+  }
+}
+
+/* ✅ For smaller devices (like tablets/phones) */
+@media (max-width: 768px) {
+  #signOutBtn {
+    top: 270px;
+    left: 2%;
+  }
 }
 #signOutBtn:hover .hover-underline1::after  {
   width: 100%;
@@ -269,30 +482,6 @@ html, body {
   text-align: left;
   font-family: 'Albert Sans', serif;
   padding: 0 20px;
-}
-/* Slideshow Styles */
-.slideshow-container {
-  position: absolute;
-  top: 250px;
-  left: 100px;
-  width: 1000px;
-  height: 700px;
-  margin: 20px auto;
-  overflow: hidden;
-}
-.slideshow-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 990px;
-  height: 660px;
-  object-fit: cover; 
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
-}
-.slideshow-image.active {
-  opacity: 1;
-  z-index: 1;
 }
 /* === Text Heading === */
 .career-selection {
@@ -397,24 +586,6 @@ html, body {
   left: 0;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.25);
 }
-.contact-section {
-  position: absolute;
-  margin-top: 250vh;
-  left: 0;
-  display: flex;
-  background-color: #882323;
-  height: 150px;
-  width: 100%;
-  opacity: 0;
-  transition: opacity 2s ease-out, transform 2s ease-out;
-  z-index: 1000;            /* keeps it above content */
-}
-.contact-section.slide-up {
-  opacity: 2;
-}
-.contact-section.slide-down {
-  opacity: 0;
-}
 #loader-wrapper {
   position: fixed;
   top: 0;
@@ -469,36 +640,6 @@ html, body {
   margin-top: 20px;
   font-size: 14px;
   color: #555;
-}
-.fb-wrapper{
-  position: absolute;
-  border: 3px solid#ddd;
-  top: 270px;
-  left: 80%; /* adjust as needed */
-  z-index: 10;
-}
-.fb-wrapper2 {
-  position: absolute;
-  border: 3px solid#ddd;
-  top: 790px;
-  left: 80%; /* adjust as needed */
-  z-index: 10;
-}
-.fb-page {          
-  width: 340px !important;     
-  height: 500px !important;   
-  border: 2px solid #ccc; 
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  z-index: 1000;
-  
-}
-.fb-xfbml-parse-ignore {
-  display: block;
-  font-family: 'Albert Sans', sans-serif;
-  text-align: center;
-  color: #333;
 }
 .admin-db-button {
   position: absolute;
@@ -859,33 +1000,76 @@ html, body {
 }
 
 .announcement-box {
-  position: absolute;
-  top: 270px;
-  left: 55%;
+  position: absolute;   
   z-index: 10;
-  border: 3px solid #ccc;
-  border-radius: 1px;
+  border: 3px solid #882323;
+  border-radius: 10px;
   padding: 10px;
   background: #fff;
-  max-width: 450px;
+  width: 450px;
+  height: 450px;
+  overflow-y: auto;
+}
+
+/* Large monitors (>=1600px) PC */
+@media (min-width: 1600px) {
+  .announcement-box {
+    top: 1230px;
+    left: 75%;
+    max-width: 400px;
+    max-height: 500px;
+  }
+}
+
+/* Laptops (<=1599px)  */
+@media (max-width: 1400px) {
+  .announcement-box {
+    top: 1230px;
+    left: 72%;
+    max-width: 25%; /* medium size */
+  }
+}
+
+/* Tablets & Phones (<=768px) */
+@media (max-width: 768px) {
+  .announcement-box {
+    top: 270px;
+    left: 70%;
+    max-width: 30%; /* make sure it fits */
+    max-height: 30%;/
+  }
 }
 
 .announcement-list {
-  max-height: 420px;
-  height: 600px;
-  box-shadow: #000;
-  width: 316px; /* adjust this height */
-  overflow-y: auto;
+  text-align: justify;
+  max-height: 450px;
+  max-width: 450px;
+  overflow-y: hidden;
   padding-right: 5px;
+  font-size: 16px; /* default */
 }
 
-.announcement-list::-webkit-scrollbar {
-  width: 5px;
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .announcement-list {
+    font-size: 18px;
+  }
 }
 
-.announcement-list::-webkit-scrollbar-thumb {
-  background: crimson;
-  border-radius: 5px;
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .announcement-list {
+    font-size: 15px;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .announcement-list {
+    font-size: 14px;
+    text-align: justify;
+    max-width: 150%; 
+  }
 }
 
 .event-card {
@@ -916,40 +1100,178 @@ html, body {
   font-size: 1rem;
   margin-top: 5px;
 }
+.delete-btn {
+  background: crimson;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: darkred;
+}
+.confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.confirm-modal.hidden {
+  display: none;
+}
+
+.confirm-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  font-family: 'Albert Sans', sans-serif;
+}
+
+.confirm-actions {
+  margin-top: 15px;
+}
+
+.confirm-actions button {
+  margin: 0 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#confirmYes {
+  background: crimson;
+  color: white;
+}
+
+#confirmNo {
+  background: #ccc;
+}
+
+
+
 .announcement-box2 {
-  position: absolute;
-  top: 270px;
-  left: 29%;
+  position: absolute;   
   z-index: 10;
-  border: 3px solid #ccc;
-  border-radius: 1px;
+  border: 3px solid #882323;
+  border-radius: 10px;
   padding: 10px;
   background: #fff;
-  max-width: 450px;
+  width: 450px;
+  height: 450px;
+  overflow-y: auto;
 }
+
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .announcement-box2 {
+    top: 750px;
+    left: 75%;
+    max-width: 400px;
+    max-height: 500px;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .announcement-box2 {
+    top: 750px;
+    left: 72%;
+    max-width: 25%;  /* medium size */
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .announcement-box2 {
+    top: 270px;
+    left: 36%;
+    max-width: 30%; /* make sure it fits */
+    max-height: 30%;/
+  }
+}
+
 
 .announcement-list {
   text-align: justify;
-  max-height: 420px;
-  box-shadow: #000;
-  width: 316px; /* adjust this height */
-  overflow-y: auto;
+  max-height: 450px;
+  max-width: 450px;
+  overflow-y: hidden;
   padding-right: 5px;
+  font-size: 16px; /* default */
 }
 
-.announcement-list::-webkit-scrollbar {
-  width: 5px;
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .announcement-list {
+    font-size: 18px;
+  }
 }
 
-.announcement-list::-webkit-scrollbar-thumb {
-  background: crimson;
-  border-radius: 5px;
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .announcement-list {
+    font-size: 15px;
+  }
 }
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .announcement-list {
+    font-size: 14px;
+    text-align: justify;
+    max-width: 150%; 
+  }
+}
+
 
 .event-card {
-  border-bottom: 1px solid #ddd;
-  padding: 5px 0;
+  border-bottom: 10px solid #882323;
+  padding: 10px 0;
   font-family: 'Albert Sans', sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 450px;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .event-card {
+    font-size: 20px;
+    padding: 15px 0;
+    border-bottom: 4px solid #882323;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .event-card {
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 2px solid #882323;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .event-card {
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 2px solid #882323;
+    max-width: 66%;
+  }
 }
 
 .event-header {
@@ -975,40 +1297,115 @@ html, body {
   margin-top: 5px;
 }
 .career-box {
-  position: absolute;
-  top: 270px;
-  left: 35%;
-  z-index: 10;
-  border: 3px solid #ccc;
-  border-radius: 1px;
+  position: absolute;   
+  z-index: 0;
+  border: 3px solid #882323;
+  border-radius: 10px;
   padding: 10px;
   background: #fff;
-  max-width: 450px;
+  width: 450px;
+  height: 450px;
+  overflow-y: auto;
+}
+
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .career-box {
+    top: 270px;
+    left: 75%;
+    max-width: 400px;
+    max-height: 500px;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .career-box {
+    top: 270px;
+    left: 72%;
+    max-width: 25%;
+  }
+}
+
+/* ✅ For smaller devices (like tablets/phones) */
+@media (max-width: 768px) {
+  .career-box {
+    top: 270px;
+    left: 2%;
+    max-width: 30%; /* make sure it fits */
+  }
 }
 
 .career-list {
-  max-height: 420px;
-  height: 500px;
-  box-shadow: #000;
-  width: 316px; /* adjust this height */
-  overflow-y: auto;
+  text-align: justify;
+  max-height: 450px;
+  max-width: 450px;
+  overflow-y: hidden;
   padding-right: 5px;
+  font-size: 16px; /* default */
 }
 
-.career-list::-webkit-scrollbar {
-  width: 5px;
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .career-list {
+    font-size: 18px;
+  }
 }
 
-.career-list::-webkit-scrollbar-thumb {
-  background: #e91e63;
-  border-radius: 5px;
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .career-list {
+    font-size: 15px;
+    
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .career-list {
+    font-size: 14px;
+    text-align: justify;
+    max-width: 150%; 
+  }
 }
 
 .career-card {
-  border-bottom: 1px solid #ddd;
-  padding: 5px 0;
+  border-bottom: 10px solid #882323;
+  padding: 10px 0;
   font-family: 'Albert Sans', sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  max-width: 450px;
 }
+
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .career-card {
+    font-size: 20px;
+    padding: 15px 0;
+    border-bottom: 4px solid #882323;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .career-card {
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 2px solid #882323;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .career-card {
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 4px solid #882323;
+    max-width: 90%;
+  }
+}
+
 
 .career-header {
   font-size: 0.75rem;
@@ -1031,14 +1428,6 @@ html, body {
   font-weight: bold;
   font-size: 1rem;
   margin-top: 5px;
-}
-.career-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.career-list::-webkit-scrollbar-thumb {
-  background: #e91e63;
-  border-radius: 5px;
 }
 .post-btn {
   background: #007BFF;
@@ -1131,12 +1520,6 @@ html, body {
   text-align: center;
   font-weight: bold;
 }
-
-
-
-
-
-
 
 
 
@@ -1245,4 +1628,127 @@ html, body {
 @keyframes fadeout {
   from { bottom: 30px; opacity: 1; }
   to { bottom: 0; opacity: 0; }
+}
+
+
+
+#feed {
+  max-width: 900px;  /* Default for large screens */
+  padding: 20px;
+  position: absolute;
+  top: 270px;
+  left: 100px;
+}
+
+.feed-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  font-family: Arial, sans-serif;
+}
+
+.feed-img {
+  width: 250px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.feed-content {
+  flex: 1;
+}
+
+.feed-content h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.feed-content p {
+  margin: 5px 0;
+  line-height: 1.4;
+  font-family: Arial, sans-serif;
+}
+
+.feed-content small {
+  display: block;
+  margin-top: 10px;
+  color: #777;
+  font-family: Arial, sans-serif;
+}
+
+/* ✅ Large PC screens (≥1600px) */
+@media (min-width: 1600px) {
+  #feed { 
+    max-width: 1100px;
+    top: 270px;
+    left: 120px;
+  }
+  .feed-img { 
+    width: 280px; 
+    height: 180px; 
+  }
+  .feed-content h2 { 
+    font-size: 24px; 
+  }
+}
+
+/* ✅ Laptop screens (≤1400px) */
+@media (max-width: 1400px) {
+  #feed { 
+    max-width: 800px; 
+    top: 270px;
+    left: 50px;
+  }
+  .feed-img { 
+    width: 220px; 
+    height: 150px; 
+  }
+  .feed-content h2 { 
+    font-size: 20px; 
+  }
+  .feed-content p { 
+    font-size: 14px; 
+  }
+}
+
+/* ✅ Phones & tablets (≤768px) */
+@media (max-width: 768px) {
+  #feed {
+    position: relative;  /* stack naturally */
+    top: auto;
+    left: auto;
+    width: 100%;
+    margin: 10px;
+  }
+  .feed-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .feed-img {
+    width: 100%;
+    height: auto;
+  }
+  .feed-content h2 { 
+    font-size: 18px; 
+  }
+  .feed-content p { 
+    font-size: 14px; 
+  }
+}
+
+/* Add to your CSS */
+.gray-post {
+  filter: grayscale(100%);
+  opacity: 0.6;
 }

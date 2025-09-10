@@ -788,14 +788,14 @@ margin-top: 5%;
 /* ✅ For 1920x1080 screens (large PC monitors) */
 @media (min-width: 1600px) {
   .contact-section {
-    margin-top: 115vh;
+    margin-top: 140vh;
   }
 }
 
 /* ✅ For 1366x768 screens (common laptops) */
 @media (max-width: 1400px) {
   .contact-section {
-    margin-top: 165vh;
+    margin-top: 190vh;
   }
 }
 

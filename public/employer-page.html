@@ -65,66 +65,8 @@
       TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
     </div>
 
-    <!-- Facebook Page Plugin -->
-    <div class="fb-wrapper">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FTUPCAA&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="500" 
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
 
-    <!-- TUPCAVITE Page -->
-    <div class="fb-wrapper2">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftupcavite.edu.ph&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="500" 
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
-
-    <!-- Slideshow Section -->
-    <div class="slideshow-container zoom-in">
-      <img class="slideshow-image" src="Grad1.png" alt="Grad 1" />
-      <img class="slideshow-image" src="Grad2.png" alt="Grad 2" />
-      <img class="slideshow-image" src="Grad3.png" alt="Grad 3" />
-      <img class="slideshow-image" src="Grad4.png" alt="Grad 4" />
-      <img class="slideshow-image" src="Grad5.png" alt="Grad 5" />
-      <img class="slideshow-image" src="Grad6.png" alt="Grad 6" />
-      <img class="slideshow-image" src="Grad7.png" alt="Grad 7" />
-      <img class="slideshow-image" src="Grad8.png" alt="Grad 8" />
-    </div>
-
-    <div class="commencement-description zoom-in">
-      <h2 class="school-name">Technological University of the Philippines - Cavite</h2>
-      <h3 class="event-title">40th <span>COMMENCEMENT EXERCISE</span></h3>
-      <p class="description">
-        Here are some snaps from the 40th Commencement Exercise at the Philippine International Convention Center on July 31, 2024.
-        See the magical moments of every TUPCians who reached the end of their college journey.
-        <br><br>
-        <strong>Photos by:</strong> Photo X Media<br>
-        <strong>Words by:</strong> Karen Pet Pabrowada
-      </p>
-    </div>
-  </div>
-
-  <!-- Contact Section -->
-    <div class="contact-section">
-      </a>
-    </div>
-
-  <!-- External JavaScript -->
-<script src="Homeslideshow.js"></script>
+    <div id="feed"></div>
 
 <script type="module">
   import { setupSignOut } from './sign-out.js';
@@ -132,20 +74,6 @@
 </script>
 
 <script>
-  // Contact Section Animation
-  document.addEventListener("DOMContentLoaded", () => {
-    const contactSection = document.querySelector('.contact-section');
-    if (contactSection) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          contactSection.classList.toggle('slide-up', entry.isIntersecting);
-          contactSection.classList.toggle('slide-down', !entry.isIntersecting);
-        });
-      }, { threshold: 0.1 });
-      observer.observe(contactSection);
-    }
-  });
-
   // Loading Screen Animation
   document.addEventListener("DOMContentLoaded", () => {
     let pct = 80;
@@ -165,18 +93,6 @@
     }, 30);
   });
 
-  // Facebook SDK Initialization
-  window.fbAsyncInit = function () {
-    FB.init({ xfbml: true, version: 'v17.0' });
-  };
-
-  (function (d, s, id) {
-    if (d.getElementById(id)) return;
-    const js = d.createElement(s);
-    js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    d.head.appendChild(js);
-  })(document, 'script', 'facebook-jssdk');
 
   // Dropdown toggle
   function toggleDropdown() {
@@ -203,6 +119,73 @@
       window.location.href = 'homepage.html'; // ❌ block non-employers
     }
   });
+
+
+async function loadFeed() {
+  const container = document.getElementById('feed');
+  container.innerHTML = 'Loading feed...';
+
+  try {
+    // ✅ Fetch only careers
+    const careersRes = await fetch('/api/careers');
+    const { careers } = await careersRes.json();
+
+    // Sort by datePosted (newest first)
+    const feed = careers.sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
+
+    // Render feed
+    container.innerHTML = feed.map((post, index) => {
+      const postedDate = new Date(post.datePosted).toLocaleString();
+      return `
+        <div class="feed-card">
+          ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+          <div class="feed-content">
+            <h2>${post.title} <small>[Career]</small></h2>
+            <p>${post.description}</p>
+            <small>
+              🏢 Company Name: ${post.link || "N/A"} <br>
+              🕒 Posted on: ${postedDate} <br>
+              ⏳ <span class="countdown" data-time="${post.datePosted}" id="countdown-${index}"></span>
+            </small>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Countdown function
+    function updateCountdowns() {
+      document.querySelectorAll(".countdown").forEach(el => {
+        const postedTime = new Date(el.dataset.time);
+        const expireTime = new Date(postedTime.getTime() + 24 * 60 * 60 * 1000);
+        const now = new Date();
+        const diffMs = expireTime - now;
+
+        if (diffMs <= 0) {
+          el.textContent = "❌ Expired";
+          return;
+        }
+
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        el.textContent = `${hours}h ${minutes}m ${seconds}s left`;
+      });
+    }
+
+    // Update immediately and every second
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+
+  } catch (err) {
+    console.error(err);
+    container.textContent = '⚠️ Failed to load careers.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadFeed);
+
+
 </script>
 </body>
 </head>

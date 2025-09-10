@@ -248,40 +248,6 @@
       TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
     </div>
 
-    <!-- Facebook Page Plugin -->
-    <div class="fb-wrapper">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FTUPCAA&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="483"
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
-
-    <!-- TUPCAVITE Page -->
-    <div class="fb-wrapper2">
-      <iframe 
-        src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftupcavite.edu.ph&tabs=timeline&width=340&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-        width="340" 
-        height="483.5" 
-        style="border:none; overflow:hidden;" 
-        scrolling="no" 
-        frameborder="0" 
-        allowfullscreen="true" 
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-      </iframe>
-    </div>
-
-
-  <!-- Contact Section -->
-    <div class="contact-section">
-      </a>
-    </div>
-
 
     <div class="announcement-box">
       <h3>ID Announcements</h3>
@@ -369,6 +335,8 @@
     </div>
   </div>
 </div>
+
+<div id="feed"></div>
 
 <!-- Toast Notification -->
 <div id="toast"></div>
@@ -819,6 +787,92 @@ function showToast(message, isError = false) {
     toast.className = toast.className.replace("show", "");
   }, 3000);
 }
+
+
+
+
+
+
+
+async function loadFeed() {
+  const container = document.getElementById('feed');
+  container.innerHTML = 'Loading feed...';
+
+  try {
+    // Fetch events and careers separately
+    const [eventsRes, careersRes] = await Promise.all([
+      fetch('/api/events'),
+      fetch('/api/careers')
+    ]);
+
+    const { events } = await eventsRes.json();
+    const { careers } = await careersRes.json();
+
+    // Add "type" field for clarity
+    const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
+    const formattedCareers = careers.map(c => ({ ...c, type: 'Career' }));
+
+    // Merge and sort by datePosted (newest first)
+    const feed = [...formattedEvents, ...formattedCareers]
+      .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
+
+    // Render feed
+    container.innerHTML = feed.map((post, index) => {
+      let extraInfo = "";
+      if (post.type === "Event") {
+        extraInfo = `📍 Location: ${post.location || "N/A"}`;
+      } else if (post.type === "Career") {
+        extraInfo = `🏢 Company Name: ${post.link || "N/A"}`;
+      }
+
+      return `
+        <div class="feed-card">
+          ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+          <div class="feed-content">
+            <h2>${post.title} <small>[${post.type}]</small></h2>
+            <p>${post.description}</p>
+            <small>
+              ${extraInfo} <br>
+              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
+              ⏳ <span class="countdown" data-time="${post.datePosted}" id="countdown-${index}"></span>
+            </small>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Countdown function
+    function updateCountdowns() {
+      document.querySelectorAll(".countdown").forEach(el => {
+        const postedTime = new Date(el.dataset.time);
+        const expireTime = new Date(postedTime.getTime() + 24 * 60 * 60 * 1000); // 1 day expiration
+        const now = new Date();
+        const diffMs = expireTime - now;
+
+        if (diffMs <= 0) {
+          el.textContent = "❌ Expired";
+          return;
+        }
+
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        el.textContent = `${hours}h ${minutes}m ${seconds}s left`;
+      });
+    }
+
+    // Run countdown immediately and update every second
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+
+  } catch (err) {
+    console.error(err);
+    container.textContent = '⚠️ Failed to load feed.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadFeed);
 
 </script>
 </body>

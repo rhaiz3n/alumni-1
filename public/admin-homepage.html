@@ -314,7 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
   enforceAdminRole();
   initLoader();
   initDropdown();
-  initContactObserver();
   initGallery();
   loadIdAnnouncements();
   loadEvents();
@@ -362,20 +361,6 @@ function initDropdown() {
       menu.classList.remove('show');
     }
   });
-}
-
-function initContactObserver() {
-  const contactSection = document.querySelector('.contact-section');
-  if (!contactSection) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      contactSection.classList.toggle('slide-up', entry.isIntersecting);
-      contactSection.classList.toggle('slide-down', !entry.isIntersecting);
-    });
-  }, { threshold: 0.1 });
-
-  observer.observe(contactSection);
 }
 
 // Gallery Logic
@@ -680,7 +665,7 @@ async function loadFeed() {
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
     // Render feed
-    container.innerHTML = feed.map(post => {
+    container.innerHTML = feed.map((post, index) => {
       let extraInfo = "";
       if (post.type === "Event") {
         extraInfo = `📍 Location: ${post.location || "N/A"}`;
@@ -696,12 +681,38 @@ async function loadFeed() {
             <p>${post.description}</p>
             <small>
               ${extraInfo} <br>
-              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()}
+              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
+              ⏳ <span class="countdown" data-time="${post.datePosted}" id="countdown-${index}"></span>
             </small>
           </div>
         </div>
       `;
     }).join('');
+
+    // Countdown function
+    function updateCountdowns() {
+      document.querySelectorAll(".countdown").forEach(el => {
+        const postedTime = new Date(el.dataset.time);
+        const expireTime = new Date(postedTime.getTime() + 24 * 60 * 60 * 1000); // 1 day expiration
+        const now = new Date();
+        const diffMs = expireTime - now;
+
+        if (diffMs <= 0) {
+          el.textContent = "❌ Expired";
+          return;
+        }
+
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        el.textContent = `${hours}h ${minutes}m ${seconds}s left`;
+      });
+    }
+
+    // Run countdown immediately and update every second
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
 
   } catch (err) {
     console.error(err);
@@ -710,6 +721,7 @@ async function loadFeed() {
 }
 
 document.addEventListener('DOMContentLoaded', loadFeed);
+
 
 
 

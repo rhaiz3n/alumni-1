@@ -39,62 +39,6 @@
       </div>
     </div>
 
-    <!-- Career Popup Modal -->
-    <div id="careerPopup" class="popup-overlay">
-      <div class="popup-content">
-        <div class="navbar"></div>
-        <img class="Logo2" src="Logo2.png" alt="TUPC Logo" />
-        <div class="career-selection">
-          <span class="career-selection-span">J</span>
-          <span class="career-selection-span2">OBS</span>
-          <span class="career-selection-span">R</span>
-          <span class="career-selection-span2">ESPONSE FORM</span>
-        </div>
-        <div class="Line1-1"></div>
-        <!-- First Name -->
-        <label for="firstName" class="label-first-name">First Name:</label>
-        <input 
-          type="text" 
-          id="firstName" 
-          class="input-first-name" 
-          maxlength="30"
-          oninput="this.value = formatName(this.value)"
-        />
-
-        <!-- Last Name -->
-        <label for="lastName" class="label-last-name">Last Name:</label>
-        <input 
-          type="text" 
-          id="lastName" 
-          class="input-last-name" 
-          maxlength="30"
-          oninput="this.value = formatName(this.value)"
-        />
-
-        <!-- Interested -->
-        <label for="interested" class="label-interest">Are you interested?</label>
-        <select id="interested" class="select-interest">
-          <option value="">-- Select --</option>
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
-        </select>
-
-        <!-- Employment Status -->
-        <label for="employmentStatus" class="label-employment">What is your current employment status?</label>
-        <select id="employmentStatus" class="select-employment">
-          <option value="">-- Select --</option>
-          <option value="Employed">Employed</option>
-          <option value="Unemployed">UnEmployed</option>
-          <option value="UnderEmployed">UnderEmployed</option>
-        </select>
-
-        <div class="popup-buttons">
-          <button class="career-btn1" onclick="submitCareerForm()">Submit</button>
-          <button class="career-btn2" onclick="closeCareerPopup()">Close</button>
-        </div>
-      </div>
-    </div>
-
 
     <a href="user-eventpage.html" class="event-button slide-in" style="text-decoration: none; color: inherit;">
       <div class="content">
@@ -341,10 +285,118 @@
 <!-- Toast Notification -->
 <div id="toast"></div>
 
+<div id="mensBasketballModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeMensBasketballModal()">&times;</span>
+    <h2>🏀 Men's Basketball Registration</h2>
+    <form id="mensBasketballForm">
+      
+      <!-- ✅ Team Name -->
+      <label for="teamName">Team Name</label>
+      <input 
+        type="text" 
+        id="teamName" 
+        name="teamName" 
+        maxlength="20" 
+        required 
+        placeholder="Enter Team Name"
+        oninput="validateTeamName(this)"
+      />
 
-  <!-- External JavaScript -->
-  <script src="Homeslideshow.js"></script>
-  
+      <!-- ✅ Age Range -->
+      <label for="ageRange">Age Range</label>
+      <input 
+        type="text" 
+        id="ageRange" 
+        name="ageRange" 
+        maxlength="5" 
+        required 
+        placeholder="e.g. 18-25"
+        oninput="validateAgeRange(this)"
+      >
+
+      <!-- ✅ Members -->
+      <div id="membersContainer">
+      <div class="member">
+        <input 
+          type="text" 
+          name="firstName[]" 
+          placeholder="First Name" 
+          maxlength="20" 
+          required
+          oninput="validateName(this)"
+        >
+        <input 
+          type="text" 
+          name="middleInitial[]" 
+          placeholder="M.I." 
+          maxlength="1"
+          oninput="validateMiddleInitial(this)"
+        >
+        <input 
+          type="text" 
+          name="lastName[]" 
+          placeholder="Last Name" 
+          maxlength="20" 
+          required
+          oninput="validateName(this)"
+        >
+      </div>
+    </div>
+
+      <button type="button" class="add-member-btn" onclick="addMember()">+ Add Member</button>
+      <button type="submit">Register</button>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- Career Survey Modal -->
+<div id="careerSurveyModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeCareerSurvey()">&times;</span>
+    <h2>Career Survey</h2>
+    <form id="careerSurveyForm">
+      <div id="surveyQuestions"></div>
+      <button type="submit" class="submit-btn">Submit Survey</button>
+    </form>
+  </div>
+</div>
+
+<!-- Employment Application Modal -->
+<div id="employmentFormModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeEmploymentForm()">&times;</span>
+    <h2>Employment Application</h2>
+    <form id="employmentForm" enctype="multipart/form-data">
+      <label>First Name</label>
+      <input type="text" name="firstName" required />
+
+      <label>Last Name</label>
+      <input type="text" name="lastName" required />
+
+      <label>Phone Number</label>
+      <input type="tel" name="phone" required />
+
+      <label>Email</label>
+      <input type="email" name="email" required />
+
+      <label>Upload Resume (PDF)</label>
+      <input type="file" name="resume" accept="application/pdf" required />
+
+      <button type="submit" class="submit-btn">Submit Application</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- Survey Notification -->
+<div id="surveyNotification" class="survey-notification">
+  <span id="surveyNotificationMsg"></span>
+  <button class="survey-close-btn" onclick="closeSurveyNotification()">×</button>
+</div>
+
 
 <script type="module">
   import { setupSignOut } from './sign-out.js';
@@ -461,25 +513,7 @@
     // Capitalize the first letter of each word
     return value.replace(/\b\w/g, char => char.toUpperCase());
   }
-  // Contact Section Animation
-document.addEventListener("DOMContentLoaded", function () {
-  const contactSection = document.querySelector('.contact-section');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        contactSection.classList.add('slide-up');
-        contactSection.classList.remove('slide-down');
-      } else {
-        contactSection.classList.remove('slide-up');
-        contactSection.classList.add('slide-down');
-      }
-    });
-  }, {
-    threshold: 0.1
-  });
 
-  observer.observe(contactSection);
-});
 
 // Loading Screen Script
 document.addEventListener("DOMContentLoaded", () => {
@@ -582,9 +616,14 @@ const loadingInterval = setInterval(() => {
     document.getElementById('notificationAlert').style.display = 'none';
   };
 
-  document.getElementById('galleryBtn').onclick = () => {
-    window.location.href = 'gallery-user.html?from=user-homepage.html';
-  };
+  document.addEventListener("DOMContentLoaded", () => {
+    const galleryBtn = document.getElementById('galleryBtn');
+    if (galleryBtn) {
+      galleryBtn.onclick = () => {
+        window.location.href = 'gallery-user.html?from=user-homepage.html';
+      };
+    }
+  });
 
 // Open the ID Request Popup
 function openIdRequestPopup() {
@@ -798,50 +837,131 @@ async function loadFeed() {
   const container = document.getElementById('feed');
   container.innerHTML = 'Loading feed...';
 
+  // helper: normalize title to a canonical key (uppercase, remove spaces & punctuation)
+  function normalizeTitle(t = '') {
+    return String(t).toUpperCase().replace(/[\s'".,()-]/g, '').replace(/[^A-Z0-9]/g, '');
+  }
+
+  // safe HTML escape for attributes
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // map normalized title keys => modal openers (strings for function names)
+  const registrationMap = {
+    'MENSBASKETBALL': 'openMensBasketballModal',
+    'MENSBASKETBALLEVENT': 'openMensBasketballModal', // if some variants saved this way
+    'HOMECOMINGEVENT': 'openHomecomingModal',
+    'HOMECOMING': 'openHomecomingModal',
+    'SPORTFEST': 'openSportfestModal',
+    'SPORTFESTEVENT': 'openSportfestModal',
+    'CAREER': 'openCareerModal',
+    'CAREERPOSTING': 'openCareerModal'
+  };
+
   try {
-    // Fetch events and careers separately
+    // fetch events/careers
     const [eventsRes, careersRes] = await Promise.all([
       fetch('/api/events'),
       fetch('/api/careers')
     ]);
 
+    if (!eventsRes.ok || !careersRes.ok) {
+      // throw explicit message to hit your catch and show "Failed to load feed"
+      throw new Error('Failed to fetch events or careers (check server).');
+    }
+
     const { events } = await eventsRes.json();
     const { careers } = await careersRes.json();
 
-    // Add "type" field for clarity
     const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
     const formattedCareers = careers.map(c => ({ ...c, type: 'Career' }));
 
-    // Merge and sort by datePosted (newest first)
     const feed = [...formattedEvents, ...formattedCareers]
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-    // Render feed
+    // render
     container.innerHTML = feed.map((post, index) => {
-      let extraInfo = "";
-      if (post.type === "Event") {
-        extraInfo = `📍 Location: ${post.location || "N/A"}`;
-      } else if (post.type === "Career") {
-        extraInfo = `🏢 Company Name: ${post.link || "N/A"}`;
-      }
+      const title = post.title || '';
+      const norm = normalizeTitle(title);
+      const showRegister = post.type === "Career" || Boolean(registrationMap[norm]);
+
+
+      const extraInfo = post.type === 'Event'
+        ? `🎉 Event: ${post.location || "N/A"}`
+        : `🏢 Company Name: ${post.link || "N/A"}`;
+
+      // escape attributes
+      const escapedTitleAttr = escapeHtml(title);
+      const isoDate = new Date(post.datePosted).toISOString();
 
       return `
         <div class="feed-card">
           ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
           <div class="feed-content">
-            <h2>${post.title} <small>[${post.type}]</small></h2>
-            <p>${post.description}</p>
+            <h2>${(title || '').toUpperCase()} <small>[${post.type}]</small></h2>
+            <p>${post.description || ''}</p>
             <small>
               ${extraInfo} <br>
               🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
-              ⏳ <span class="countdown" data-time="${post.datePosted}" id="countdown-${index}"></span>
+              ⏳ <span class="countdown" data-time="${isoDate}" id="countdown-${index}"></span>
             </small>
+              ${ showRegister
+                ? `<button class="register-btn" 
+                            data-id="${post.id}" 
+                            data-type="${post.type}" 
+                            data-title="${escapedTitleAttr}" 
+                            data-norm="${norm}">
+                    ${post.type === "Career" ? "Apply" : "Register"}
+                  </button>`
+                : ""
+              }
           </div>
         </div>
       `;
     }).join('');
 
-    // Countdown function
+    // delegation: handle register button clicks (safe — no inline onclick)
+    container.addEventListener('click', function onFeedClick(e) {
+      const btn = e.target.closest && e.target.closest('.register-btn');
+      if (!btn) return;
+
+      const title = btn.getAttribute('data-title') || '';
+      const norm = btn.getAttribute('data-norm') || normalizeTitle(title);
+      const type = btn.getAttribute('data-type');  // ✅ FIX: added
+      const id = btn.getAttribute('data-id');      // ✅ FIX: added
+
+      // 🚀 Handle career apply
+      if (type === "Career" && typeof window.openCareerSurvey === "function") {
+        window.openCareerSurvey({
+          id,
+          title,
+          description: btn.closest(".feed-card").querySelector("p")?.textContent || ""
+        });
+        return;
+      }
+
+      // ✅ Handle events normally
+      const fnName = registrationMap[norm];
+      if (fnName && typeof window[fnName] === 'function') {
+        window[fnName](title);
+      } else if (typeof window.openRegistrationModal === 'function') {
+        window.openRegistrationModal(title);
+      } else {
+        console.warn('No modal opener found for', title, norm);
+        alert('Registration not available for this post.');
+      }
+    }, { once: false });
+
+
+
+
+    // countdowns
     function updateCountdowns() {
       document.querySelectorAll(".countdown").forEach(el => {
         const postedTime = new Date(el.dataset.time);
@@ -862,7 +982,6 @@ async function loadFeed() {
       });
     }
 
-    // Run countdown immediately and update every second
     updateCountdowns();
     setInterval(updateCountdowns, 1000);
 
@@ -874,6 +993,259 @@ async function loadFeed() {
 
 document.addEventListener('DOMContentLoaded', loadFeed);
 
+
+
+
+
+
+
+
+// 🔹 Master modal opener
+function openRegistrationModal(title) {
+  switch (title.toUpperCase()) {
+    case "MENSBASKETBALL":
+      openMensBasketballModal();
+      break;
+
+    case "HOMECOMING EVENT":
+      openHomecomingModal();
+      break;
+
+    case "SPORTFEST":
+      openSportfestModal();
+      break;
+
+    case "CAREER FAIR":
+      openCareerModal();
+      break;
+
+    default:
+      console.warn("⚠️ No modal opener found for", title);
+  }
+}
+
+// 🔹 Men’s Basketball modal handlers
+function openMensBasketballModal() {
+  document.getElementById("mensBasketballModal").style.display = "flex";
+}
+
+function closeMensBasketballModal() {
+  document.getElementById("mensBasketballModal").style.display = "none";
+}
+
+function addMember() {
+  const container = document.getElementById("membersContainer");
+  const div = document.createElement("div");
+  div.classList.add("member");
+  div.innerHTML = `
+    <input type="text" name="firstName[]" placeholder="First Name" required>
+    <input type="text" name="middleInitial[]" placeholder="M.I.">
+    <input type="text" name="lastName[]" placeholder="Last Name" required>
+  `;
+  container.appendChild(div);
+}
+
+// 🔹 Handle Men’s Basketball form submission
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("mensBasketballForm");
+  if (!form) return; // prevent null error
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const teamName = document.getElementById("teamName").value.trim();
+    const ageRange = document.getElementById("ageRange").value.trim();
+
+    // Collect all players
+    const firstNames = document.querySelectorAll("input[name='firstName[]']");
+    const middleInitials = document.querySelectorAll("input[name='middleInitial[]']");
+    const lastNames = document.querySelectorAll("input[name='lastName[]']");
+
+    const players = [];
+    firstNames.forEach((input, i) => {
+      players.push({
+        firstName: input.value.trim(),
+        middleInitial: middleInitials[i].value.trim(),
+        lastName: lastNames[i].value.trim()
+      });
+    });
+
+    const payload = { teamName, ageRange, players };
+
+    try {
+      const res = await fetch("/api/sportfest/mensBasketball", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to register");
+
+      alert(`✅ Team registered successfully! Players: ${data.playerCount}`);
+      closeMensBasketballModal();
+    } catch (err) {
+      alert("❌ Error: " + err.message);
+    }
+  };
+});
+
+
+
+
+
+
+
+
+
+function openCareerSurvey(career) {
+  window.currentCareer = career; // ✅ keep career reference
+
+  // Inject Survey Questions
+  const modal = document.getElementById("careerSurveyModal");
+  const container = document.getElementById("surveyQuestions");
+  container.innerHTML = `
+    <label>First Name</label>
+    <input type="text" name="firstName" maxlength="20" required />
+
+    <label>Last Name</label>
+    <input type="text" name="lastName" maxlength="20" required />
+
+    <label>Are you interested?</label>
+    <select name="interested" required>
+      <option value="">-- Select --</option>
+      <option value="YES">YES</option>
+      <option value="NO">NO</option>
+    </select>
+
+    <label>What is your current employment status?</label>
+    <select name="employmentStatus" required>
+      <option value="">-- Select --</option>
+      <option value="EMPLOYED">EMPLOYED</option>
+      <option value="UNEMPLOYED">UNEMPLOYED</option>
+      <option value="UNDEREMPLOYED">UNDEREMPLOYED</option>
+    </select>
+
+    <label>If employed, is your work inline with this career?</label>
+    <select name="inlineWork">
+      <option value="">-- Select --</option>
+      <option value="YES">YES</option>
+      <option value="NO">NO</option>
+      <option value="MAYBE">MAYBE</option>
+    </select>
+  `;
+
+  modal.style.display = "flex";
+
+  // ✅ Survey Submit
+  document.getElementById("careerSurveyForm").onsubmit = async function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    const payload = {
+      careerId: career.id,
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      interested: formData.get("interested"),
+      employmentStatus: formData.get("employmentStatus"),
+      inlineWork: formData.get("inlineWork") || null,
+    };
+
+    try {
+      const res = await fetch("/api/responses/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save survey");
+
+      closeCareerSurvey();
+
+      if (payload.interested === "NO") {
+        showSurveyNotification("❌ You are not interested. Career description will not be shown.", "error");
+      } else {
+        // ✅ If interested, open Employment Form
+        document.getElementById("employmentFormModal").style.display = "flex";
+      }
+    } catch (err) {
+      console.error("❌ Survey submit error:", err);
+      showSurveyNotification("❌ Failed to save your survey. Please try again.", "error");
+    }
+  };
+
+  // ✅ Employment Application Submit
+  document.getElementById("employmentForm").onsubmit = async function (e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    try {
+      const res = await fetch("/api/applications/add", {
+        method: "POST",
+        body: formData, // includes file
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to submit application");
+
+      showSurveyNotification("✅ Employment Application Submitted Successfully!", "success");
+      closeEmploymentForm();
+    } catch (err) {
+      console.error("❌ Application submit error:", err);
+      showSurveyNotification("❌ Failed to submit application. Please try again.", "error");
+    }
+  };
+}
+
+function closeCareerSurvey() {
+  document.getElementById("careerSurveyModal").style.display = "none";
+}
+
+function closeEmploymentForm() {
+  document.getElementById("employmentFormModal").style.display = "none";
+}
+
+function showSurveyNotification(message, type = "success") {
+  const box = document.getElementById("surveyNotification");
+  const msg = document.getElementById("surveyNotificationMsg");
+
+  msg.innerHTML = message;
+  box.className = `survey-notification ${type}`;
+  box.style.display = "flex";
+}
+
+function closeSurveyNotification() {
+  document.getElementById("surveyNotification").style.display = "none";
+}
+
+
+
+
+
+
+
+function validateAgeRange(input) {
+  // Allow only numbers
+  input.value = input.value.replace(/[^0-9]/g, "");
+
+  // Limit to 5 digits
+  if (input.value.length > 5) {
+    input.value = input.value.slice(0, 5);
+  }
+}
+function validateName(input) {
+  // Remove non-letters
+  input.value = input.value.replace(/[^a-zA-Z ]/g, "");
+
+  // Capitalize first letter of each word
+  input.value = input.value.replace(/\b\w/g, char => char.toUpperCase());
+}
+
+function validateMiddleInitial(input) {
+  // Allow only 1 uppercase letter
+  input.value = input.value.replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 1);
+}
 </script>
 </body>
 </html>

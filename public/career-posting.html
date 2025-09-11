@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveEditBtn = document.getElementById('saveEditBtn');
   const cancelEditBtn = document.querySelector('#editCareerModal button[onclick="closeEditModal()"]');
   const role = sessionStorage.getItem('userRole');
+  const userId = sessionStorage.getItem('userId'); // ✅ assume you store userId in sessionStorage
 
   let currentEditId = null;
 
@@ -146,7 +147,38 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = role === 'admin' ? 'admin-homepage.html' : 'employer-page.html';
   };
 
-  document.getElementById('openModalBtn').onclick = () => modal.style.display = 'flex';
+document.getElementById('openModalBtn').onclick = async () => {
+  const role = sessionStorage.getItem("userRole");
+  const userId = sessionStorage.getItem("userId"); // ✅ get stored ID
+
+  if (role === 'employer') {
+    // ✅ Check last posted career timestamp for employer
+    const res = await fetch(`/api/careers/last-post/${userId}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.lastPost) {
+        const lastPostTime = new Date(data.lastPost);
+        const now = new Date();
+        const diffMs = now - lastPostTime;
+        const hoursPassed = diffMs / (1000 * 60 * 60);
+
+        if (hoursPassed < 24) {
+          const remainingMs = 24 * 60 * 60 * 1000 - diffMs;
+          const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+          const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+
+          showToast(`⚠️ You can only post 1 career per day. Try again in ${hours}h ${minutes}m ${seconds}s`);
+          return;
+        }
+      }
+    }
+  }
+
+  modal.style.display = 'flex'; // ✅ Open modal if allowed
+};
+
+
   document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
   window.onclick = e => {
     if (e.target === modal) modal.style.display = 'none';
@@ -165,9 +197,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const formData = new FormData(e.target);
+    formData.append("userId", userId); // ✅ Send employer ID
+
     const res = await fetch('/api/careers/add', {
       method: 'POST',
-      body: new FormData(e.target)
+      body: formData
     });
 
     if (!res.ok) {
@@ -190,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showToast(message) {
     toast.textContent = message;
     toast.className = 'toast show';
-    setTimeout(() => toast.className = 'toast', 3000);
+    setTimeout(() => toast.className = 'toast', 4000);
   }
 
   async function loadAdminCareers() {
@@ -300,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAdminCareers();
 });
 </script>
+
 
 </body>
 </html>

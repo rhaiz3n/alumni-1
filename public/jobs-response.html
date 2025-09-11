@@ -60,7 +60,7 @@
     <thead>
       <tr>
         <th>First Name</th><th>Last Name</th>
-        <th>Interested</th><th>Employment Status</th>
+        <th>Interested</th><th>Employment Status</th><th>InlineWork</th>
         <th>Date Submitted</th>
       </tr>
     </thead>
@@ -106,7 +106,7 @@ async function loadPage(page = 1, search = '') {
     tbody.innerHTML = '';
     rows.forEach(r => {
       const tr = document.createElement('tr');
-      ['firstName', 'lastName', 'interested', 'employmentStatus', 'dateSubmitted'].forEach(key => {
+      ['firstName', 'lastName', 'interested', 'employmentStatus', 'inlineWork', 'dateSubmitted'].forEach(key => {
         const td = document.createElement('td');
         if (key === 'dateSubmitted' && r[key]) {
           const date = new Date(r[key]);

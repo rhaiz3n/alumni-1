@@ -82,10 +82,12 @@ async function initTables() {
     )`,
     responses: `CREATE TABLE IF NOT EXISTS responses (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      careerId INT, -- ✅ added
       firstName VARCHAR(100),
       lastName VARCHAR(100),
       interested VARCHAR(100),
       employmentStatus VARCHAR(100),
+      inlineWork VARCHAR(100),
       dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     registration: `CREATE TABLE IF NOT EXISTS registration (
@@ -128,6 +130,7 @@ async function initTables() {
       title VARCHAR(255),
       description TEXT,
       link VARCHAR(255),
+      userId VARCHAR(100),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     homeregs: `CREATE TABLE IF NOT EXISTS homeregs (
@@ -213,6 +216,19 @@ async function initTables() {
       link VARCHAR(255),
       message TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    applications: `CREATE TABLE applications (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      careerId INT NOT NULL,
+      employerId INT NOT NULL,
+      firstName VARCHAR(50) NOT NULL,
+      lastName VARCHAR(50) NOT NULL,
+      phone VARCHAR(20) NOT NULL,
+      email VARCHAR(100) NOT NULL,
+      resumePath VARCHAR(255) NOT NULL, -- file path of uploaded PDF
+      dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (careerId) REFERENCES careers(id),
+      FOREIGN KEY (employerId) REFERENCES users(id)
     )`,
   };
   for (const [name, ddl] of Object.entries(sql)) {
@@ -410,31 +426,26 @@ app.get('/api/alumni', async (req, res) => {
 
 // ✅ Add new job response + emit + notify
 // Helper function for MySQL datetime format (add this at the top of server.js if not already there)
-function formatDateTimeForMySQL(date = new Date()) {
-  return date.toISOString().slice(0, 19).replace('T', ' ');
-}
 
 app.post('/api/responses/add', async (req, res) => {
-  const { firstName, lastName, interested, employmentStatus } = req.body;
+  const { careerId, firstName, lastName, interested, employmentStatus, inlineWork } = req.body;
   
   // Validate required fields
-  if (!firstName || !lastName || !interested || !employmentStatus) {
+  if (!careerId || !firstName || !lastName || !interested || !employmentStatus) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   
   const dateSubmitted = formatDateTimeForMySQL(); // MySQL-compatible format
-
-  const connection = await pool.getConnection(); // FIXED: Removed .promise()
+  const connection = await pool.getConnection();
 
   try {
     await connection.beginTransaction();
 
     // Insert into responses table
     const [insertResult] = await connection.execute(`
-      INSERT INTO responses (firstName, lastName, interested, employmentStatus, dateSubmitted)
-      VALUES (?, ?, ?, ?, ?)`,
-      [firstName, lastName, interested, employmentStatus, dateSubmitted]
-    );
+      INSERT INTO responses (careerId, firstName, lastName, interested, employmentStatus, inlineWork, dateSubmitted)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [careerId, firstName, lastName, interested, employmentStatus, inlineWork || null, dateSubmitted]);
 
     // Insert into notifications table
     const message = `${firstName} ${lastName} submitted a job response.`;
@@ -442,19 +453,18 @@ app.post('/api/responses/add', async (req, res) => {
 
     await connection.execute(`
       INSERT INTO notifications (name, message, link, createdAt)
-      VALUES (?, ?, ?, ?)`,
-      ['Jobs Responses', message, notifLink, dateSubmitted]
-    );
+      VALUES (?, ?, ?, ?)
+    `, ['Jobs Responses', message, notifLink, dateSubmitted]);
 
     await connection.commit();
     connection.release();
 
-    // Emit real-time notification (use ISO format for frontend)
+    // Emit real-time notification
     io.emit('newNotification', {
       name: 'Jobs Responses',
       message,
       link: notifLink,
-      createdAt: new Date().toISOString() // Frontend can handle ISO format
+      createdAt: new Date().toISOString()
     });
 
     res.json({ success: true, insertedId: insertResult.insertId });
@@ -466,28 +476,37 @@ app.post('/api/responses/add', async (req, res) => {
   }
 });
 
+
 // 📄 GET paginated + searchable job responses
 app.get('/api/responses', async (req, res) => {
   const page = +req.query.page || 1;
   const limit = +req.query.limit || 100;
   const offset = (page - 1) * limit;
   const search = req.query.search ? `%${req.query.search}%` : '%';
+  const careerId = req.query.careerId || null;
 
   try {
-    // Count query - FIXED: Removed .promise()
+    const whereClause = careerId 
+      ? `careerId = ? AND (firstName LIKE ? OR lastName LIKE ?)` 
+      : `(firstName LIKE ? OR lastName LIKE ?)`;
+
+    const params = careerId 
+      ? [careerId, search, search] 
+      : [search, search];
+
+    // Count query
     const [countResult] = await pool.execute(
-      `SELECT COUNT(*) AS total FROM responses 
-       WHERE firstName LIKE ? OR lastName LIKE ?`,
-      [search, search]
+      `SELECT COUNT(*) AS total FROM responses WHERE ${whereClause}`,
+      params
     );
     const total = countResult[0].total;
 
-    // Data query - FIXED: Removed .promise() and used template literals for LIMIT/OFFSET
+    // Data query
     const [rows] = await pool.execute(
       `SELECT * FROM responses 
-       WHERE firstName LIKE ? OR lastName LIKE ?
+       WHERE ${whereClause}
        ORDER BY id DESC LIMIT ${limit} OFFSET ${offset}`,
-      [search, search]
+      params
     );
 
     res.json({
@@ -500,6 +519,7 @@ app.get('/api/responses', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -799,6 +819,7 @@ app.post('/api/employer/login', async (req, res) => {
       return res.status(403).json({ error: `Your account is ${employer.status}. Access denied.` });
     }
 
+    // ✅ Save session
     req.session.user = {
       id: employer.id,
       preferredUserId: employer.preferredUserId,
@@ -806,12 +827,23 @@ app.post('/api/employer/login', async (req, res) => {
     };
 
     console.log('✅ Employer Login successful for:', userId);
-    res.json({ success: true, message: 'Login successful. Welcome Employer!' });
+
+    // ✅ Respond with full info (include employerId)
+    res.json({
+      success: true,
+      message: 'Login successful. Welcome Employer!',
+      role: 'employer',
+      employerId: employer.id,           // 🔥 use this to filter careers
+      userId: employer.preferredUserId,  // their login name
+      employerName: employer.employerName
+    });
+
   } catch (err) {
     console.error('❌ Employer Login DB Error:', err);
     res.status(500).json({ error: 'Database error' });
   }
 });
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1042,7 +1074,7 @@ app.get('/api/events', async (req, res) => {
     // Auto-delete events older than 7 days
     await pool.query(`
       DELETE FROM events 
-      WHERE datePosted < NOW() - INTERVAL 7 DAY
+      WHERE datePosted < NOW() - INTERVAL 1 DAY
     `);
 
     // Fetch events (those less than 7 days old remain)
@@ -1137,8 +1169,8 @@ app.post('/api/careers/add', authorizeAdminOrEmployer, uploadImage.single('image
     await connection.beginTransaction();
 
     const [careerResult] = await connection.execute(
-      `INSERT INTO careers (image, title, description, link) VALUES (?, ?, ?, ?)`,
-      [req.file.buffer, title, description, link]
+      `INSERT INTO careers (image, title, description, link, userId) VALUES (?, ?, ?, ?, ?)`,
+      [req.file.buffer, title, description, link, postedBy] // postedBy = preferredUserId for employer
     );
 
     const [notifResult] = await connection.execute(
@@ -1227,6 +1259,34 @@ app.delete('/api/careers/:id', async (req, res) => {
   }
 });
 
+app.get('/api/careers/last-post/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // Try student first
+    let [rows] = await pool.query(
+      `SELECT datePosted FROM careers WHERE userId = ? ORDER BY datePosted DESC LIMIT 1`,
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      // Try employer with preferredUserId
+      [rows] = await pool.query(
+        `SELECT datePosted FROM careers WHERE userId = ? ORDER BY datePosted DESC LIMIT 1`,
+        [userId] // employer's preferredUserId is stored as userId in careers table
+      );
+    }
+
+    if (rows.length === 0) {
+      return res.json({ lastPost: null });
+    }
+
+    res.json({ lastPost: rows[0].datePosted });
+  } catch (err) {
+    console.error("❌ Careers Last-Post Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2314,3 +2374,63 @@ server.listen(PORT, () => {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+// 📄 Employment Application Upload
+import multer from "multer";
+import path from "path";
+
+// Storage config for resumes
+const storage = multer.diskStorage({
+  destination: "uploads/resumes/",
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+
+app.post("/api/applications/add", upload.single("resume"), async (req, res) => {
+  try {
+    const { careerId, firstName, lastName, phone, email } = req.body;
+
+    if (!careerId || !firstName || !lastName || !phone || !email || !req.file) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Get employerId from career
+    const [career] = await pool.execute("SELECT employerId FROM careers WHERE id = ?", [careerId]);
+    if (!career.length) return res.status(404).json({ error: "Career not found" });
+
+    const employerId = career[0].employerId;
+
+    // Save to DB
+    const [result] = await pool.execute(
+      `INSERT INTO applications 
+       (careerId, employerId, firstName, lastName, phone, email, resumePath) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [careerId, employerId, firstName, lastName, phone, email, req.file.filename]
+    );
+
+    res.json({ success: true, applicationId: result.insertId });
+  } catch (err) {
+    console.error("❌ Application Insert Error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// 📄 Get Applications for an Employer
+app.get("/api/applications/:employerId", async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT a.*, c.title AS careerTitle 
+       FROM applications a
+       JOIN careers c ON a.careerId = c.id
+       WHERE a.employerId = ? ORDER BY a.dateSubmitted DESC`,
+      [req.params.employerId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Applications Fetch Error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});

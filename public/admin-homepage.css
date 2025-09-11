@@ -1722,6 +1722,11 @@ html, body {
   .feed-content p { 
     font-size: 14px; 
   }
+  .feed-content small{
+    font-size: 15px;
+    width: 90%; 
+    word-break:break-all ;
+  }
 }
 
 /* ✅ Phones & tablets (≤768px) */

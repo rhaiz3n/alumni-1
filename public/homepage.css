@@ -785,6 +785,7 @@ margin-top: 5%;
   transition: opacity 2s ease-out, transform 2s ease-out;
   z-index: 1000;            /* keeps it above content */
 }
+
 /* ✅ For 1920x1080 screens (large PC monitors) */
 @media (min-width: 1600px) {
   .contact-section {
@@ -806,6 +807,7 @@ margin-top: 5%;
     max-width: 100%;
   }
 }
+
 .contact-section.slide-up {
   opacity: 2;
 }

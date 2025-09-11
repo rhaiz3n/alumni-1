@@ -40,14 +40,16 @@
     <span class="close">&times;</span>
     <form id="eventForm" enctype="multipart/form-data">
       <label for="title">Event Title</label>
+      <label for="title">Event Title</label>
       <select id="title" name="title" required>
         <option value="">-- Choose Event --</option>
-        <option value="HomeComing">HomeComing Event</option>
-        <option value="SportFest">Sport Fest</option>
+        <option value="HOMECOMING EVENT">HOME-COMING EVENT</option>
+        <option value="SPORT FEST EVENT">SPORT FEST EVENT</option>
+        <option value="MENSBASKETBALL">MEN'S BASKETBALL</option>
       </select>
 
-      <label for="location">Set Date, Time & Location</label>
-      <input type="text" id="location" name="location" placeholder="e.g. Sept 30, 7PM, Gymnasium" required>
+      <label for="location">Indicate Type of Event</label>
+      <input type="text" id="location" name="location" placeholder="Type of Event" required>
 
       <!-- ✅ Styled File Upload -->
       <label for="eventImage" class="file-label">Upload Image</label>
@@ -668,7 +670,7 @@ async function loadFeed() {
     container.innerHTML = feed.map((post, index) => {
       let extraInfo = "";
       if (post.type === "Event") {
-        extraInfo = `📍 Location: ${post.location || "N/A"}`;
+        extraInfo = `🎉 Event: ${post.location || "N/A"}`;
       } else if (post.type === "Career") {
         extraInfo = `🏢 Company Name: ${post.link || "N/A"}`;
       }
@@ -677,7 +679,7 @@ async function loadFeed() {
         <div class="feed-card">
           ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
           <div class="feed-content">
-            <h2>${post.title} <small>[${post.type}]</small></h2>
+            <h2>${post.title.toUpperCase()} <small>[${post.type}]</small></h2>
             <p>${post.description}</p>
             <small>
               ${extraInfo} <br>

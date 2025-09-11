@@ -1537,12 +1537,13 @@ html, body {
   height: 80px;
   border-radius: 50%;
   border: 3px solid #444;
+  background-color: #ffffff;
   object-fit: cover;
   cursor: pointer;
   transition: transform 0.2s ease;
-
+  z-index: 10;
   /* Position in page */
-  position: absolute;
+  position: fixed;
   top: 350px;   /* adjust to your layout */
   left: 20px;   /* adjust to your layout */
 }
@@ -1671,9 +1672,11 @@ html, body {
   font-size: 22px;
   color: #333;
   font-family: Arial, sans-serif;
+  width: 50%;
 }
 
 .feed-content p {
+
   margin: 5px 0;
   line-height: 1.4;
   font-family: Arial, sans-serif;
@@ -1717,7 +1720,13 @@ html, body {
     font-size: 20px; 
   }
   .feed-content p { 
-    font-size: 14px; 
+    font-size: 15px;
+    text-align: justify;
+  }
+  .feed-content small{
+    font-size: 15px;
+    width: 90%; 
+    word-break:break-all ;
   }
 }
 
@@ -1751,4 +1760,442 @@ html, body {
 .gray-post {
   filter: grayscale(100%);
   opacity: 0.6;
+}
+
+
+
+
+/* ============================= */
+/* 🏀 Men's Basketball Modal     */
+/* ============================= */
+#mensBasketballModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6); /* dark overlay */
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* 🔹 Modal Card */
+#mensBasketballModal .modal-content {
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  width: 600px;
+  max-width: 90%;
+  border-radius: 10px;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  animation: slideDown 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  max-height: 50vh;
+}
+
+/* 🔹 Modal Header */
+#mensBasketballModal .modal-header {
+  background: #6e6e6e00;
+  color: #ffffff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#mensBasketballModal .modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+#mensBasketballModal .modal-header .close-btn {
+  font-size: 22px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+#mensBasketballModal .modal-header .close-btn:hover {
+  color: #ddd;
+}
+
+/* 🔹 Modal Body */
+#mensBasketballModal .modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Inputs & Selects */
+#mensBasketballModal input,
+#mensBasketballModal select {
+  width: 95%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.3s;
+  margin: 10px;
+}
+
+#mensBasketballModal input:focus,
+#mensBasketballModal select:focus {
+  border-color: #882323;
+  outline: none;
+}
+
+/* 🔹 Members container */
+#mensBasketballModal .member {
+  display: flex;
+  gap: 10px;
+}
+
+#mensBasketballModal .member input {
+  flex: 1;
+  left: 50px;
+}
+
+/* 🔹 Add Member Button */
+#mensBasketballModal .add-member-btn {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+  margin-top: 15px;
+  margin-right: 10px;
+  left: 30%;
+}
+#mensBasketballModal .add-member-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 198, 255, 0.6);
+}
+
+/* 🔹 Submit Button */
+#mensBasketballModal button[type="submit"] {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+  margin-top: 15px;
+}
+#mensBasketballModal button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 198, 255, 0.6);
+}
+
+/* 🔹 Animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+/* Feed Register/Apply Buttons */
+.register-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #0066ff, #0044cc);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.register-btn:hover {
+  background: linear-gradient(135deg, #0044cc, #002a80);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.register-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+/* Differentiate Career "Apply" button */
+.register-btn[data-type="Career"] {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.register-btn[data-type="Career"]:hover {
+  background: linear-gradient(135deg, #1e7e34, #145c26);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Career Survey Modal */
+#careerSurveyModal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+#careerSurveyModal .modal-content {
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  width: 500px;
+  max-width: 90%;
+  padding: 25px;
+  border-radius: 10px;
+  animation: fadeInUp 0.3s ease-in-out;
+}
+
+#careerSurveyModal h2 {
+  margin-top: 0;
+  color: #0066cc;
+  text-align: center;
+}
+
+#careerSurveyModal label {
+  font-weight: bold;
+  margin-top: 12px;
+  display: block;
+}
+
+#careerSurveyModal select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+#careerSurveyModal input {
+  width: 95%;
+  padding: 10px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#careerSurveyModal .submit-btn {
+  background: linear-gradient(135deg, #0066ff, #0044cc);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+#careerSurveyModal .submit-btn:hover {
+  background: linear-gradient(135deg, #0044cc, #002a80);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.survey-submit-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0077ff, #00c6ff);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 119, 255, 0.3);
+}
+
+.survey-submit-btn:hover {
+  background: linear-gradient(135deg, #005fcc, #00aacc);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 119, 255, 0.4);
+}
+
+.survey-submit-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 6px rgba(0, 119, 255, 0.2);
+}
+
+
+
+
+
+
+
+/* ===== Modal Overlay ===== */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 9999; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  justify-content: center; 
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ===== Modal Box ===== */
+.modal-content {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 30px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  color: #fff;
+  animation: scaleUp 0.3s ease-in-out;
+  font-family: 'Albert Sans', sans-serif;
+}
+
+/* ===== Modal Close Button ===== */
+.modal-content .close {
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+  color: #ff5c5c;
+  transition: 0.2s;
+}
+.modal-content .close:hover {
+  color: #ff2a2a;
+  transform: scale(1.2);
+}
+
+/* ===== Headings ===== */
+.modal-content h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #f8f9fa;
+}
+
+/* ===== Form Inputs ===== */
+.modal-content label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #eee;
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 2px #0dcaf0;
+}
+
+/* ===== Submit Button ===== */
+.submit-btn {
+  display: block;
+  margin: 20px auto 0;
+  padding: 12px 20px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0dcaf0, #6610f2);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Notification Box (Success / Error) ===== */
+#surveyNotification {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(40, 167, 69, 0.9); /* green by default */
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  font-size: 15px;
+  max-width: 300px;
+  animation: slideIn 0.4s ease-out;
+}
+
+#surveyNotification.error {
+  background: rgba(220, 53, 69, 0.9); /* red */
+}
+
+#surveyNotification .close-btn {
+  float: right;
+  margin-left: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  transition: 0.2s;
+}
+#surveyNotification .close-btn:hover {
+  color: #ffc107;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }

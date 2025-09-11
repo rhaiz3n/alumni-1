@@ -22,10 +22,12 @@ async function initTables() {
       )`,
       responses: `CREATE TABLE IF NOT EXISTS responses (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        careerId INT, -- ✅ added
         firstName VARCHAR(100),
         lastName VARCHAR(100),
         interested VARCHAR(100),
         employmentStatus VARCHAR(100),
+        inlineWork VARCHAR(100),
         dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       registration: `CREATE TABLE IF NOT EXISTS registration (
@@ -62,12 +64,13 @@ async function initTables() {
         location VARCHAR(255),
         datePosted DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
-      careers: `CREATE TABLE IF NOT EXISTS careers (
+      careers: `CREATE TABLE careers (
         id INT AUTO_INCREMENT PRIMARY KEY,
         image LONGBLOB,
         title VARCHAR(255),
         description TEXT,
         link VARCHAR(255),
+        userId VARCHAR(100),
         datePosted DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       homeregs: `CREATE TABLE IF NOT EXISTS homeregs (
@@ -153,7 +156,20 @@ async function initTables() {
         link VARCHAR(255),
         message TEXT,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      )`
+      )`,
+      applications: `CREATE TABLE applications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        careerId INT NOT NULL,
+        employerId INT NOT NULL,
+        firstName VARCHAR(50) NOT NULL,
+        lastName VARCHAR(50) NOT NULL,
+        phone VARCHAR(20) NOT NULL,
+        email VARCHAR(100) NOT NULL,
+        resumePath VARCHAR(255) NOT NULL, -- file path of uploaded PDF
+        dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (careerId) REFERENCES careers(id),
+        FOREIGN KEY (employerId) REFERENCES users(id)
+      )`,
     };
 
     for (const [name, ddl] of Object.entries(sql)) {

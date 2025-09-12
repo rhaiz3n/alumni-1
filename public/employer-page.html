@@ -304,10 +304,25 @@ document.addEventListener('DOMContentLoaded', loadFeed);
 
 
 
-fetch(`/api/applications/${employerId}`)
-  .then(res => res.json())
-  .then(applications => {
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    // ✅ Get logged-in employer info from backend session
+    const res = await fetch("/api/employer/me");
+    if (!res.ok) throw new Error("Not logged in");
+    const employer = await res.json();
+
+    const employerId = employer.employerId;
+
+    // ✅ Now fetch applications for this employer
+    const appsRes = await fetch(`/api/applications/${employerId}`);
+    const applications = await appsRes.json();
+
     const list = document.getElementById("applicationsList");
+    if (!applications.length) {
+      list.innerHTML = "<p>No applications yet.</p>";
+      return;
+    }
+
     list.innerHTML = applications.map(app => `
       <div class="application-card">
         <h3>${app.firstName} ${app.lastName}</h3>
@@ -317,7 +332,11 @@ fetch(`/api/applications/${employerId}`)
         <a href="/uploads/resumes/${app.resumePath}" target="_blank">📄 View Resume</a>
       </div>
     `).join("");
-  });
+  } catch (err) {
+    console.error("❌ Error loading applications:", err);
+    document.getElementById("applicationsList").innerHTML = "<p>⚠️ Please log in first.</p>";
+  }
+});
 </script>
 </body>
 </head>

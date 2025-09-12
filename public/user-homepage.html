@@ -377,7 +377,7 @@
       <input type="text" name="lastName" required />
 
       <label>Phone Number</label>
-      <input type="tel" name="phone" required />
+      <input type="tel" name="phoneNo" required />
 
       <label>Email</label>
       <input type="email" name="email" required />
@@ -1099,9 +1099,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 function openCareerSurvey(career) {
-  window.currentCareer = career; // ✅ keep career reference
+  window.currentCareer = career;
 
-  // Inject Survey Questions
   const modal = document.getElementById("careerSurveyModal");
   const container = document.getElementById("surveyQuestions");
   container.innerHTML = `
@@ -1138,64 +1137,67 @@ function openCareerSurvey(career) {
   modal.style.display = "flex";
 
   // ✅ Survey Submit
-  document.getElementById("careerSurveyForm").onsubmit = async function (e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
+  const surveyForm = document.getElementById("careerSurveyForm");
+  if (surveyForm) {
+    surveyForm.onsubmit = async function (e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
 
-    const payload = {
-      careerId: career.id,
-      firstName: formData.get("firstName"),
-      lastName: formData.get("lastName"),
-      interested: formData.get("interested"),
-      employmentStatus: formData.get("employmentStatus"),
-      inlineWork: formData.get("inlineWork") || null,
-    };
+      const payload = {
+        careerId: career.id,
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
+        interested: formData.get("interested"),
+        employmentStatus: formData.get("employmentStatus"),
+        inlineWork: formData.get("inlineWork") || null,
+      };
 
-    try {
-      const res = await fetch("/api/responses/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      try {
+        const res = await fetch("/api/responses/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save survey");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to save survey");
 
-      closeCareerSurvey();
+        closeCareerSurvey();
 
-      if (payload.interested === "NO") {
-        showSurveyNotification("❌ You are not interested. Career description will not be shown.", "error");
-      } else {
-        // ✅ If interested, open Employment Form
-        document.getElementById("employmentFormModal").style.display = "flex";
+        if (payload.interested === "NO") {
+          showSurveyNotification("❌ You are not interested. Career description will not be shown.", "error");
+        } else {
+          document.getElementById("employmentFormModal").style.display = "flex";
+        }
+      } catch (err) {
+        console.error("❌ Survey submit error:", err);
+        showSurveyNotification("❌ Failed to save your survey. Please try again.", "error");
       }
-    } catch (err) {
-      console.error("❌ Survey submit error:", err);
-      showSurveyNotification("❌ Failed to save your survey. Please try again.", "error");
-    }
-  };
+    };
+  }
 
   // ✅ Employment Application Submit
-  document.getElementById("employmentForm").onsubmit = async function (e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
+ document.getElementById("employmentForm").onsubmit = async function (e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
 
-    try {
-      const res = await fetch("/api/applications/add", {
-        method: "POST",
-        body: formData, // includes file
-      });
+  try {
+    const backendUrl = "https://jubilant-goldfish-q7xww97wxv7739ww7-3002.app.github.dev";
+    const res = await fetch(`${backendUrl}/api/applications/add`, {
+      method: "POST",
+      body: formData
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to submit application");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to submit application");
 
-      showSurveyNotification("✅ Employment Application Submitted Successfully!", "success");
-      closeEmploymentForm();
-    } catch (err) {
-      console.error("❌ Application submit error:", err);
-      showSurveyNotification("❌ Failed to submit application. Please try again.", "error");
-    }
-  };
+    showSurveyNotification("✅ Employment Application Submitted Successfully!", "success");
+    closeEmploymentForm();
+  } catch (err) {
+    console.error("❌ Application submit error:", err);
+    showSurveyNotification("❌ Failed to submit application. Please try again.", "error");
+  }
+};
 }
 
 function closeCareerSurvey() {
@@ -1246,6 +1248,8 @@ function validateMiddleInitial(input) {
   // Allow only 1 uppercase letter
   input.value = input.value.replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 1);
 }
+
+
 </script>
 </body>
 </html>

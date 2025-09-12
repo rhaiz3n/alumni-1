@@ -10,57 +10,60 @@ const { Server } = require('socket.io');
 const pool = require('../db/mysql'); // MySQL pool (mysql2)
 const { sendOtpEmail } = require('../GmailMailer');
 
+// 👇 Import applications routes (CommonJS style)
+const applicationsRoutes = require('./applications.js');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 3002;
 
-const upload = multer({ 
+const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
-  },
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    // Accept only Excel files
-    if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-        file.mimetype === 'application/vnd.ms-excel') {
+    if (
+      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.mimetype === "application/vnd.ms-excel"
+    ) {
       cb(null, true);
     } else {
-      cb(new Error('Only Excel files are allowed'));
+      cb(new Error("Only Excel files are allowed"));
     }
   }
 });
-
-
-
-
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+// ✅ Mount applications routes
+app.use("/api", applicationsRoutes);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/homepage.html'));
 });
 
 app.use('/uploads', express.static('uploads'));
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'alumni2025',
   resave: false,
-  saveUninitialized: false, // ❌ was true, set false
+  saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,          // ❌ change to true if using HTTPS
+    secure: false,
     maxAge: 1000 * 60 * 60  // 1 hour
   }
 }));
+
 app.locals.io = io;
 
 io.on('connection', socket => {
   console.log('🔌 Socket connected:', socket.id);
 });
+
 
 // Create tables if not exist
 async function initTables() {
@@ -219,16 +222,12 @@ async function initTables() {
     )`,
     applications: `CREATE TABLE applications (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      careerId INT NOT NULL,
-      employerId INT NOT NULL,
       firstName VARCHAR(50) NOT NULL,
       lastName VARCHAR(50) NOT NULL,
-      phone VARCHAR(20) NOT NULL,
+      phoneNo VARCHAR(20) NOT NULL,
       email VARCHAR(100) NOT NULL,
       resumePath VARCHAR(255) NOT NULL, -- file path of uploaded PDF
-      dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (careerId) REFERENCES careers(id),
-      FOREIGN KEY (employerId) REFERENCES users(id)
+      dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
   };
   for (const [name, ddl] of Object.entries(sql)) {
@@ -319,6 +318,8 @@ function parseDate(dateValue) {
   
   return null; // Return null instead of undefined
 }
+
+
 
 // 📦 Upload Excel for alumni (6 fields only)
 app.post('/api/alumni/upload-excel', upload.single('file'), async (req, res) => {
@@ -895,17 +896,6 @@ app.get('/api/registration', async (req, res) => {
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Add these helper functions at the top of your server.js
-function validateInteger(value, fieldName) {
-  if (!value || value === '') return null;
-  
-  const parsed = parseInt(value);
-  if (isNaN(parsed)) {
-    console.log(`Warning: Invalid integer value "${value}" for field ${fieldName}, setting to null`);
-    return null;
-  }
-  return parsed;
-}
-
 function validateDate(dateValue) {
   if (!dateValue) return null;
   
@@ -1664,10 +1654,6 @@ app.get('/api/allsport/distinct-sports', async (req, res) => {
 
 const uploadPhoto = multer({ storage: multer.memoryStorage() });
 
-// 🔧 Format datetime for MySQL
-function mysqlDateNow() {
-  return new Date().toISOString().slice(0, 19).replace('T', ' ');
-}
 
 // POST: Upload Multiple Images
 app.post('/api/gallery/add-multiple', uploadPhoto.array('images', 25), async (req, res) => {
@@ -2366,71 +2352,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
 
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-// 📄 Employment Application Upload
-import multer from "multer";
-import path from "path";
-
-// Storage config for resumes
-const storage = multer.diskStorage({
-  destination: "uploads/resumes/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
-
-app.post("/api/applications/add", upload.single("resume"), async (req, res) => {
-  try {
-    const { careerId, firstName, lastName, phone, email } = req.body;
-
-    if (!careerId || !firstName || !lastName || !phone || !email || !req.file) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    // Get employerId from career
-    const [career] = await pool.execute("SELECT employerId FROM careers WHERE id = ?", [careerId]);
-    if (!career.length) return res.status(404).json({ error: "Career not found" });
-
-    const employerId = career[0].employerId;
-
-    // Save to DB
-    const [result] = await pool.execute(
-      `INSERT INTO applications 
-       (careerId, employerId, firstName, lastName, phone, email, resumePath) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [careerId, employerId, firstName, lastName, phone, email, req.file.filename]
-    );
-
-    res.json({ success: true, applicationId: result.insertId });
-  } catch (err) {
-    console.error("❌ Application Insert Error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// 📄 Get Applications for an Employer
-app.get("/api/applications/:employerId", async (req, res) => {
-  try {
-    const [rows] = await pool.execute(
-      `SELECT a.*, c.title AS careerTitle 
-       FROM applications a
-       JOIN careers c ON a.careerId = c.id
-       WHERE a.employerId = ? ORDER BY a.dateSubmitted DESC`,
-      [req.params.employerId]
-    );
-    res.json(rows);
-  } catch (err) {
-    console.error("❌ Applications Fetch Error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
+server.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });

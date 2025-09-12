@@ -2113,12 +2113,12 @@ html, body {
 
 .modal-content input,
 .modal-content select {
-  width: 100%;
+  width: 95%;
   padding: 10px 12px;
   margin-top: 6px;
   border-radius: 8px;
   border: none;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.24);
   color: #fff;
   font-size: 14px;
   outline: none;
@@ -2127,7 +2127,8 @@ html, body {
 
 .modal-content input:focus,
 .modal-content select:focus {
-  background: rgba(255, 255, 255, 0.25);
+  color: #0c0c0c;
+  background: rgba(0, 0, 0, 0.103);
   box-shadow: 0 0 0 2px #0dcaf0;
 }
 

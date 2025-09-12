@@ -159,16 +159,12 @@ async function initTables() {
       )`,
       applications: `CREATE TABLE applications (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        careerId INT NOT NULL,
-        employerId INT NOT NULL,
         firstName VARCHAR(50) NOT NULL,
         lastName VARCHAR(50) NOT NULL,
-        phone VARCHAR(20) NOT NULL,
+        phoneNo VARCHAR(20) NOT NULL,
         email VARCHAR(100) NOT NULL,
         resumePath VARCHAR(255) NOT NULL, -- file path of uploaded PDF
-        dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (careerId) REFERENCES careers(id),
-        FOREIGN KEY (employerId) REFERENCES users(id)
+        dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
     };
 

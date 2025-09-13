@@ -369,24 +369,15 @@
   <div class="modal-content">
     <span class="close" onclick="closeEmploymentForm()">&times;</span>
     <h2>Employment Application</h2>
-    <form id="employmentForm" enctype="multipart/form-data">
-      <label>First Name</label>
-      <input type="text" name="firstName" required />
-
-      <label>Last Name</label>
-      <input type="text" name="lastName" required />
-
-      <label>Phone Number</label>
-      <input type="tel" name="phoneNo" required />
-
-      <label>Email</label>
-      <input type="email" name="email" required />
-
-      <label>Upload Resume (PDF)</label>
-      <input type="file" name="resume" accept="application/pdf" required />
-
-      <button type="submit" class="submit-btn">Submit Application</button>
-    </form>
+      <form id="employmentForm" enctype="multipart/form-data">
+        <input type="hidden" name="careerId" value="CAREER_ID_HERE">
+        <input type="text" name="firstName" required>
+        <input type="text" name="lastName" required>
+        <input type="text" name="phoneNo" required>
+        <input type="email" name="email" required>
+        <input type="file" name="resume" accept="application/pdf" required>
+        <button type="submit">Apply</button>
+      </form>
   </div>
 </div>
 
@@ -456,28 +447,44 @@
 
   document.addEventListener('DOMContentLoaded', loadEvents);
 
-  async function loadCareers() {
-    const listContainer = document.getElementById('careerList');
-    listContainer.innerHTML = 'Loading...';
-    try {
-      const res = await fetch('/api/careers');
-      if (!res.ok) throw new Error('Failed to load careers');
-      const { careers } = await res.json();
-      listContainer.innerHTML = careers.slice(0, 10).map(career => `
-        <div class="career-card">
-          <div class="career-header">
-            <span class="career-badge">CAREER</span>
-            Posted: ${new Date(career.datePosted).toLocaleDateString()}
-          </div>
-          <div class="career-title">${career.title}</div>
-        </div>
-      `).join('') || '<div>No announcements found.</div>';
-    } catch (err) {
-      listContainer.innerHTML = '❌ Failed to load careers';
-    }
-  }
+async function loadCareers() {
+  const listContainer = document.getElementById('careerList');
+  listContainer.innerHTML = 'Loading...';
 
-  document.addEventListener('DOMContentLoaded', loadCareers);
+  try {
+    const role = sessionStorage.getItem("userRole"); // "admin", "employer", "user"
+    let careersUrl;
+
+    if (role === "admin") {
+      careersUrl = "/api/careers/all";
+    } else if (role === "employer") {
+      careersUrl = "/api/careers"; // employer-specific (session based)
+    } else {
+      careersUrl = "/api/careers/public"; // users → new route
+    }
+
+    const res = await fetch(careersUrl);
+    if (!res.ok) throw new Error('Failed to load careers');
+
+    const { careers } = await res.json();
+
+    listContainer.innerHTML = careers.slice(0, 10).map(career => `
+      <div class="career-card">
+        <div class="career-header">
+          <span class="career-badge">CAREER</span>
+          Posted: ${new Date(career.datePosted).toLocaleDateString()}
+        </div>
+        <div class="career-title">${career.title}</div>
+      </div>
+    `).join('') || '<div>No announcements found.</div>';
+  } catch (err) {
+    console.error("❌ Career load error:", err);
+    listContainer.innerHTML = '❌ Failed to load careers';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadCareers);
+
 
   window.addEventListener('DOMContentLoaded', () => {
     const role = sessionStorage.getItem('userRole');
@@ -837,43 +844,27 @@ async function loadFeed() {
   const container = document.getElementById('feed');
   container.innerHTML = 'Loading feed...';
 
-  // helper: normalize title to a canonical key (uppercase, remove spaces & punctuation)
-  function normalizeTitle(t = '') {
-    return String(t).toUpperCase().replace(/[\s'".,()-]/g, '').replace(/[^A-Z0-9]/g, '');
-  }
-
-  // safe HTML escape for attributes
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  // map normalized title keys => modal openers (strings for function names)
-  const registrationMap = {
-    'MENSBASKETBALL': 'openMensBasketballModal',
-    'MENSBASKETBALLEVENT': 'openMensBasketballModal', // if some variants saved this way
-    'HOMECOMINGEVENT': 'openHomecomingModal',
-    'HOMECOMING': 'openHomecomingModal',
-    'SPORTFEST': 'openSportfestModal',
-    'SPORTFESTEVENT': 'openSportfestModal',
-    'CAREER': 'openCareerModal',
-    'CAREERPOSTING': 'openCareerModal'
-  };
-
   try {
-    // fetch events/careers
+    const role = sessionStorage.getItem("userRole");  // "admin", "employer", "user"
+    const userId = sessionStorage.getItem("userId");  // stored on login
+    let careersUrl;
+
+    if (role === "admin") {
+      careersUrl = "/api/careers/all";       // Admin → all careers
+    } else if (role === "employer") {
+      careersUrl = "/api/careers";           // Employer → only their careers (session-based)
+    } else {
+      careersUrl = "/api/careers/public";    // User → public careers (you need to make this route)
+    }
+
+    // Fetch events + careers together
     const [eventsRes, careersRes] = await Promise.all([
-      fetch('/api/events'),
-      fetch('/api/careers')
+      fetch("/api/events"),
+      fetch(careersUrl)
     ]);
 
     if (!eventsRes.ok || !careersRes.ok) {
-      // throw explicit message to hit your catch and show "Failed to load feed"
-      throw new Error('Failed to fetch events or careers (check server).');
+      throw new Error('Failed to fetch events or careers.');
     }
 
     const { events } = await eventsRes.json();
@@ -885,100 +876,86 @@ async function loadFeed() {
     const feed = [...formattedEvents, ...formattedCareers]
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-    // render
+    // Render feed (same as before)
     container.innerHTML = feed.map((post, index) => {
-      const title = post.title || '';
-      const norm = normalizeTitle(title);
-      const showRegister = post.type === "Career" || Boolean(registrationMap[norm]);
-
-
       const extraInfo = post.type === 'Event'
-        ? `🎉 Event: ${post.location || "N/A"}`
-        : `🏢 Company Name: ${post.link || "N/A"}`;
+        ? `🎉 Location: ${post.location || 'N/A'}`
+        : `🏢 Company: ${post.link || 'N/A'}`;
 
-      // escape attributes
-      const escapedTitleAttr = escapeHtml(title);
-      const isoDate = new Date(post.datePosted).toISOString();
+      const imgSrc = `/api/${post.type.toLowerCase()}s/image/${post.id}`;
+
+      let countdownTime;
+      if (post.type === 'Career') {
+        countdownTime = new Date(post.datePosted).getTime() + 5 * 24 * 60 * 60 * 1000;
+      } else if (post.type === 'Event') {
+        countdownTime = new Date(post.eventDateTime || post.datePosted).getTime();
+      }
 
       return `
-        <div class="feed-card">
-          ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+        <div class="feed-card" id="feed-card-${post.id}">
+          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ''}
           <div class="feed-content">
-            <h2>${(title || '').toUpperCase()} <small>[${post.type}]</small></h2>
+            <h2>${post.title?.toUpperCase() || ''} <small>[${post.type}]</small></h2>
             <p>${post.description || ''}</p>
             <small>
               ${extraInfo} <br>
-              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
-              ⏳ <span class="countdown" data-time="${isoDate}" id="countdown-${index}"></span>
+              🕒 Posted: ${new Date(post.datePosted).toLocaleString()} <br>
+              ⏳ <span class="countdown" data-time="${countdownTime}" id="countdown-${index}"></span>
             </small>
-              ${ showRegister
-                ? `<button class="register-btn" 
-                            data-id="${post.id}" 
-                            data-type="${post.type}" 
-                            data-title="${escapedTitleAttr}" 
-                            data-norm="${norm}">
-                    ${post.type === "Career" ? "Apply" : "Register"}
-                  </button>`
-                : ""
-              }
+            ${post.type === 'Career'
+              ? `<button class="register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
+              : `<button class="register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
           </div>
         </div>
       `;
     }).join('');
 
-    // delegation: handle register button clicks (safe — no inline onclick)
-    container.addEventListener('click', function onFeedClick(e) {
-      const btn = e.target.closest && e.target.closest('.register-btn');
+    // Handle Apply/Register clicks
+    container.addEventListener('click', e => {
+      const btn = e.target.closest('.register-btn');
       if (!btn) return;
 
-      const title = btn.getAttribute('data-title') || '';
-      const norm = btn.getAttribute('data-norm') || normalizeTitle(title);
-      const type = btn.getAttribute('data-type');  // ✅ FIX: added
-      const id = btn.getAttribute('data-id');      // ✅ FIX: added
+      const type = btn.getAttribute('data-type');
+      const id = btn.getAttribute('data-id');
+      const post = feed.find(p => p.id == id && p.type === type);
 
-      // 🚀 Handle career apply
-      if (type === "Career" && typeof window.openCareerSurvey === "function") {
-        window.openCareerSurvey({
-          id,
-          title,
-          description: btn.closest(".feed-card").querySelector("p")?.textContent || ""
-        });
-        return;
-      }
-
-      // ✅ Handle events normally
-      const fnName = registrationMap[norm];
-      if (fnName && typeof window[fnName] === 'function') {
-        window[fnName](title);
-      } else if (typeof window.openRegistrationModal === 'function') {
-        window.openRegistrationModal(title);
+      if (type === 'Career' && typeof window.openCareerSurvey === 'function') {
+        window.openCareerSurvey(post);
+      } else if (type === 'Event' && typeof window.openRegistrationModal === 'function') {
+        window.openRegistrationModal(post.title);
       } else {
-        console.warn('No modal opener found for', title, norm);
-        alert('Registration not available for this post.');
+        alert('No action defined for this post.');
       }
-    }, { once: false });
+    });
 
-
-
-
-    // countdowns
+    // Countdown updater (unchanged)
     function updateCountdowns() {
-      document.querySelectorAll(".countdown").forEach(el => {
-        const postedTime = new Date(el.dataset.time);
-        const expireTime = new Date(postedTime.getTime() + 24 * 60 * 60 * 1000); // 1 day expiration
+      document.querySelectorAll('.countdown').forEach(el => {
+        const expireTime = new Date(Number(el.dataset.time));
         const now = new Date();
         const diffMs = expireTime - now;
 
+        const card = el.closest('.feed-card');
+        const btn = card?.querySelector('.register-btn');
+
         if (diffMs <= 0) {
-          el.textContent = "❌ Expired";
+          el.textContent = '❌ Expired';
+          if (card) card.style.filter = 'grayscale(100%)';
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = '❌ Closed';
+          }
           return;
         }
 
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+        const days = Math.floor(diffMs / (1000*60*60*24));
+        const hours = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
+        const minutes = Math.floor((diffMs % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((diffMs % (1000*60)) / 1000);
 
-        el.textContent = `${hours}h ${minutes}m ${seconds}s left`;
+        el.textContent = days > 0
+          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
+          : `${hours}h ${minutes}m ${seconds}s left`;
       });
     }
 
@@ -986,7 +963,7 @@ async function loadFeed() {
     setInterval(updateCountdowns, 1000);
 
   } catch (err) {
-    console.error(err);
+    console.error('❌ Failed to load feed:', err);
     container.textContent = '⚠️ Failed to load feed.';
   }
 }
@@ -1177,13 +1154,12 @@ function openCareerSurvey(career) {
   }
 
   // ✅ Employment Application Submit
- document.getElementById("employmentForm").onsubmit = async function (e) {
+document.getElementById("employmentForm").onsubmit = async function (e) {
   e.preventDefault();
   const formData = new FormData(e.target);
 
   try {
-    const backendUrl = "https://jubilant-goldfish-q7xww97wxv7739ww7-3002.app.github.dev";
-    const res = await fetch(`${backendUrl}/api/applications/add`, {
+    const res = await fetch(`/api/applications/add`, {
       method: "POST",
       body: formData
     });
@@ -1198,6 +1174,7 @@ function openCareerSurvey(career) {
     showSurveyNotification("❌ Failed to submit application. Please try again.", "error");
   }
 };
+
 }
 
 function closeCareerSurvey() {

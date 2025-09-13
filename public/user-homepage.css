@@ -2200,3 +2200,10 @@ html, body {
   from { transform: translateX(120%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+
+.disabled-btn {
+  background-color: #aaa !important;  /* gray */
+  color: #fff !important;            /* white text */
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}

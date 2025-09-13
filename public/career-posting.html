@@ -228,44 +228,44 @@ document.getElementById('openModalBtn').onclick = async () => {
     setTimeout(() => toast.className = 'toast', 4000);
   }
 
-  async function loadAdminCareers() {
-    const container = document.getElementById('adminEvents');
-    container.innerHTML = 'Loading…';
-    try {
-      const res = await fetch('/api/careers');
-      if (!res.ok) throw new Error(await res.text());
+async function loadAdminCareers() {
+  const container = document.getElementById('adminEvents');
+  container.innerHTML = 'Loading…';
+  try {
+    const res = await fetch('/api/careers');
+    if (!res.ok) throw new Error(await res.text());
 
-      const { careers } = await res.json();
-      const list = careers.slice(0, 15);
-      while (list.length < 15) list.push(null);
+    const { careers } = await res.json();
+    const list = careers.slice(0, 15);
+    while (list.length < 15) list.push(null);
 
-      container.innerHTML = list.map(e => e ? `
-        <div class="card" data-id="${e.id}">
-          <img src="${e.image}" alt="">
-          <div class="card-title">${e.title}</div>
-          <div class="card-meta">${e.link}</div>
-          <div class="card-desc">${e.description}</div>
-          ${role === 'admin' ? `
-            <div class="actions">
-              <button class="edit">Edit</button>
-              <button class="del">Delete</button>
-            </div>` : ''}
-        </div>` : `<div class="card empty-card"></div>`
-      ).join('');
+    container.innerHTML = list.map(e => e ? `
+      <div class="card" data-id="${e.id}">
+        <img src="/api/careers/image/${e.id}" alt="">
+        <div class="card-title">${e.title}</div>
+        <div class="card-meta">${e.link}</div>
+        <div class="card-desc">${e.description}</div>
+        ${role === 'admin' ? `
+          <div class="actions">
+            <button class="edit">Edit</button>
+            <button class="del">Delete</button>
+          </div>` : ''}
+      </div>` : `<div class="card empty-card"></div>`
+    ).join('');
 
-      container.querySelectorAll('.edit').forEach(btn => {
-        btn.onclick = () => editCareer(btn.closest('.card'));
-      });
+    container.querySelectorAll('.edit').forEach(btn => {
+      btn.onclick = () => editCareer(btn.closest('.card'));
+    });
 
-      container.querySelectorAll('.del').forEach(btn => {
-        btn.onclick = () => deleteCareer(btn.closest('.card').dataset.id);
-      });
+    container.querySelectorAll('.del').forEach(btn => {
+      btn.onclick = () => deleteCareer(btn.closest('.card').dataset.id);
+    });
 
-    } catch (err) {
-      console.error(err);
-      container.textContent = '❌ Failed to load careers.';
-    }
+  } catch (err) {
+    console.error(err);
+    container.textContent = '❌ Failed to load careers.';
   }
+}
 
   function editCareer(card) {
     currentEditId = card.dataset.id;

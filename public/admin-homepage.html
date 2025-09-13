@@ -39,7 +39,7 @@
   <div class="modal-content">
     <span class="close">&times;</span>
     <form id="eventForm" enctype="multipart/form-data">
-      <label for="title">Event Title</label>
+      
       <label for="title">Event Title</label>
       <select id="title" name="title" required>
         <option value="">-- Choose Event --</option>
@@ -50,6 +50,12 @@
 
       <label for="location">Indicate Type of Event</label>
       <input type="text" id="location" name="location" placeholder="Type of Event" required>
+
+      <label for="eventDate">Event Schedule</label>
+      <div class="event-datetime">
+        <input type="date" id="eventDate" name="eventDate" required>
+        <input type="time" id="eventTime" name="eventTime" required>
+      </div>
 
       <!-- ✅ Styled File Upload -->
       <label for="eventImage" class="file-label">Upload Image</label>
@@ -62,6 +68,7 @@
     </form>
   </div>
 </div>
+
 
 
 
@@ -547,7 +554,7 @@ async function loadEvents() {
 async function loadCareers() {
   const listContainer = document.getElementById('careerList');
   try {
-    const res = await fetch('/api/careers');
+    const res = await fetch('/api/careers/all');
     const { careers } = await res.json();
     listContainer.innerHTML = careers.slice(0, 10).map(c => `
       <div class="career-card">
@@ -644,85 +651,115 @@ function initNotificationSystem() {
 }
 
 
+// ===== Admin Feed Loader =====
 async function loadFeed() {
   const container = document.getElementById('feed');
   container.innerHTML = 'Loading feed...';
 
   try {
-    // Fetch events and careers separately
+    // Fetch all events and all careers
     const [eventsRes, careersRes] = await Promise.all([
       fetch('/api/events'),
-      fetch('/api/careers')
+      fetch('/api/careers/all') // fetch all careers for admin
     ]);
 
     const { events } = await eventsRes.json();
     const { careers } = await careersRes.json();
 
-    // Add "type" field for clarity
+    // Add type field
     const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
     const formattedCareers = careers.map(c => ({ ...c, type: 'Career' }));
 
-    // Merge and sort by datePosted (newest first)
+    // Merge + sort by datePosted (newest first)
     const feed = [...formattedEvents, ...formattedCareers]
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-    // Render feed
+    // Render feed cards
     container.innerHTML = feed.map((post, index) => {
       let extraInfo = "";
       if (post.type === "Event") {
-        extraInfo = `🎉 Event: ${post.location || "N/A"}`;
+        extraInfo = `🎉 Location: ${post.location || "N/A"}`;
       } else if (post.type === "Career") {
         extraInfo = `🏢 Company Name: ${post.link || "N/A"}`;
       }
 
+      // ✅ Correct image path from DB
+      let imgSrc = "";
+      if (post.type === "Career") {
+        imgSrc = `/api/careers/image/${post.id}`;
+      } else if (post.type === "Event") {
+        imgSrc = `/api/events/image/${post.id}`;
+      }
+
+      let countdownTime;
+      if (post.type === "Career") {
+        const postedTime = new Date(post.datePosted);
+        countdownTime = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString();
+      } else if (post.type === "Event") {
+        countdownTime = post.eventDateTime || post.datePosted;
+      }
+
       return `
         <div class="feed-card">
-          ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ""}
           <div class="feed-content">
             <h2>${post.title.toUpperCase()} <small>[${post.type}]</small></h2>
             <p>${post.description}</p>
             <small>
               ${extraInfo} <br>
               🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
-              ⏳ <span class="countdown" data-time="${post.datePosted}" id="countdown-${index}"></span>
+              ⏳ <span class="countdown" data-time="${countdownTime}" id="countdown-${index}"></span>
             </small>
           </div>
         </div>
       `;
     }).join('');
 
-    // Countdown function
+
+    // Countdown updater
     function updateCountdowns() {
       document.querySelectorAll(".countdown").forEach(el => {
-        const postedTime = new Date(el.dataset.time);
-        const expireTime = new Date(postedTime.getTime() + 24 * 60 * 60 * 1000); // 1 day expiration
-        const now = new Date();
-        const diffMs = expireTime - now;
-
-        if (diffMs <= 0) {
-          el.textContent = "❌ Expired";
+        const expireTime = new Date(el.dataset.time);
+        if (isNaN(expireTime.getTime())) {
+          el.textContent = "❌ Invalid Date";
           return;
         }
 
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+        const diffMs = expireTime - new Date();
+        const card = el.closest(".feed-card");
 
-        el.textContent = `${hours}h ${minutes}m ${seconds}s left`;
+        if (diffMs <= 0) {
+          el.textContent = "❌ Expired";
+          if (card) {
+            card.style.filter = "grayscale(100%)";
+            card.style.opacity = "0.6";
+          }
+          return;
+        }
+
+        const days = Math.floor(diffMs / (1000*60*60*24));
+        const hours = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
+        const minutes = Math.floor((diffMs % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((diffMs % (1000*60)) / 1000);
+
+        el.textContent = days > 0
+          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
+          : `${hours}h ${minutes}m ${seconds}s left`;
       });
     }
 
-    // Run countdown immediately and update every second
     updateCountdowns();
     setInterval(updateCountdowns, 1000);
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ Failed to load feed:", err);
     container.textContent = '⚠️ Failed to load feed.';
   }
 }
 
+// Run feed loader on page load
 document.addEventListener('DOMContentLoaded', loadFeed);
+
 
 
 
@@ -793,11 +830,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formData = new FormData(eventForm);
 
+    // 👉 combine date + time into one hidden field
+    const eventDate = formData.get("eventDate");
+    const eventTime = formData.get("eventTime");
+    if (eventDate && eventTime) {
+      formData.set("eventDateTime", `${eventDate}T${eventTime}`);
+    }
+
     try {
       const res = await fetch("/api/events/add", {
         method: "POST",
         body: formData
       });
+
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Event creation failed");

@@ -3,66 +3,55 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
-const XLSX = require('xlsx');
 const session = require('express-session');
 const http = require('http');
 const { Server } = require('socket.io');
-const pool = require('../db/mysql'); // MySQL pool (mysql2)
-const { sendOtpEmail } = require('../GmailMailer');
-
-// 👇 Import applications routes (CommonJS style)
+const pool = require('../db/mysql'); // MySQL pool
 const applicationsRoutes = require('./applications.js');
+const { imageUpload, excelUpload, resumeUpload } = require("./uploadConfig");
+const fs = require('fs');
+const XLSX = require("xlsx");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 3002;
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (
-      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-      file.mimetype === "application/vnd.ms-excel"
-    ) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only Excel files are allowed"));
-    }
-  }
-});
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ✅ Mount applications routes
-app.use("/api", applicationsRoutes);
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/homepage.html'));
-});
-
-app.use('/uploads', express.static('uploads'));
-
+// ✅ Session MUST come before routes
 app.use(session({
   secret: process.env.SESSION_SECRET || 'alumni2025',
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: false,
-    maxAge: 1000 * 60 * 60  // 1 hour
-  }
+  cookie: { httpOnly: true, secure: false, maxAge: 1000 * 60 * 60 } // 1hr
 }));
 
-app.locals.io = io;
+// ✅ Mount API routes AFTER session middleware
+app.use("/api", applicationsRoutes);
 
+// Public pages
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/homepage.html'));
+});
+
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+
+app.locals.io = io;
 io.on('connection', socket => {
   console.log('🔌 Socket connected:', socket.id);
 });
+
+app.post('/api/alumni/import', excelUpload.single('file'), (req, res) => {
+  // req.file.buffer → Excel file buffer
+  res.json({ success: true, filename: req.file.originalname });
+});
+
 
 
 // Create tables if not exist
@@ -121,20 +110,22 @@ async function initTables() {
     )`,
     events: `CREATE TABLE IF NOT EXISTS events (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      image LONGBLOB,
       title VARCHAR(255),
       description TEXT,
       location VARCHAR(255),
-      datePosted DATETIME DEFAULT CURRENT_TIMESTAMP
+      datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
+      eventDateTime DATETIME,
+      image LONGBLOB  -- ✅ store actual image as binary
     )`,
+
     careers: `CREATE TABLE IF NOT EXISTS careers (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      image LONGBLOB,
       title VARCHAR(255),
       description TEXT,
       link VARCHAR(255),
       userId VARCHAR(100),
-      datePosted DATETIME DEFAULT CURRENT_TIMESTAMP
+      datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
+      image LONGBLOB  -- ✅ store actual image as binary
     )`,
     homeregs: `CREATE TABLE IF NOT EXISTS homeregs (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -322,7 +313,7 @@ function parseDate(dateValue) {
 
 
 // 📦 Upload Excel for alumni (6 fields only)
-app.post('/api/alumni/upload-excel', upload.single('file'), async (req, res) => {
+app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
@@ -357,14 +348,15 @@ app.post('/api/alumni/upload-excel', upload.single('file'), async (req, res) => 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       try {
-        const values = [
-          row['First Name'] || row['FIRST NAME'] || row['firstName'] || null,
-          row['Last Name']  || row['LAST NAME']  || row['lastName']  || null,
-          row['Initial']    || row['INITIAL']    || row['initial']   || null,
-          row['Suffix']     || row['SUFFIX']     || row['suffix']    || null,
-          row['Major']      || row['COURSE']      || row['Major / Course'] || row['major'] || null,
-          row['Graduated']  || row['GRADUATED']  || row['graduated'] || null
-        ];
+      const values = [
+        row['FirstName'] || row['FIRSTNAME'] || row['firstName'] || row['First Name'] || row['FIRST NAME'] ||row['first Name'] ||null,
+        row['LastName']  || row['LASTNAME']  || row['lastName']  || row['Last Name']  ||row['LAST NAME']  ||row['last Name']  ||null,
+        row['Initial']    || row['INITIAL']    || row['initial']   || row['Middle Initial']   || row['MIDDLE INITIAL']   || row['middle initial']   || null,
+        row['Suffix']     || row['SUFFIX']     || row['suffix']    || null,
+        row['Major']      || row['MAJOR / COURSE']     || row['Course'] || row['major'] || null,
+        row['Year Graduated']  || row['YEAR GRADUATED']  || row['year graduated'] || null
+      ];
+
 
         await connection.execute(stmt, values);
         insertedCount++;
@@ -384,6 +376,7 @@ app.post('/api/alumni/upload-excel', upload.single('file'), async (req, res) => 
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // 📄 Paginated & searchable alumni fetch - FIXED VERSION
@@ -1027,112 +1020,174 @@ app.get('/api/fullInformation', async (req, res) => {
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-// 📦 Setup
-const uploadImage = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB max
-});
 
-// 🧠 Helper for MySQL-compliant DATETIME
-function mysqlDateNow() {
-  return new Date().toISOString().slice(0, 19).replace('T', ' ');
-}
 
-// 📌 POST: Add Event
-app.post('/api/events/add', uploadImage.single('image'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No image' });
-
-  const { title, description, location } = req.body;
-  const datePosted = mysqlDateNow();
-
+app.post('/api/events/add', imageUpload.single('image'), async (req, res) => {
   try {
-    const [result] = await pool.execute(
-      `INSERT INTO events (image, title, description, location, datePosted)
-       VALUES (?, ?, ?, ?, ?)`,
-      [req.file.buffer, title, description, location, datePosted]
+    const { title, description, location, eventDate, eventTime } = req.body;
+    const eventDateTime = `${eventDate} ${eventTime}`;
+
+    // ✅ Use buffer instead of filename
+    let imageBuffer = null;
+    if (req.file) {
+      imageBuffer = req.file.buffer; // This is the actual binary data
+    }
+
+    // ✅ Insert into DB (store binary in `image` column, not filename)
+    await pool.query(
+      `INSERT INTO events (title, description, location, eventDateTime, image, datePosted)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [title, description, location, eventDateTime, imageBuffer]
     );
-    res.json({ success: true, id: result.insertId });
+
+    res.json({ success: true });
   } catch (err) {
-    console.error('❌ Error inserting event:', err);
-    res.status(500).json({ error: err.message });
+    console.error("❌ Event insert error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 // 📌 GET: Events List
 app.get('/api/events', async (req, res) => {
   try {
-    // Auto-delete events older than 7 days
+    // Auto-delete events older than 5 days
     await pool.query(`
       DELETE FROM events 
-      WHERE datePosted < NOW() - INTERVAL 1 DAY
+      WHERE eventDateTime < NOW() - INTERVAL 5 DAY
     `);
 
-    // Fetch events (those less than 7 days old remain)
+    // Fetch events (ordered by eventDateTime)
     const [rows] = await pool.query(
-      `SELECT id, title, description, location, datePosted, image 
-       FROM events ORDER BY datePosted DESC`
+      `SELECT id, title, description, location, datePosted, eventDateTime 
+       FROM events ORDER BY eventDateTime DESC`
     );
 
     const events = rows.map(row => {
-      const datePosted = new Date(row.datePosted);
+      const eventDateTime = new Date(row.eventDateTime);
       const now = new Date();
-
-      // Calculate age in days
-      const ageDays = Math.floor((now - datePosted) / (1000 * 60 * 60 * 24));
+      const isGray = eventDateTime < now;
 
       return {
         id: row.id,
         title: row.title,
         description: row.description,
         location: row.location,
-        datePosted,
-        image: `data:image/jpeg;base64,${row.image.toString('base64')}`,
-        isGray: ageDays >= 5 // mark gray if older than 5 days
+        datePosted: new Date(row.datePosted),
+        eventDateTime,
+        // ✅ New: serve via API route
+        image: `/api/events/${row.id}/image`,
+        isGray
       };
     });
 
     res.json({ events });
   } catch (err) {
-    console.error("Error fetching events:", err);
+    console.error("❌ Error fetching events:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
 
-// 📌 PUT: Edit Event
-app.put('/api/events/:id', async (req, res) => {
+
+
+
+// 📌 PUT: Edit Event (with optional image update)
+app.put('/api/events/:id', imageUpload.single('image'), async (req, res) => {
   const { id } = req.params;
   const { title, description, location } = req.body;
 
   try {
-    const [result] = await pool.execute(
-      `UPDATE events SET title = ?, description = ?, location = ? WHERE id = ?`,
-      [title, description, location, id]
-    );
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Event not found' });
+    let query = `UPDATE events SET title = ?, description = ?, location = ?`;
+    const params = [title, description, location];
+
+    // ✅ If new image uploaded, store it as BLOB
+    if (req.file) {
+      query += `, image = ?`;
+      params.push(req.file.buffer);
+    }
+
+    query += ` WHERE id = ?`;
+    params.push(id);
+
+    const [result] = await pool.execute(query, params);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
     res.json({ success: true });
   } catch (err) {
+    console.error("❌ Event update error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// 📌 DELETE: Remove Event
+
+
+// 📌 DELETE: Remove Event (with image file cleanup)
 app.delete('/api/events/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
+    // ✅ Delete DB record directly
     const [result] = await pool.execute(
       `DELETE FROM events WHERE id = ?`,
       [id]
     );
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Event not found' });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
     res.json({ success: true });
   } catch (err) {
+    console.error("❌ Event delete error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
 
 
+app.get('/api/careers/image/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT image FROM careers WHERE id = ?',
+      [req.params.id]
+    );
+
+    if (!rows.length || !rows[0].image) {
+      return res.status(404).send('No image found');
+    }
+
+    // ✅ Always serve as binary
+    res.setHeader('Content-Type', 'image/jpeg'); // adjust if you want PNG detection
+    res.send(rows[0].image);
+  } catch (err) {
+    console.error("❌ Career image fetch error:", err);
+    res.status(500).send('Server error');
+  }
+});
+
+app.get('/api/events/image/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT image FROM events WHERE id = ?',
+      [req.params.id]
+    );
+
+    if (!rows.length || !rows[0].image) {
+      return res.status(404).send('No image found');
+    }
+
+    // ✅ Default content type (better: store mimetype when uploading)
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.send(rows[0].image);
+  } catch (err) {
+    console.error("❌ Event image fetch error:", err);
+    res.status(500).send('Server error');
+  }
+});
 
 
 
@@ -1144,79 +1199,69 @@ function authorizeAdminOrEmployer(req, res, next) {
   next();
 }
 
-app.post('/api/careers/add', authorizeAdminOrEmployer, uploadImage.single('image'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+// Example for careers
+app.post(
+  '/api/careers/add',
+  authorizeAdminOrEmployer,
+  imageUpload.single('image'),
+  async (req, res) => {
+    const { title, description, link } = req.body;
+    const user = req.session.user;
 
-  const { title, description, link } = req.body;
-  const user = req.session.user;
-  const postedBy = user.isAdmin ? user.userName : user.preferredUserId;
-  const createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  const message = `${title} posted by ${postedBy}`;
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image uploaded' });
+    }
 
-  const connection = await pool.getConnection(); // ✅ no .promise()
+    // ✅ Who posted it
+    const postedBy = user.isEmployer ? user.preferredUserId : user.userName;
 
+    try {
+      // ✅ Insert binary image + mimetype
+      const [result] = await pool.execute(
+        `INSERT INTO careers (image, mime_type, title, description, link, userId) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [req.file.buffer, req.file.mimetype, title, description, link, postedBy]
+      );
+
+      res.json({ success: true, id: result.insertId });
+    } catch (err) {
+      console.error("❌ Career insert error:", err);
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
+);
+
+
+app.get('/api/careers/all', async (req, res) => {
   try {
-    await connection.beginTransaction();
-
-    const [careerResult] = await connection.execute(
-      `INSERT INTO careers (image, title, description, link, userId) VALUES (?, ?, ?, ?, ?)`,
-      [req.file.buffer, title, description, link, postedBy] // postedBy = preferredUserId for employer
+    const [rows] = await pool.execute(
+      'SELECT * FROM careers ORDER BY datePosted DESC'
     );
-
-    const [notifResult] = await connection.execute(
-      `INSERT INTO notifications (name, link, message, createdAt) VALUES (?, ?, ?, ?)`,
-      [`Career Post by ${postedBy}`, 'career-posting.html', message, createdAt]
-    );
-
-    await connection.commit();
-    connection.release();
-
-    io.emit('newNotification', {
-      id: notifResult.insertId,
-      name: `Career Post by ${postedBy}`,
-      message,
-      link: 'career-posting.html',
-      createdAt
-    });
-
-    res.json({ success: true, id: careerResult.insertId });
+    res.json({ careers: rows });
   } catch (err) {
-    await connection.rollback();
-    connection.release();
-    res.status(500).json({ error: err.message });
+    console.error("❌ Failed to fetch all careers:", err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-// 📌 GET: Careers List (auto-delete if older than 1 day)
+
 app.get('/api/careers', async (req, res) => {
   try {
-    // ✅ First, delete all careers older than 1 day
-    await pool.query(`
-      DELETE FROM careers 
-      WHERE TIMESTAMPDIFF(DAY, datePosted, NOW()) >= 1 
-    `);
+    const user = req.session.user;
+    if (!user || !user.isEmployer) return res.status(401).json({ error: 'Not logged in' });
 
-    // ✅ Then fetch the remaining careers
-    const [rows] = await pool.query(
-      `SELECT id, title, description, link, datePosted, image 
-       FROM careers ORDER BY datePosted DESC`
+    const [rows] = await pool.execute(
+      'SELECT * FROM careers WHERE userId = ? ORDER BY datePosted DESC',
+      [user.id]  // only fetch this employer's posts
     );
 
-    const careers = rows.map(row => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      link: row.link,
-      datePosted: row.datePosted,
-      image: `data:image/jpeg;base64,${row.image.toString('base64')}`
-    }));
-
-    res.json({ careers });
+    res.json({ careers: rows });
   } catch (err) {
-    console.error("❌ Error in /api/careers:", err);
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 
 app.put('/api/careers/:id', async (req, res) => {
@@ -1316,7 +1361,7 @@ app.post('/api/homeregs', uploadReceipt.single('receipt'), async (req, res) => {
     const [notifResult] = await connection.execute(
       `INSERT INTO notifications (name, message, link, createdAt)
        VALUES (?, ?, ?, ?)`,
-      ['HomeComing event', notifMessage, 'event-registration.html', createdAt]
+      ['HomeComing event', notifMessage, 'admin-homepage.html', createdAt]
     );
 
     await connection.commit();
@@ -2356,7 +2401,23 @@ app.use((err, req, res, next) => {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post('/api/applications/add', resumeUpload.single('resume'), async (req, res) => {
+  try {
+    const { firstName, lastName, email, phoneNo } = req.body;
+    const resumeBuffer = req.file.buffer; // resume in memory
 
+    await pool.execute(
+      `INSERT INTO applications (firstName, lastName, phoneNo, email, resumePath)
+       VALUES (?, ?, ?, ?, ?)`,
+      [firstName, lastName, phoneNo, email, req.file.originalname]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);

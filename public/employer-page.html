@@ -67,6 +67,8 @@
 
 
     <div id="feed"></div>
+    
+    
 
 <script type="module">
   import { setupSignOut } from './sign-out.js';
@@ -121,134 +123,61 @@
   });
 
 
-async function loadFeed() {
-  const container = document.getElementById('feed');
-  container.innerHTML = 'Loading feed...';
-
-  try {
-    // ✅ Fetch only careers
-    const careersRes = await fetch('/api/careers');
-    const { careers } = await careersRes.json();
-
-    // Sort by datePosted (newest first)
-    const feed = careers.sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
-
-    // Render feed with "View Applications" button
-    container.innerHTML = feed.map((post, index) => {
-      const postedDate = new Date(post.datePosted).toLocaleString();
-      return `
-        <div class="feed-card" id="career-${post.id}">
-          ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
-          <div class="feed-content">
-            <h2>${post.title.toUpperCase()} <small>[Career]</small></h2>
-            <p>${post.description}</p>
-            <small>
-              🏢 Company Name: ${post.link || "N/A"} <br>
-              🕒 Posted on: ${postedDate} <br>
-              ⏳ <span class="countdown" data-time="${post.datePosted}" id="countdown-${index}"></span>
-            </small>
-            <br>
-            <button class="view-app-btn" onclick="loadApplications(${post.id})">📂 View Applications</button>
-            <div class="applications-container" id="applications-${post.id}" style="display:none; margin-top:10px;"></div>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // Countdown function
-    function updateCountdowns() {
-      document.querySelectorAll(".countdown").forEach(el => {
-        const postedTime = new Date(el.dataset.time);
-        const expireTime = new Date(postedTime.getTime() + 24 * 60 * 60 * 1000);
-        const now = new Date();
-        const diffMs = expireTime - now;
-
-        if (diffMs <= 0) {
-          el.textContent = "❌ Expired";
-          return;
-        }
-
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-        el.textContent = `${hours}h ${minutes}m ${seconds}s left`;
-      });
-    }
-
-    updateCountdowns();
-    setInterval(updateCountdowns, 1000);
-
-  } catch (err) {
-    console.error(err);
-    container.textContent = '⚠️ Failed to load careers.';
-  }
-}
 
 async function loadFeed() {
   const container = document.getElementById('feed');
   container.innerHTML = 'Loading your posted careers...';
 
   try {
-    // ✅ Get employerId (from session/localStorage)
-    const employerId = localStorage.getItem("employerId");
-    if (!employerId) {
-      container.innerHTML = "⚠️ Employer not logged in.";
-      return;
-    }
-
-    // ✅ Fetch only this employer's careers
-    const careersRes = await fetch(`/api/careers?employerId=${employerId}`);
-    const { careers } = await careersRes.json();
+    const res = await fetch('/api/careers'); // ✅ session-based
+    const { careers } = await res.json();
 
     if (!careers || careers.length === 0) {
       container.innerHTML = "📭 You haven’t posted any careers yet.";
       return;
     }
 
-    // Sort by datePosted (newest first)
-    const feed = careers.sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
-
-    // Render feed
-    container.innerHTML = feed.map((post, index) => {
-      const postedDate = new Date(post.datePosted).toLocaleString();
-      return `
+    container.innerHTML = careers
+      .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted))
+      .map(post => `
         <div class="feed-card" id="career-${post.id}">
-          ${post.image ? `<img class="feed-img" src="${post.image}" alt="">` : ""}
+          ${post.id ? `<img class="feed-img" src="/api/careers/image/${post.id}" alt="">` : ""}
           <div class="feed-content">
             <h2>${post.title.toUpperCase()} <small>[Career]</small></h2>
             <p>${post.description}</p>
             <small>
-              🏢 Company Name: ${post.link || "N/A"} <br>
-              🕒 Posted on: ${postedDate} <br>
-              ⏳ <span class="countdown" data-time="${post.datePosted}" id="countdown-${index}"></span>
+              🏢 Company: ${post.link || "N/A"} <br>
+              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
+              ⏳ <span class="countdown" data-time="${post.datePosted}"></span>
             </small>
-            <br>
-            <button class="view-app-btn" onclick="loadApplications(${post.id})">📂 View Applications</button>
-            <div class="applications-container" id="applications-${post.id}" style="display:none; margin-top:10px;"></div>
           </div>
         </div>
-      `;
-    }).join('');
+      `).join('');
 
-    // Countdown function
+    // ✅ Countdown updater
     function updateCountdowns() {
       document.querySelectorAll(".countdown").forEach(el => {
         const postedTime = new Date(el.dataset.time);
-        const expireTime = new Date(postedTime.getTime() + 24 * 60 * 60 * 1000);
+        const expireTime = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000);
         const now = new Date();
         const diffMs = expireTime - now;
 
+        const card = el.closest(".feed-card");
+
         if (diffMs <= 0) {
           el.textContent = "❌ Expired";
+          if (card) card.classList.add("expired");
           return;
         }
 
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
 
-        el.textContent = `${hours}h ${minutes}m ${seconds}s left`;
+        el.textContent = days > 0
+          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
+          : `${hours}h ${minutes}m ${seconds}s left`;
       });
     }
 
@@ -261,12 +190,12 @@ async function loadFeed() {
   }
 }
 
+
 // ✅ Same application loader
 async function loadApplications(careerId) {
   const container = document.getElementById(`applications-${careerId}`);
   if (!container) return;
 
-  // Toggle display
   if (container.style.display === "block") {
     container.style.display = "none";
     return;
@@ -276,6 +205,7 @@ async function loadApplications(careerId) {
   container.innerHTML = "Loading applications...";
 
   try {
+    const employerId = localStorage.getItem("employerId"); // ✅ must exist
     const res = await fetch(`/api/applications/career/${careerId}`);
     const apps = await res.json();
 
@@ -288,7 +218,7 @@ async function loadApplications(careerId) {
       <div class="application-card">
         <strong>${app.firstName} ${app.lastName}</strong><br>
         📧 ${app.email}<br>
-        📞 ${app.phone}<br>
+        📞 ${app.phoneNo}<br>
         <a href="/uploads/resumes/${app.resumePath}" target="_blank">📄 View Resume</a>
         <hr>
       </div>
@@ -299,44 +229,14 @@ async function loadApplications(careerId) {
   }
 }
 
+
+
 document.addEventListener('DOMContentLoaded', loadFeed);
 
 
 
 
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    // ✅ Get logged-in employer info from backend session
-    const res = await fetch("/api/employer/me");
-    if (!res.ok) throw new Error("Not logged in");
-    const employer = await res.json();
 
-    const employerId = employer.employerId;
-
-    // ✅ Now fetch applications for this employer
-    const appsRes = await fetch(`/api/applications/${employerId}`);
-    const applications = await appsRes.json();
-
-    const list = document.getElementById("applicationsList");
-    if (!applications.length) {
-      list.innerHTML = "<p>No applications yet.</p>";
-      return;
-    }
-
-    list.innerHTML = applications.map(app => `
-      <div class="application-card">
-        <h3>${app.firstName} ${app.lastName}</h3>
-        <p><strong>Career:</strong> ${app.careerTitle}</p>
-        <p><strong>Email:</strong> ${app.email}</p>
-        <p><strong>Phone:</strong> ${app.phone}</p>
-        <a href="/uploads/resumes/${app.resumePath}" target="_blank">📄 View Resume</a>
-      </div>
-    `).join("");
-  } catch (err) {
-    console.error("❌ Error loading applications:", err);
-    document.getElementById("applicationsList").innerHTML = "<p>⚠️ Please log in first.</p>";
-  }
-});
 </script>
 </body>
 </head>

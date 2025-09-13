@@ -58,20 +58,22 @@ async function initTables() {
       )`,
       events: `CREATE TABLE IF NOT EXISTS events (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        image LONGBLOB,
         title VARCHAR(255),
         description TEXT,
         location VARCHAR(255),
-        datePosted DATETIME DEFAULT CURRENT_TIMESTAMP
+        datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
+        eventDateTime DATETIME,
+        image LONGBLOB  -- ✅ store actual image as binary
       )`,
-      careers: `CREATE TABLE careers (
+
+      careers: `CREATE TABLE IF NOT EXISTS careers (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        image LONGBLOB,
         title VARCHAR(255),
         description TEXT,
         link VARCHAR(255),
         userId VARCHAR(100),
-        datePosted DATETIME DEFAULT CURRENT_TIMESTAMP
+        datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
+        image LONGBLOB  -- ✅ store actual image as binary
       )`,
       homeregs: `CREATE TABLE IF NOT EXISTS homeregs (
         id INT AUTO_INCREMENT PRIMARY KEY,

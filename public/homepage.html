@@ -566,7 +566,8 @@ document.getElementById('login-form').onsubmit = async e => {
       // ✅ Save employer session data
       sessionStorage.setItem('userRole', 'employer');
       sessionStorage.setItem('userName', d2.employerName || u); // save employer/company name
-      sessionStorage.setItem('userId', d2.userId); // 🔥 save preferredUserId
+      sessionStorage.setItem('userId', d2.userId); // preferredUserId (for session)
+      localStorage.setItem('employerId', d2.employerId || d2.userId);
 
       showToast('✅ Employer login successful!', 'success');
 
@@ -842,57 +843,72 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // 📋 Dynamic ID, Event & Career Announcements
-  async function loadAnnouncements() {
-    document.getElementById('idAnnouncementList').innerHTML = 'Loading...';
-    document.getElementById('eventList').innerHTML = 'Loading...';
-    document.getElementById('careerList').innerHTML = 'Loading...';
+async function loadAnnouncements() {
+  document.getElementById('idAnnouncementList').innerHTML = 'Loading...';
+  document.getElementById('eventList').innerHTML = 'Loading...';
+  document.getElementById('careerList').innerHTML = 'Loading...';
 
-    try {
-      const [r1, r2, r3] = await Promise.all([
-        fetch('/api/admin/id-announcements'),
-        fetch('/api/events'),
-        fetch('/api/careers')
-      ]);
-      const idA = (await r1.json()).announcements || [];
-      const events = (await r2.json()).events || [];
-      const careers = (await r3.json()).careers || [];
+  try {
+    const role = sessionStorage.getItem("userRole"); // "admin", "employer", "user"
+    let careersUrl;
 
-      document.getElementById('idAnnouncementList').innerHTML =
-        idA.map(a => `
-          <div class="event-card">
-            <div class="event-header">
-              <span class="badge">ID ANNOUNCEMENT</span>
-              <span class="posted-date">Posted: ${new Date(a.datePosted).toLocaleDateString()}</span>
-            </div>
-            <div class="event-title">${a.title}</div>
-            <div>${a.description}</div>
-          </div>
-        `).join('') || '<div>No ID announcements</div>';
-
-      document.getElementById('eventList').innerHTML =
-        events.map(e => `
-          <div class="event-card">
-            <div class="event-header">
-              <span class="badge">EVENT</span>
-              <span class="posted-date">Posted: ${new Date(e.datePosted).toLocaleDateString()}</span>
-            </div>
-            <div class="event-title">${e.title}</div>
-            <p>${e.location}</p>
-          </div>
-        `).join('') || '<div>No events</div>';
-
-      document.getElementById('careerList').innerHTML =
-        careers.map(c => `
-          <div class="career-card">
-            <div class="career-header"><span class="career-badge">CAREER</span> Posted: ${new Date(c.datePosted).toLocaleDateString()}</div>
-            <div class="career-title">${c.title}</div>
-          </div>
-        `).join('') || '<div>No career announcements</div>';
-
-    } catch (err) {
-      console.error('Failed to load announcements:', err);
+    if (role === "admin") {
+      careersUrl = "/api/careers/all";
+    } else if (role === "employer") {
+      careersUrl = "/api/careers";
+    } else {
+      careersUrl = "/api/careers/public"; // new route for users
     }
+
+    const [r1, r2, r3] = await Promise.all([
+      fetch('/api/admin/id-announcements'),
+      fetch('/api/events'),
+      fetch(careersUrl)
+    ]);
+
+    const idA = (await r1.json()).announcements || [];
+    const events = (await r2.json()).events || [];
+    const careers = (await r3.json()).careers || [];
+
+    document.getElementById('idAnnouncementList').innerHTML =
+      idA.map(a => `
+        <div class="event-card">
+          <div class="event-header">
+            <span class="badge">ID ANNOUNCEMENT</span>
+            <span class="posted-date">Posted: ${new Date(a.datePosted).toLocaleDateString()}</span>
+          </div>
+          <div class="event-title">${a.title}</div>
+          <div>${a.description}</div>
+        </div>
+      `).join('') || '<div>No ID announcements</div>';
+
+    document.getElementById('eventList').innerHTML =
+      events.map(e => `
+        <div class="event-card">
+          <div class="event-header">
+            <span class="badge">EVENT</span>
+            <span class="posted-date">Posted: ${new Date(e.datePosted).toLocaleDateString()}</span>
+          </div>
+          <div class="event-title">${e.title}</div>
+          <p>${e.location || ''}</p>
+        </div>
+      `).join('') || '<div>No events</div>';
+
+    document.getElementById('careerList').innerHTML =
+      careers.map(c => `
+        <div class="career-card">
+          <div class="career-header">
+            <span class="career-badge">CAREER</span>
+            Posted: ${new Date(c.datePosted).toLocaleDateString()}
+          </div>
+          <div class="career-title">${c.title}</div>
+        </div>
+      `).join('') || '<div>No career announcements</div>';
+
+  } catch (err) {
+    console.error('❌ Failed to load announcements:', err);
   }
+}
 
   // 🔄 Contact section animation
   document.addEventListener("DOMContentLoaded", function () {

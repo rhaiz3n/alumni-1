@@ -2024,3 +2024,57 @@ html, body {
   display: block; /* normal file input for gallery */
   margin-top: 10px;
 }
+
+
+/* Form group styling */
+#eventForm label {
+  display: block;
+  font-weight: 600;
+  margin: 12px 0 6px;
+  color: #ffffff;
+}
+
+#eventForm input[type="date"],
+#eventForm input[type="time"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 15px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus effect */
+#eventForm input[type="date"]:focus,
+#eventForm input[type="time"]:focus {
+  outline: none;
+  border-color: #0077ff;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+/* Nice hover */
+#eventForm input[type="date"]:hover,
+#eventForm input[type="time"]:hover {
+  background: rgba(255,255,255,0.2);
+  box-shadow: 0 0 6px #00c6ff;
+}
+
+/* Optional: make them look side by side */
+.event-datetime {
+  display: flex;
+  gap: 12px;
+}
+
+.event-datetime input {
+  flex: 1;
+}
+
+
+.expired {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  pointer-events: none; /* optional: disable clicks */
+}

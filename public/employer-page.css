@@ -566,3 +566,16 @@ html, body {
     font-size: 14px; 
   }
 }
+
+
+/* Career card when expired */
+.feed-card.expired {
+  background-color: #e0e0e0;   /* gray */
+  opacity: 0.7;
+  pointer-events: auto;        /* still allow button clicks */
+}
+.feed-card.expired h2,
+.feed-card.expired p,
+.feed-card.expired small {
+  color: #555;  /* darker gray for text */
+}

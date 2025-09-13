@@ -638,11 +638,14 @@ html, body {
   padding: 2rem;
   border-radius: 15px;
   width: 95%;
+  height: 50%;
   max-width: 900px;
+  max-height: 900px;
   color: #fff;
   box-shadow: 0 15px 35px rgba(0,0,0,0.5);
   animation: slideUp 0.5s ease;
   position: relative;
+  overflow-y: auto;
 }
 
 /* ❌ Close Button */

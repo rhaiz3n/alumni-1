@@ -25,7 +25,7 @@
     <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
     
     <a href="user-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
-    <button class="back-button" id="backBtn">BACK</button>
+    <button class="back-button" id="backBtn">←</button>
     
     <div class="a-l-u-m-n-i slide-in">
       <span class="a-l-u-m-n-i-span">G</span>
@@ -157,6 +157,23 @@ document.getElementById('backBtn').addEventListener('click', () => {
     window.history.back();
   }
 });
+
+  // 🔄 Loader Progress
+  document.addEventListener("DOMContentLoaded", () => {
+    let p = 80;
+    const wrap = document.getElementById("loader-wrapper");
+    const bar = document.getElementById("progress-bar");
+    const text = document.getElementById("percentage");
+    const iv = setInterval(() => {
+      p = Math.min(100, p + 1);
+      bar.style.width = `${p}%`;
+      text.textContent = `${p}%`;
+      if (p >= 100) {
+        clearInterval(iv);
+        wrap.style.display = 'none';
+      }
+    }, 30);
+  });
 </script>
 </body>
 </html>

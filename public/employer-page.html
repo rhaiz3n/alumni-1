@@ -24,10 +24,6 @@
     <div class="Line1"></div>
     <div class="Line2"></div>
 
-    <div class="career-button slide-in" onclick="window.location.href='career-posting.html'">
-      <div class="content"><div class="state-layer"><div class="hover-underline1">CAREER</div></div></div>
-    </div>
-
 
     <button id="signOutBtn" class="sign-out-button slide-in">
       <div class="content"><div class="state-layer"><div class="hover-underline1">SIGN-OUT</div></div></div>
@@ -68,7 +64,55 @@
 
     <div id="feed"></div>
     
-    
+    <!-- Trigger Button -->
+<button id="openModalBtn" class="galaxy-btn">POST NEW CAREER</button>
+
+<!-- Modal -->
+<div id="eventModal" class="modal">
+  <div class="modal-content galaxy-card">
+    <span class="close-btn" id="closeModalBtn">&times;</span>
+    <h1>Create Career</h1>
+    <form id="adminForm" enctype="multipart/form-data">
+      <label>Career Type</label>
+      <select id="careerType" name="careerType" required>
+        <option value="">-- Select a Career --</option>
+        <option value="Electrician">Electrician</option>
+        <option value="Mechanic">Mechanic</option>
+        <option value="Education">Education</option>
+        <option value="Software Developer">Software Developer</option>
+        <option value="Network Engineer">Network Engineer</option>
+        <option value="Telecommunications Engineer">Telecommunications Engineer</option>
+        <option value="Electrical Engineer">Electrical Engineer</option>
+        <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
+      </select>
+
+      <input type="hidden" id="careerTitle" name="title">
+
+      <label>Company Name</label>
+      <input type="text" name="link" required>
+
+      <label>Image</label>
+      <input type="file" name="image" accept=".png,.jpg" required>
+
+      <label>Description</label>
+      <textarea name="description" rows="3" required></textarea>
+
+      <button type="submit" class="galaxy-btn2">Publish</button>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- 🌤️ Application Modal -->
+<div id="modal-application" class="modal-application">
+  <div class="modal-content-application">
+    <span class="modal-close-application" onclick="closeApplicationModal()">&times;</span>
+    <h2>📄 Applications</h2>
+    <div id="applications-container"></div>
+  </div>
+</div>
+
 
 <script type="module">
   import { setupSignOut } from './sign-out.js';
@@ -94,7 +138,6 @@
       }
     }, 30);
   });
-
 
   // Dropdown toggle
   function toggleDropdown() {
@@ -122,20 +165,52 @@
     }
   });
 
-
-
-async function loadFeed() {
-  const container = document.getElementById('feed');
-  container.innerHTML = 'Loading your posted careers...';
-
-  try {
-    const res = await fetch('/api/careers'); // ✅ session-based
-    const { careers } = await res.json();
-
-    if (!careers || careers.length === 0) {
-      container.innerHTML = "📭 You haven’t posted any careers yet.";
-      return;
+  // ✅ Toast Function
+  function showToast(message) {
+    let toast = document.getElementById("toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "toast";
+      toast.style.position = "fixed";
+      toast.style.bottom = "30px";
+      toast.style.left = "50%";
+      toast.style.transform = "translateX(-50%)";
+      toast.style.background = "#333";
+      toast.style.color = "#fff";
+      toast.style.padding = "12px 20px";
+      toast.style.borderRadius = "6px";
+      toast.style.zIndex = "10000";
+      toast.style.fontSize = "15px";
+      toast.style.opacity = "0";
+      toast.style.transition = "opacity 0.5s, bottom 0.5s";
+      document.body.appendChild(toast);
     }
+    toast.textContent = message;
+    toast.style.opacity = "1";
+    toast.style.bottom = "50px";
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.bottom = "30px";
+    }, 3000);
+  }
+
+  // ✅ Modal references
+  const modal = document.getElementById('eventModal');
+  const editModal = document.getElementById('editModal'); // make sure you actually have <div id="editModal"> in your HTML!
+
+  // ✅ Feed Loader
+  async function loadFeed() {
+    const container = document.getElementById('feed');
+    container.innerHTML = 'Loading your posted careers...';
+
+    try {
+      const res = await fetch('/api/careers'); // ✅ session-based
+      const { careers } = await res.json();
+
+      if (!careers || careers.length === 0) {
+        container.innerHTML = "📭 You haven’t posted any careers yet.";
+        return;
+      }
 
     container.innerHTML = careers
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted))
@@ -150,62 +225,68 @@ async function loadFeed() {
               🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
               ⏳ <span class="countdown" data-time="${post.datePosted}"></span>
             </small>
+            <br>
+            <button onclick="toggleApplications(${post.id})" class="btn-view-apps">
+              📄 View Applications
+            </button>
+            <div id="applications-${post.id}" class="applications-container" style="display:none;"></div>
           </div>
         </div>
       `).join('');
 
-    // ✅ Countdown updater
-    function updateCountdowns() {
-      document.querySelectorAll(".countdown").forEach(el => {
-        const postedTime = new Date(el.dataset.time);
-        const expireTime = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000);
-        const now = new Date();
-        const diffMs = expireTime - now;
 
-        const card = el.closest(".feed-card");
 
-        if (diffMs <= 0) {
-          el.textContent = "❌ Expired";
-          if (card) card.classList.add("expired");
-          return;
-        }
+      // ✅ Countdown updater
+      function updateCountdowns() {
+        document.querySelectorAll(".countdown").forEach(el => {
+          const postedTime = new Date(el.dataset.time);
+          const expireTime = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000);
+          const now = new Date();
+          const diffMs = expireTime - now;
 
-        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+          const card = el.closest(".feed-card");
 
-        el.textContent = days > 0
-          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
-          : `${hours}h ${minutes}m ${seconds}s left`;
-      });
+          if (diffMs <= 0) {
+            el.textContent = "❌ Expired";
+            if (card) card.classList.add("expired");
+            return;
+          }
+
+          const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+          el.textContent = days > 0
+            ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
+            : `${hours}h ${minutes}m ${seconds}s left`;
+        });
+      }
+
+      updateCountdowns();
+      setInterval(updateCountdowns, 1000);
+
+    } catch (err) {
+      console.error(err);
+      container.textContent = '⚠️ Failed to load your careers.';
     }
-
-    updateCountdowns();
-    setInterval(updateCountdowns, 1000);
-
-  } catch (err) {
-    console.error(err);
-    container.textContent = '⚠️ Failed to load your careers.';
   }
-}
 
-
-// ✅ Same application loader
-async function loadApplications(careerId) {
+  // ✅ Application loader
+async function toggleApplications(careerId) {
   const container = document.getElementById(`applications-${careerId}`);
   if (!container) return;
 
+  // Toggle visibility
   if (container.style.display === "block") {
     container.style.display = "none";
     return;
   }
 
   container.style.display = "block";
-  container.innerHTML = "Loading applications...";
+  container.innerHTML = "⏳ Loading applications...";
 
   try {
-    const employerId = localStorage.getItem("employerId"); // ✅ must exist
     const res = await fetch(`/api/applications/career/${careerId}`);
     const apps = await res.json();
 
@@ -214,15 +295,33 @@ async function loadApplications(careerId) {
       return;
     }
 
-    container.innerHTML = apps.map(app => `
-      <div class="application-card">
-        <strong>${app.firstName} ${app.lastName}</strong><br>
-        📧 ${app.email}<br>
-        📞 ${app.phoneNo}<br>
-        <a href="/uploads/resumes/${app.resumePath}" target="_blank">📄 View Resume</a>
-        <hr>
-      </div>
-    `).join("");
+    // Build table
+    container.innerHTML = `
+      <table class="applications-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Resume</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${apps.map(app => `
+            <tr>
+              <td>${app.firstName} ${app.lastName}</td>
+              <td>${app.email}</td>
+              <td>${app.phoneNo}</td>
+              <td>
+                <a href="/uploads/resumes/${app.resumePath}" download target="_blank">
+                  📄 Download
+                </a>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
   } catch (err) {
     console.error("❌ Failed to load applications:", err);
     container.innerHTML = "<p>⚠️ Failed to load applications.</p>";
@@ -230,14 +329,80 @@ async function loadApplications(careerId) {
 }
 
 
+  document.addEventListener('DOMContentLoaded', loadFeed);
 
-document.addEventListener('DOMContentLoaded', loadFeed);
+  // ✅ Modal open/close logic
+  document.getElementById('openModalBtn').onclick = async () => {
+    const role = sessionStorage.getItem("userRole");
+    const userId = sessionStorage.getItem("userId"); // ✅ get stored ID
 
+    if (role === 'employer') {
+      const res = await fetch(`/api/careers/last-post/${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.lastPost) {
+          const lastPostTime = new Date(data.lastPost);
+          const now = new Date();
+          const diffMs = now - lastPostTime;
+          const hoursPassed = diffMs / (1000 * 60 * 60);
 
+          if (hoursPassed < 24) {
+            const remainingMs = 24 * 60 * 60 * 1000 - diffMs;
+            const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+            const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
 
+            showToast(`⚠️ You can only post 1 career per day. Try again in ${hours}h ${minutes}m ${seconds}s`);
+            return;
+          }
+        }
+      }
+    }
 
+    modal.style.display = 'flex';
+  };
 
+  document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
+
+  window.onclick = e => {
+    if (e.target === modal) modal.style.display = 'none';
+    if (editModal && e.target === editModal) editModal.classList.remove('show');
+  };
+
+  // 📌 Career form submit
+  document.getElementById('adminForm').onsubmit = async e => {
+    e.preventDefault();
+
+    const careerType = document.getElementById("careerType");
+    const hiddenTitle = document.getElementById("careerTitle");
+    hiddenTitle.value = careerType.value; // ✅ fill hidden field
+
+    if (!hiddenTitle.value) {
+      alert("⚠️ Please select a career type.");
+      return;
+    }
+
+    const formData = new FormData(e.target);
+    formData.append("userId", sessionStorage.getItem("userId")); // ✅ Send employer ID
+
+    const res = await fetch('/api/careers/add', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      showToast('❌ Error: ' + await res.text());
+      return;
+    }
+
+    showToast('✅ Career posted!');
+    e.target.reset();
+    hiddenTitle.value = "";
+    modal.style.display = 'none';
+    loadFeed(); // reload feed after posting
+  };
 </script>
+
 </body>
 </head>
 </html>

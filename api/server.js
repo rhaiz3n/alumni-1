@@ -7,7 +7,8 @@ const session = require('express-session');
 const http = require('http');
 const { Server } = require('socket.io');
 const pool = require('../db/mysql'); // MySQL pool
-const applicationsRoutes = require('./applications.js');
+const applicationsRoutes = require("./applications.js");
+const careersRoutes = require("./careers.js");
 const { imageUpload, excelUpload, resumeUpload } = require("./uploadConfig");
 const fs = require('fs');
 const XLSX = require("xlsx");
@@ -19,8 +20,8 @@ const PORT = process.env.PORT || 3002;
 
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "20mb" }));  // handles JSON
+app.use(express.urlencoded({ extended: true, limit: "20mb" })); // handles form-urlencoded
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ✅ Session MUST come before routes
@@ -32,12 +33,15 @@ app.use(session({
 }));
 
 // ✅ Mount API routes AFTER session middleware
-app.use("/api", applicationsRoutes);
+app.use("/api/applications", applicationsRoutes);
+app.use("/api/careers", careersRoutes);
 
 // Public pages
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/homepage.html'));
 });
+
+
 
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
@@ -52,6 +56,7 @@ app.post('/api/alumni/import', excelUpload.single('file'), (req, res) => {
   res.json({ success: true, filename: req.file.originalname });
 });
 
+app.use("/uploads/resumes", express.static(path.join(__dirname, "../public/uploads/resumes")));
 
 
 // Create tables if not exist
@@ -1700,28 +1705,25 @@ app.get('/api/allsport/distinct-sports', async (req, res) => {
 const uploadPhoto = multer({ storage: multer.memoryStorage() });
 
 
-// POST: Upload Multiple Images
 app.post('/api/gallery/add-multiple', uploadPhoto.array('images', 25), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'At least one image required' });
   }
 
-  const now = mysqlDateNow();
-
-  const connection = await pool.getConnection(); // ✅ FIXED: removed `.promise()`
+  const connection = await pool.getConnection();
 
   try {
     await connection.beginTransaction();
 
-    const insertQuery = `INSERT INTO gallery (image, datePosted) VALUES (?, ?)`;
+    const insertQuery = `INSERT INTO gallery (image, datePosted) VALUES (?, NOW())`;
     for (const file of req.files) {
-      await connection.execute(insertQuery, [file.buffer, now]);
+      await connection.execute(insertQuery, [file.buffer]);
     }
 
     await connection.commit();
     connection.release();
 
-    res.json({ success: true });
+    res.json({ success: true, uploaded: req.files.length });
   } catch (err) {
     await connection.rollback();
     connection.release();
@@ -1729,6 +1731,7 @@ app.post('/api/gallery/add-multiple', uploadPhoto.array('images', 25), async (re
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // GET: All Images
 app.get('/api/gallery', async (req, res) => {
@@ -1766,7 +1769,18 @@ app.delete('/api/gallery/:id', async (req, res) => {
   }
 });
 
+app.get('/api/gallery/image/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT image FROM gallery WHERE id = ?', [req.params.id]);
+    if (!rows.length) return res.status(404).send('Not found');
 
+    res.set('Content-Type', 'image/jpeg');
+    res.send(rows[0].image);
+  } catch (err) {
+    console.error('❌ Gallery Image Fetch Error:', err);
+    res.status(500).send(err.message);
+  }
+});
 
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2422,3 +2436,4 @@ app.post('/api/applications/add', resumeUpload.single('resume'), async (req, res
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
+

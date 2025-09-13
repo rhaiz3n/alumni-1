@@ -24,14 +24,17 @@
     <div class="Line1"></div>
     <div class="Line2"></div>
 
-    <!-- Career Button -->
-    <div class="career-button slide-in" onclick="openCareerPopup()">
-      <div class="content">
-        <div class="state-layer">
-          <div class="hover-underline1">CAREER</div>
-        </div>
-      </div>
-    </div>
+
+<div class="search-container">
+  <input 
+    type="text" 
+    id="feedSearch" 
+    placeholder="🔍 Search events or careers..."
+    oninput="filterFeed()"
+  />
+</div>
+
+
     <div id="notificationAlert" class="notification-modal">
       <div class="notification-box">
         <span id="closeNotification" class="notification-close">&times;</span>
@@ -40,13 +43,6 @@
     </div>
 
 
-    <a href="user-eventpage.html" class="event-button slide-in" style="text-decoration: none; color: inherit;">
-      <div class="content">
-        <div class="state-layer">
-          <div class="hover-underline1">EVENTS</div>
-        </div>
-      </div>
-    </a>
 
     <!-- ID Request Button -->
     <div class="id-button slide-in" onclick="openIdRequestPopup()">
@@ -371,10 +367,16 @@
     <h2>Employment Application</h2>
       <form id="employmentForm" enctype="multipart/form-data">
         <input type="hidden" name="careerId" value="CAREER_ID_HERE">
-        <input type="text" name="firstName" required>
-        <input type="text" name="lastName" required>
+        <label>First Name</label>
+        <input type="text" name="firstName" required maxlength="20" oninput="validateNameC(this)">
+
+        <label>Last Name</label>
+        <input type="text" name="lastName" required maxlength="20" oninput="validateNameC(this)">
+        <label>Phone No.</label>
         <input type="text" name="phoneNo" required>
+        <label>Personal Email Address</label>
         <input type="email" name="email" required>
+        <label>RESUME PDF TYPE</label>
         <input type="file" name="resume" accept="application/pdf" required>
         <button type="submit">Apply</button>
       </form>
@@ -388,6 +390,11 @@
   <button class="survey-close-btn" onclick="closeSurveyNotification()">×</button>
 </div>
 
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+
+<small id="teamNameError" style="color:red;"></small>
 
 <script type="module">
   import { setupSignOut } from './sign-out.js';
@@ -1040,12 +1047,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const players = [];
     firstNames.forEach((input, i) => {
-      players.push({
-        firstName: input.value.trim(),
-        middleInitial: middleInitials[i].value.trim(),
-        lastName: lastNames[i].value.trim()
-      });
+      if (input.value.trim() || lastNames[i].value.trim()) {
+        players.push({
+          firstName: input.value.trim(),
+          middleInitial: middleInitials[i].value.trim(),
+          lastName: lastNames[i].value.trim()
+        });
+      }
     });
+
+    // ✅ Enforce min 10, max 20 players
+    if (players.length < 10) {
+      showToast("⚠️ You need at least 10 members to register a team.");
+      return;
+    }
+    if (players.length > 20) {
+      showToast("⚠️ Maximum 20 members are allowed per team.");
+      return;
+    }
 
     const payload = { teamName, ageRange, players };
 
@@ -1059,10 +1078,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to register");
 
-      alert(`✅ Team registered successfully! Players: ${data.playerCount}`);
+      showToast(`✅ Team registered successfully! Players: ${data.playerCount}`);
       closeMensBasketballModal();
     } catch (err) {
-      alert("❌ Error: " + err.message);
+      showToast("❌ Error: " + err.message);
     }
   };
 });
@@ -1076,16 +1095,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 function openCareerSurvey(career) {
-  window.currentCareer = career;
+  window.currentCareer = career; // save globally for employment form
 
   const modal = document.getElementById("careerSurveyModal");
   const container = document.getElementById("surveyQuestions");
+
   container.innerHTML = `
     <label>First Name</label>
-    <input type="text" name="firstName" maxlength="20" required />
+    <input type="text" name="firstName" maxlength="20" required oninput="validateNameC(this)">
 
     <label>Last Name</label>
-    <input type="text" name="lastName" maxlength="20" required />
+    <input type="text" name="lastName" maxlength="20" required oninput="validateNameC(this)">
 
     <label>Are you interested?</label>
     <select name="interested" required>
@@ -1152,30 +1172,39 @@ function openCareerSurvey(career) {
       }
     };
   }
-
-  // ✅ Employment Application Submit
-document.getElementById("employmentForm").onsubmit = async function (e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-
-  try {
-    const res = await fetch(`/api/applications/add`, {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to submit application");
-
-    showSurveyNotification("✅ Employment Application Submitted Successfully!", "success");
-    closeEmploymentForm();
-  } catch (err) {
-    console.error("❌ Application submit error:", err);
-    showSurveyNotification("❌ Failed to submit application. Please try again.", "error");
-  }
-};
-
 }
+
+// ✅ Employment Form Submit (only bind once globally)
+document.addEventListener("DOMContentLoaded", () => {
+  const employmentForm = document.getElementById("employmentForm");
+  if (!employmentForm) return;
+
+  employmentForm.onsubmit = async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    // ✅ Fix: use set() so careerId is not duplicated
+    formData.set("careerId", window.currentCareer?.id || ""); 
+
+    try {
+      const res = await fetch(`/api/applications/add`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to submit application");
+
+      showSurveyNotification("✅ Employment Application Submitted Successfully!", "success");
+      closeEmploymentForm();
+    } catch (err) {
+      console.error("❌ Application submit error:", err);
+      showSurveyNotification("❌ Failed to submit application. Please try again.", "error");
+    }
+  };
+});
+
+
 
 function closeCareerSurvey() {
   document.getElementById("careerSurveyModal").style.display = "none";
@@ -1203,12 +1232,11 @@ function closeSurveyNotification() {
 
 
 
-
 function validateAgeRange(input) {
-  // Allow only numbers
-  input.value = input.value.replace(/[^0-9]/g, "");
+  // Allow only numbers and dash (-)
+  input.value = input.value.replace(/[^0-9-]/g, "");
 
-  // Limit to 5 digits
+  // Limit to 5 characters
   if (input.value.length > 5) {
     input.value = input.value.slice(0, 5);
   }
@@ -1226,7 +1254,61 @@ function validateMiddleInitial(input) {
   input.value = input.value.replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 1);
 }
 
+function validateTeamName(input) {
+  const msg = document.getElementById("teamNameError");
+  const regex = /^[a-zA-Z0-9 ]*$/;
 
+  if (!regex.test(input.value)) {
+    msg.textContent = "❌ Only letters, numbers, and spaces allowed.";
+  } else {
+    msg.textContent = "";
+  }
+}
+
+function validateNameC(input) {
+  // Remove everything except letters & spaces
+  input.value = input.value.replace(/[^a-zA-Z\s]/g, '');
+
+  // Convert to uppercase
+  input.value = input.value.toUpperCase();
+
+  // Enforce max length (just in case)
+  if (input.value.length > 20) {
+    input.value = input.value.slice(0, 20);
+  }
+}
+
+
+function filterFeed() {
+  const query = document.getElementById("feedSearch").value.toLowerCase();
+  const cards = document.querySelectorAll(".feed-card");
+
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    if (text.includes(query)) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+}
+
+
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  container.appendChild(toast);
+
+  // Auto remove after 4s
+  setTimeout(() => {
+    toast.style.animation = "fadeOut 0.5s forwards";
+    setTimeout(() => toast.remove(), 500);
+  }, 4000);
+}
 </script>
 </body>
 </html>

@@ -1836,6 +1836,7 @@ html, body {
   font-size: 14px;
   transition: border 0.3s;
   margin: 10px;
+  color: white;
 }
 
 #mensBasketballModal input:focus,
@@ -2153,6 +2154,7 @@ html, body {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
+
 /* ===== Notification Box (Success / Error) ===== */
 #surveyNotification {
   display: none;
@@ -2206,4 +2208,119 @@ html, body {
   color: #fff !important;            /* white text */
   cursor: not-allowed !important;
   opacity: 0.7;
+}
+
+form button[type="submit"] {
+  background: linear-gradient(135deg, #74ebd5, #ACB6E5); /* sky blue to cloud white gradient */
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 10%;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+form button[type="submit"]:hover {
+  background: linear-gradient(135deg, #4facfe, #00f2fe); /* brighter blue */
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+form button[type="submit"]:active {
+  transform: scale(0.96);
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+
+
+.search-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+/* Large monitors (>=1600px) PC */
+@media (min-width: 1600px) {
+  .search-container {
+    font-size: 20px;
+    top: 188px;
+    left: 70px;
+    width:400px;
+  }
+}
+
+/* Laptops (<=1599px)  */
+@media (max-width: 1400px) {
+  .search-container {
+    font-size: 20px;
+    top: 188px;
+    left: 70px;
+    width:400px;
+  }
+}
+
+/* Tablets & Phones (<=768px) */
+@media (max-width: 768px) {
+  .search-container {
+    top: 270px;
+    left: 70%;
+  }
+}
+
+#feedSearch {
+  width: 80%;
+  padding: 12px 15px;
+  font-size: 16px;
+  border: 2px solid #87ceeb;
+  border-radius: 25px;
+  outline: none;
+  transition: 0.3s;
+}
+
+#feedSearch:focus {
+  border-color: #4682b4;
+  box-shadow: 0 0 8px rgba(70, 130, 180, 0.6);
+}
+
+
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: linear-gradient(135deg, #87cefa, #e0f7ff);
+  color: #003366;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  animation: fadeInUp 0.5s, fadeOut 0.5s 3s;
+  opacity: 0.95;
+  min-width: 220px;
+  text-align: center;
+}
+
+.toast.success { border-left: 6px solid #28a745; }
+.toast.error { border-left: 6px solid #dc3545; }
+.toast.info { border-left: 6px solid #007bff; }
+
+@keyframes fadeInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateY(-20px); }
 }

@@ -2,62 +2,68 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const multer = require('multer');
 const session = require('express-session');
 const http = require('http');
 const { Server } = require('socket.io');
 const pool = require('../db/mysql'); // MySQL pool
 const applicationsRoutes = require("./applications.js");
 const careersRoutes = require("./careers.js");
+const profileRoutes = require("./profileRoutes.js");
 const { imageUpload, excelUpload, resumeUpload } = require("./uploadConfig");
-const fs = require('fs');
-const XLSX = require("xlsx");
+const multer = require('multer');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 3002;
 
-
+// ----------------------
 // Middleware
-app.use(express.json({ limit: "20mb" }));  // handles JSON
-app.use(express.urlencoded({ extended: true, limit: "20mb" })); // handles form-urlencoded
-app.use(express.static(path.join(__dirname, '../public')));
+// ----------------------
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
-// ✅ Session MUST come before routes
+// ✅ Static files (frontend assets, default-profile.png, etc.)
+app.use(express.static(path.join(__dirname, "../public")));
+
+// ✅ Session (must be before routes)
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'alumni2025',
+  secret: process.env.SESSION_SECRET || "alumni2025",
   resave: false,
   saveUninitialized: false,
   cookie: { httpOnly: true, secure: false, maxAge: 1000 * 60 * 60 } // 1hr
 }));
 
-// ✅ Mount API routes AFTER session middleware
+// ----------------------
+// Routes
+// ----------------------
 app.use("/api/applications", applicationsRoutes);
 app.use("/api/careers", careersRoutes);
+app.use("/api/fullInformation", profileRoutes);
 
-// Public pages
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/homepage.html'));
+// Public homepage
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/homepage.html"));
 });
 
-
-
-app.use(express.json({ limit: "20mb" }));
-app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-
-app.locals.io = io;
-io.on('connection', socket => {
-  console.log('🔌 Socket connected:', socket.id);
-});
-
-app.post('/api/alumni/import', excelUpload.single('file'), (req, res) => {
-  // req.file.buffer → Excel file buffer
+// Excel import
+app.post("/api/alumni/import", excelUpload.single("file"), (req, res) => {
   res.json({ success: true, filename: req.file.originalname });
 });
 
+// ✅ Serve uploaded files
+app.use(express.static(path.join(__dirname, "../public")));
 app.use("/uploads/resumes", express.static(path.join(__dirname, "../public/uploads/resumes")));
+app.use("/profilePics", express.static(path.join(__dirname, "public/profilePics")));
+app.use("/uploads", express.static(path.join(__dirname, "../public/uploads"))); // fixed path!
 
+// ----------------------
+// Sockets
+// ----------------------
+app.locals.io = io;
+io.on("connection", socket => {
+  console.log("🔌 Socket connected:", socket.id);
+});
 
 // Create tables if not exist
 async function initTables() {
@@ -1095,10 +1101,10 @@ app.get('/api/events', async (req, res) => {
 
 app.get('/api/careers', async (req, res) => {
   try {
-    // ✅ Step 1: Delete careers older than 13 days (5 active + 8 gray)
+    // ✅ Step 1: Delete careers older than 20 days (5 active + 15 gray)
     await pool.query(`
       DELETE FROM careers
-      WHERE NOW() > DATE_ADD(datePosted, INTERVAL 13 DAY)
+      WHERE NOW() > DATE_ADD(datePosted, INTERVAL 20 DAY)
     `);
 
     // ✅ Step 2: Fetch remaining careers
@@ -1133,6 +1139,7 @@ app.get('/api/careers', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 

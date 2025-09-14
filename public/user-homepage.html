@@ -214,52 +214,63 @@
 
 
 
-<!-- Profile picture trigger -->
-<img id="profilePic" src="default-profile.png" alt="Profile Picture" class="profile-circle" onclick="openProfileModal()">
+
+<!-- Profile picture trigger (Dashboard Circle) -->
+<img id="profilePic" 
+     src="/images/default-profile.png" 
+     alt="Profile Picture" 
+     class="profile-circle" 
+     onclick="openProfileModal()">
 
 <!-- Modal -->
 <div id="modal-profile" class="modal-profile">
   <div class="modal-profile-content">
-    <!-- Close Button -->
-    <button class="modal-profile-close" onclick="closeProfileModal()">&times;</button>
-    
-    <!-- Profile Header -->
-    <div class="modal-top">
-      <img 
-        id="modalProfilePic" 
-        src="default-profile.png" 
-        alt="Profile" 
-        class="modal-profile-pic"
-      >
-      <h2 id="name">Loading...</h2>
-    </div>
-    
-    <!-- Profile Details -->
-    <div class="modal-details">
-      <p><strong>Username:</strong> <span id="userName">-</span></p>
 
-      <!-- Email -->
+    <!-- Profile Card Layout -->
+    <div class="profile-card">
+      
+      <!-- LEFT: Circle Profile Pic -->
+      <div class="profile-left">
+        <div class="profile-pic-frame">
+          <img id="modalProfilePic" src="/images/default-profile.png" alt="Profile" class="profile-pic">
+        </div>
+        <p class="profile-label">PROFILE PIC</p>
+      </div>
+
+      <!-- RIGHT: Name + Buttons -->
+      <div class="profile-right">
+        <h2 id="name">NAME</h2>
+        <div class="profile-buttons">
+          <button id="viewApplicationsBtn" class="profile-btn">📂 View Applications</button>
+          <button id="viewInfoBtn" class="profile-btn">ℹ️ View Information</button>
+          <button id="changePicBtn" class="profile-btn">🖼 Change Profile Picture</button>
+          <input type="file" id="uploadProfilePic" accept="image/*" style="display:none;">
+          <button id="editBtn" class="profile-btn edit-btn">✏ Edit Profile</button>
+          <button id="saveBtn" class="profile-btn save-btn" style="display:none;">💾 Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden details (only show when "View Information" is clicked) -->
+    <div id="profile-details" class="profile-details hidden">
       <p>
-        <strong>Email:</strong>
+        <strong>Username:</strong> <span id="userName">-</span>
+      </p>
+      <p>
+        <strong>Email:</strong> 
         <span id="personalEmail">-</span>
         <input type="email" id="editPersonalEmail" style="display:none;">
       </p>
-
-      <!-- Civil Status -->
       <p>
-        <strong>Civil Status:</strong>
+        <strong>Civil Status:</strong> 
         <span id="civilStatus">-</span>
         <input type="text" id="editCivilStatus" style="display:none;">
       </p>
-
-      <!-- Phone No -->
       <p>
-        <strong>Phone No.:</strong>
+        <strong>Phone No.:</strong> 
         <span id="phoneNo">-</span>
         <input type="text" id="editPhoneNo" style="display:none;">
       </p>
-
-      <!-- Read-only fields -->
       <p><strong>Gender:</strong> <span id="gender">-</span></p>
       <p><strong>Date of Birth:</strong> <span id="dateBirth">-</span></p>
       <p><strong>Major:</strong> <span id="major">-</span></p>
@@ -268,13 +279,15 @@
       <p><strong>Student No.:</strong> <span id="studentNo">-</span></p>
     </div>
 
-    <!-- Actions -->
-    <div class="modal-actions">
-      <button id="editBtn" onclick="enableEdit()">Edit</button>
-      <button id="saveBtn" style="display:none;" onclick="saveProfile()">Save</button>
-    </div>
   </div>
 </div>
+
+
+
+
+
+
+
 
 <div id="feed"></div>
 
@@ -372,8 +385,16 @@
 
         <label>Last Name</label>
         <input type="text" name="lastName" required maxlength="20" oninput="validateNameC(this)">
-        <label>Phone No.</label>
-        <input type="text" name="phoneNo" required>
+
+        <label for="phoneNo">Phone No.</label>
+              <input 
+                type="tel" 
+                name="phoneNo" 
+                id="phoneNo" 
+                required 
+                maxlength="12" 
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+              />
         <label>Personal Email Address</label>
         <input type="email" name="email" required>
         <label>RESUME PDF TYPE</label>
@@ -865,47 +886,67 @@ function showLoginToast(message, type = 'success') {
 /////////////////////////////////////////////////////////////////////////////////////
 
 
+/* ---------------------------
+   Modal Open / Close
+---------------------------- */
 function openProfileModal() {
   const modal = document.getElementById("modal-profile");
   const profilePic = document.getElementById("profilePic");
   const modalProfilePic = document.getElementById("modalProfilePic");
 
-  if (modal && profilePic && modalProfilePic) {
-    modal.style.display = "flex";
-    modalProfilePic.src = profilePic.src;
+  if (!modal) return;
+
+  // Toggle behavior
+  if (modal.style.display === "flex") {
+    closeProfileModal();
+    return;
   }
 
-  // Show loading state
-  document.getElementById('name').textContent = "Loading...";
+  modal.style.display = "flex";
+  modalProfilePic.src = (profilePic?.src) || "/images/default-profile.png";
 
-  // ✅ Fetch user full information instead of only registration
-  fetch('/api/fullInformation/me', { credentials: 'include' })
+  // Loading state
+  document.getElementById("name").textContent = "Loading...";
+
+  // Fetch user info
+  fetch("/api/fullInformation/me", { credentials: "include" })
     .then(res => {
       if (!res.ok) throw new Error("Not logged in or no user info found");
       return res.json();
     })
     .then(data => {
-      document.getElementById('name').textContent = 
+      document.getElementById("name").textContent =
         [data.firstName, data.lastName].filter(Boolean).join(" ") || "No Name";
 
-      document.getElementById('userName').textContent = data.userName || '-';
-      document.getElementById('personalEmail').textContent = data.personalEmail || '-';
-      document.getElementById('gender').textContent = data.gender || '-';
+      // Basic info
+      document.getElementById("userName").textContent = data.userName || "-";
+      document.getElementById("personalEmail").textContent = data.personalEmail || "-";
+      document.getElementById("gender").textContent = data.gender || "-";
 
-      // extra info from fullInformation
-      document.getElementById('civilStatus').textContent = data.civilStatus || '-';
-      document.getElementById('dateBirth').textContent = data.dateBirth 
-        ? new Date(data.dateBirth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
-        : '-';
-      document.getElementById('phoneNo').textContent = data.phoneNo || '-';
-      document.getElementById('major').textContent = data.major || '-';
-      document.getElementById('yearStarted').textContent = data.yearStarted || '-';
-      document.getElementById('graduated').textContent = data.graduated || '-';
-      document.getElementById('studentNo').textContent = data.studentNo || '-';
+      // Extra info
+      document.getElementById("civilStatus").textContent = data.civilStatus || "-";
+      document.getElementById("dateBirth").textContent = data.dateBirth
+        ? new Date(data.dateBirth).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "-";
+      document.getElementById("phoneNo").textContent = data.phoneNo || "-";
+      document.getElementById("major").textContent = data.major || "-";
+      document.getElementById("yearStarted").textContent = data.yearStarted || "-";
+      document.getElementById("graduated").textContent = data.graduated || "-";
+      document.getElementById("studentNo").textContent = data.studentNo || "-";
+
+      // Profile picture
+      if (data.profilePic) {
+        modalProfilePic.src = data.profilePic;
+        profilePic.src = data.profilePic;
+      }
     })
     .catch(err => {
-      console.error('❌ Error loading user info:', err);
-      document.getElementById('name').textContent = "Error loading info";
+      console.error("❌ Error loading user info:", err);
+      document.getElementById("name").textContent = "Error loading info";
     });
 }
 
@@ -913,21 +954,32 @@ function closeProfileModal() {
   document.getElementById("modal-profile").style.display = "none";
 }
 
+/* ---------------------------
+   Info Toggle + Edit/Save
+---------------------------- */
+function toggleInformation() {
+  const details = document.getElementById("profile-details");
+  details.classList.toggle("hidden");
+}
+
 function enableEdit() {
   // Email
   document.getElementById("personalEmail").style.display = "none";
   document.getElementById("editPersonalEmail").style.display = "inline";
-  document.getElementById("editPersonalEmail").value = document.getElementById("personalEmail").textContent;
+  document.getElementById("editPersonalEmail").value =
+    document.getElementById("personalEmail").textContent;
 
   // Civil Status
   document.getElementById("civilStatus").style.display = "none";
   document.getElementById("editCivilStatus").style.display = "inline";
-  document.getElementById("editCivilStatus").value = document.getElementById("civilStatus").textContent;
+  document.getElementById("editCivilStatus").value =
+    document.getElementById("civilStatus").textContent;
 
   // Phone No
   document.getElementById("phoneNo").style.display = "none";
   document.getElementById("editPhoneNo").style.display = "inline";
-  document.getElementById("editPhoneNo").value = document.getElementById("phoneNo").textContent;
+  document.getElementById("editPhoneNo").value =
+    document.getElementById("phoneNo").textContent;
 
   // Switch buttons
   document.getElementById("editBtn").style.display = "none";
@@ -938,23 +990,25 @@ function saveProfile() {
   const updatedData = {
     personalEmail: document.getElementById("editPersonalEmail").value,
     civilStatus: document.getElementById("editCivilStatus").value,
-    phoneNo: document.getElementById("editPhoneNo").value
+    phoneNo: document.getElementById("editPhoneNo").value,
   };
 
   fetch("/api/registration/update", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify(updatedData)
+    body: JSON.stringify(updatedData),
   })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        showToast("Profile updated!");
+        showToast("✅ Profile updated!");
 
         // Update UI
-        document.getElementById("personalEmail").textContent = updatedData.personalEmail;
-        document.getElementById("civilStatus").textContent = updatedData.civilStatus;
+        document.getElementById("personalEmail").textContent =
+          updatedData.personalEmail;
+        document.getElementById("civilStatus").textContent =
+          updatedData.civilStatus;
         document.getElementById("phoneNo").textContent = updatedData.phoneNo;
 
         // Switch back to view mode
@@ -969,7 +1023,7 @@ function saveProfile() {
         document.getElementById("editBtn").style.display = "inline";
         document.getElementById("saveBtn").style.display = "none";
       } else {
-        showToast("Error: " + data.error, true);
+        showToast("❌ Error: " + data.error, true);
       }
     })
     .catch(err => {
@@ -977,6 +1031,81 @@ function saveProfile() {
       showToast("Server error while updating", true);
     });
 }
+
+/* ---------------------------
+   Profile Picture Upload
+---------------------------- */
+document.getElementById("uploadProfilePic")?.addEventListener("change", async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Instant preview
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById("modalProfilePic").src = e.target.result;
+    document.getElementById("profilePic").src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  // Upload to backend
+  const formData = new FormData();
+  formData.append("profilePic", file);
+
+  try {
+    const res = await fetch("/api/profile/upload-picture", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (data.success && data.imageUrl) {
+      document.getElementById("modalProfilePic").src = data.imageUrl;
+      document.getElementById("profilePic").src = data.imageUrl;
+      showToast("✅ Profile picture updated!");
+    } else {
+      showToast("❌ Upload failed", true);
+    }
+  } catch (err) {
+    console.error("❌ Upload error:", err);
+    showToast("Server error while uploading", true);
+  }
+});
+
+/* ---------------------------
+   Event Bindings
+---------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // Existing bindings
+  document.getElementById("viewInfoBtn")?.addEventListener("click", toggleInformation);
+  document.getElementById("editBtn")?.addEventListener("click", enableEdit);
+  document.getElementById("saveBtn")?.addEventListener("click", saveProfile);
+
+  // New binding: open file picker when Change Picture button clicked
+  document.getElementById("changePicBtn")?.addEventListener("click", () => {
+    document.getElementById("uploadProfilePic").click();
+  });
+});
+
+/* ---------------------------
+   Modal Close (outside click + Esc)
+---------------------------- */
+window.addEventListener("click", function (e) {
+  const modal = document.getElementById("modal-profile");
+  if (e.target === modal) {
+    closeProfileModal();
+  }
+});
+
+window.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    closeProfileModal();
+  }
+});
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
 
 
 

@@ -560,7 +560,7 @@ html, body {
 
 /* Galaxy card */
 .galaxy-card {
-  background: radial-gradient(circle at top left, #1b0034, #0d0d1a);
+  background: radial-gradient(circle at top left, #440183, #3a3a6e);
   border: 2px solid rgba(180, 90, 255, 0.6);
   border-radius: 15px;
   padding: 25px 30px;
@@ -592,7 +592,7 @@ html, body {
   font-size: 1.6rem;
   text-align: center;
   margin-bottom: 20px;
-  background: linear-gradient(90deg, #00f5ff, #ff00ff, #ffa200);
+  background: linear-gradient(90deg, #000000, #e77be7, #ffa200);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -602,13 +602,11 @@ html, body {
   display: block;
   margin: 12px 0 5px;
   font-weight: bold;
-  color: #c8a2ff;
+  color: #ffffff;
 }
 
 /* Inputs & textarea */
-.galaxy-card input, 
-.galaxy-card select, 
-.galaxy-card textarea {
+.galaxy-card select {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
@@ -619,6 +617,31 @@ html, body {
   outline: none;
   transition: border 0.3s ease, box-shadow 0.3s ease;
 }
+.galaxy-card textarea {
+  width: 95%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.08);
+  color: #666666;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.galaxy-card input {
+  width: 95%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.08);
+  color: #666666;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+
 .galaxy-card input:focus, 
 .galaxy-card select:focus, 
 .galaxy-card textarea:focus {

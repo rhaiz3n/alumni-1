@@ -133,7 +133,7 @@
           class="degrees-typebox" 
           name="major" 
           placeholder="Course & Major. [BET/BTVTED]" 
-          maxlength="9" 
+          maxlength="15" 
           required 
           oninput="formatMajor(this)" 
         />
@@ -378,11 +378,6 @@
         </div>
       </div>
 
-      <div class="upload-container">
-        <label for="profilePic" class="upload-btn">📷 Upload Profile Picture</label>
-        <input type="file" id="profilePic" accept="image/*">
-      </div>
-
       <!-- Date of Birth -->
       <div class="dob-container" name="dateBirth">
         <div class="dob-label slide-in" style="animation-delay: 0.2s"><span class="required-star"></span>
@@ -458,21 +453,25 @@ function closeConsentModal() {
 function formatMajor(input) {
   let value = input.value.toUpperCase();
 
-  // Remove all characters except letters and hyphens
+  // ✅ Allow only letters and hyphens
   value = value.replace(/[^A-Z\-]/g, '');
 
-  // Allow only the first hyphen, remove any others
-  const firstDash = value.indexOf('-');
-  if (firstDash !== -1) {
-    // Keep only the first dash and remove any additional dashes
-    const beforeDash = value.slice(0, firstDash + 1);
-    const afterDash = value.slice(firstDash + 1).replace(/-/g, '');
-    value = beforeDash + afterDash;
-  }
+  // ✅ Allow up to 2 dashes
+  let dashCount = 0;
+  value = value
+    .split('')
+    .filter(char => {
+      if (char === '-') {
+        dashCount++;
+        return dashCount <= 2; // keep only the first 2 dashes
+      }
+      return true;
+    })
+    .join('');
 
-  // Limit to 9 characters total
-  input.value = value.slice(0, 9);
+  input.value = value;
 }
+
 
 function formatName(value) {
   // Keep only letters and spaces

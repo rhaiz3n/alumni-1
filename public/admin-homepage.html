@@ -161,17 +161,34 @@
       </div>
     </div>
 
-    <!-- Edit Button -->
-    <button onclick="toggleEdit()" class="gcash-button">GCASH PAYMENT QRCode</button>
+<!-- 🔹 Button to open Admin Modal -->
+<button id="openAdminModalBtn" class="gcash-button" onclick="openAdminModal()">
+  Manage GCash QR Code
+</button>
 
-    <!-- Image Upload Section -->
+<!-- 🔹 Admin GCash Modal -->
+<div id="adminGcashModal" class="modal-admin" style="display:none;">
+  <div class="modal-content-admin">
+    <span class="close" onclick="closeAdminModal()">&times;</span>
+    
+    <!-- Upload Section -->
+    <button onclick="toggleEdit()" class="upload-gcash-btn">Upload GCash QR Code</button>
     <div id="editSection" style="display: none; margin-top: 10px;">
       <input type="file" id="gcashUpload" accept="image/*" />
       <button onclick="saveImage()" class="save-button">Save</button>
       <button onclick="closeEdit()" class="close-button">Close</button>
-
-      <div id="previewBox" style="margin-top: 10px;"></div>
+      <div id="previewBox" style="margin-top: 10px;">No QR uploaded</div>
     </div>
+
+    <!-- Enable / Disable Button -->
+    <button id="disableGcashBtn" class="disable-gcash-btn"
+            onclick="toggleGcash(this, 123, true)">
+      Disable User GCash Button
+    </button>
+  </div>
+</div>
+
+
 
 
     <a href="admin-homepage.html">
@@ -298,27 +315,6 @@
 
 <!-- Main Application Script -->
 <script>
-    function toggleEdit() {
-      const section = document.getElementById('editSection');
-      section.style.display = section.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function closeEdit() {
-      document.getElementById('editSection').style.display = 'none';
-    }
-
-    function saveImage() {
-      const file = document.getElementById("gcashUpload").files[0];
-      if (!file) return alert("No file selected!");
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        localStorage.setItem("gcashImage", reader.result);
-        document.getElementById("previewBox").innerHTML = `<img src="${reader.result}" style="max-width:200px" />`;
-      };
-      reader.readAsDataURL(file);
-    }
-  
 document.addEventListener('DOMContentLoaded', () => {
   enforceAdminRole();
   initLoader();
@@ -678,7 +674,7 @@ async function loadFeed() {
     container.innerHTML = feed.map((post, index) => {
       let extraInfo = "";
       if (post.type === "Event") {
-        extraInfo = `🎉 Location: ${post.location || "N/A"}`;
+        extraInfo = `🎉 Type of Event: ${post.location || "N/A"}`;
       } else if (post.type === "Career") {
         extraInfo = `🏢 Company Name: ${post.link || "N/A"}`;
       }
@@ -729,7 +725,7 @@ async function loadFeed() {
         const card = el.closest(".feed-card");
 
         if (diffMs <= 0) {
-          el.textContent = "❌ Expired";
+          el.textContent = "❌ Closed";
           if (card) {
             card.style.filter = "grayscale(100%)";
             card.style.opacity = "0.6";
@@ -923,6 +919,77 @@ function mysqlDateNow() {
   return now.toISOString().slice(0, 19).replace('T', ' '); 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+function openAdminModal() {
+  document.getElementById("adminGcashModal").style.display = "flex";
+}
+
+function closeAdminModal() {
+  document.getElementById("adminGcashModal").style.display = "none";
+}
+
+// Optional: close when clicking outside
+window.addEventListener("click", (e) => {
+  const modal = document.getElementById("adminGcashModal");
+  if (e.target === modal) {
+    closeAdminModal();
+  }
+});
+
+/* 🔹 Show/Hide QR Upload Section */
+function toggleEdit() {
+  const section = document.getElementById('editSection');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeEdit() {
+  document.getElementById('editSection').style.display = 'none';
+}
+
+function saveImage() {
+  const file = document.getElementById("gcashUpload").files[0];
+  if (!file) return alert("No file selected!");
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    localStorage.setItem("gcashImage", reader.result);
+    document.getElementById("previewBox").innerHTML =
+      `<img src="${reader.result}" style="max-width:200px" />`;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* 🔹 Toggle GCash enabled/disabled (stored in localStorage) */
+function toggleGcash(button) {
+  const currentState = localStorage.getItem("gcashEnabled") === "true";
+  const newState = !currentState;
+
+  localStorage.setItem("gcashEnabled", newState);
+
+  button.textContent = newState ? "Disable User GCash Button" : "Enable User GCash Button";
+  showToast(`✔️ GCash ${newState ? "enabled" : "disabled"}`, "success");
+}
+
+/* 🔹 Initialize GCash button state */
+document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("gcashEnabled") === null) {
+    localStorage.setItem("gcashEnabled", "true"); // default enabled
+  }
+
+  const enabled = localStorage.getItem("gcashEnabled") === "true";
+  const button = document.getElementById("disableGcashBtn");
+  button.textContent = enabled ? "Disable User GCash Button" : "Enable User GCash Button";
+});
 
 
 </script>

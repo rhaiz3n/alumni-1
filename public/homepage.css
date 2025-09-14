@@ -228,7 +228,7 @@ html, body {
   .career-button {
     font-size: 20px;
     top: 200px;
-    left: 50%;
+    left: 60%;
   }
 }
 
@@ -237,7 +237,7 @@ html, body {
   .career-button {
     font-size: 20px;
     top: 200px;
-    left: 40%;
+    left: 50%;
   }
 }
 
@@ -468,30 +468,7 @@ html, body {
   font-family: 'Albert Sans', serif;
   padding: 0 20px;
 }
-/* Slideshow Styles */
-.slideshow-container {
-  position: absolute;
-  top: 250px;
-  left: 100px;
-  width: 1000px;
-  height: 700px;
-  margin: 20px auto;
-  overflow: hidden;
-}
-.slideshow-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 990px;
-  height: 660px;
-  object-fit: cover; 
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
-}
-.slideshow-image.active {
-  opacity: 1;
-  z-index: 999;
-}
+
 .registration-modal {
   position: fixed;
   top: 0;
@@ -773,47 +750,7 @@ margin-top: 5%;
   left: 0;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.25);
 }
-.contact-section {
-  position: absolute;
-  margin-top: 220vh;
-  left: 0;
-  display: flex;
-  background-color: #882323;
-  height: 150px;
-  width: 160%;
-  opacity: 0;
-  transition: opacity 2s ease-out, transform 2s ease-out;
-  z-index: 1000;            /* keeps it above content */
-}
 
-/* ✅ For 1920x1080 screens (large PC monitors) */
-@media (min-width: 1600px) {
-  .contact-section {
-    margin-top: 140vh;
-  }
-}
-
-/* ✅ For 1366x768 screens (common laptops) */
-@media (max-width: 1400px) {
-  .contact-section {
-    margin-top: 190vh;
-  }
-}
-
-/* ✅ For smaller devices (like tablets/phones) */
-@media (max-width: 768px) {
-  .contact-section {
-    margin-top: 100vh;
-    max-width: 100%;
-  }
-}
-
-.contact-section.slide-up {
-  opacity: 2;
-}
-.contact-section.slide-down {
-  opacity: 0;
-}
 #loader-wrapper {
   position: fixed;
   top: 0;
@@ -1563,123 +1500,6 @@ margin-top: 5%;
   display: inline-block;
 }
 
-
-
-
-
-
-
-
-.gallery {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: #be2e2e00;
-  overflow: hidden;
-}
-/* ✅ For 1920x1080 screens (large PC monitors) */
-@media (min-width: 1600px) {
-  .gallery {
-    top: 270px;
-  }
-}
-
-/* ✅ For 1366x768 screens (common laptops) */
-@media (max-width: 1400px) {
-  .gallery {
-    top: 265px;
-
-  }
-}
-
-/* ✅ For smaller devices (like tablets/phones) */
-@media (max-width: 768px) {
-  .gallery {
-    top: 270px;
-  }
-}
-
-/* base polaroid */
-.gallery .polaroid {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  padding: 10px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.28);
-  overflow: hidden;
-  cursor: pointer;
-  --rot: -3deg;
-  transform: rotate(var(--rot));
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-  animation: float 6s ease-in-out infinite;
-}
-
-.gallery .polaroid img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.gallery .polaroid:hover {
-  animation: none;
-  transform: scale(1.2) rotate(0deg);
-  box-shadow: 0 18px 36px rgba(0,0,0,0.45);
-  z-index: 10;
-}
-
-/* floating animation */
-@keyframes float {
-  0%   { transform: translateY(0) rotate(var(--rot)); }
-  50%  { transform: translateY(-10px) rotate(calc(var(--rot) + 10deg)); }
-  100% { transform: translateY(0) rotate(var(--rot)); }
-}
-
-/* ==================== MEDIA QUERIES ==================== */
-
-/* Large PC screens ≥1600px */
-@media (min-width: 1600px) {
-  .gallery .p1 { top: 10px; left: 100px; }
-  .gallery .p2 { top: 200px; left: 400px; }
-  .gallery .p3 { top: 400px; left: 200px; }
-  .gallery .p4 { top: 100px; left: 700px; }
-  .gallery .p5 { top: 350px; left: 600px; }
-  .gallery .p6 { top: 250px; left: 950px; }
-  .gallery .p7 { top: 420px; left: 800px; }
-  .gallery .p8 { top: 150px; left: 1150px; }
-}
-
-/* Laptops ≤1400px */
-@media (max-width: 1400px) {
-  .gallery .p1 { top:20px; left: 60px; }
-  .gallery .p2 { top: 180px; left: 250px; }
-  .gallery .p3 { top: 360px; left: 110px; }
-  .gallery .p4 { top: 80px; left: 480px; }
-  .gallery .p5 { top: 400px; left: 380px; }
-  .gallery .p6 { top: 230px; left: 640px; }
-  .gallery .p7 { top: 470px; left: 630px; }
-  .gallery .p8 { top: 60px; left: 760px; }
-}
-
-/* Phones ≤768px */
-@media (max-width: 768px) {
-  .gallery {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    padding: 20px;
-    height: auto;
-  }
-  .gallery .polaroid {
-    position: static; /* stack naturally */
-    width: 90%;
-    max-width: 260px;
-    animation: none;  /* no floating */
-    transform: rotate(0);
-  }
-}
 .credit-box {
   background: white;
   border: 2px solid #ddd;
@@ -1688,6 +1508,7 @@ margin-top: 5%;
   margin: 20px auto;
   max-width: 600px;
   text-align: center;
+  font-weight: bolder;
   font-size: 20px;
   font-style: italic;
   color: #333;
@@ -1702,7 +1523,7 @@ margin-top: 5%;
 /* ✅ For 1920x1080 screens (large PC monitors) */
 @media (min-width: 1600px) {
   .credit-box {
-    top: 1000px;
+    top: 270px;
     left: 50px;
     max-width: 60%;
   }
@@ -1711,7 +1532,7 @@ margin-top: 5%;
 /* ✅ For 1366x768 screens (common laptops) */
 @media (max-width: 1400px) {
   .credit-box {
-    top: 1030px;
+    top: 270px;
     left: 50px;
     max-width: 60%;
   }
@@ -1753,4 +1574,126 @@ margin-top: 5%;
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+
+#feed {
+  max-width: 900px;  /* Default for large screens */
+  padding: 20px;
+  position: absolute;
+  top: 270px;
+  left: 100px;
+}
+
+.feed-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  font-family: Arial, sans-serif;
+  text-align: justify;
+}
+
+.feed-img {
+  width: 250px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.feed-content {
+  flex: 1;
+}
+
+.feed-content h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.feed-content p {
+  margin: 5px 0;
+  line-height: 1.4;
+  font-family: Arial, sans-serif;
+}
+
+.feed-content small {
+  display: block;
+  margin-top: 10px;
+  color: #777;
+  font-family: Arial, sans-serif;
+}
+
+/* ✅ Large PC screens (≥1600px) */
+@media (min-width: 1600px) {
+  #feed { 
+    max-width: 1100px;
+    top: 380px;
+    left: 120px;
+  }
+  .feed-img { 
+    width: 280px; 
+    height: 180px; 
+  }
+  .feed-content h2 { 
+    font-size: 24px; 
+  }
+}
+
+/* ✅ Laptop screens (≤1400px) */
+@media (max-width: 1400px) {
+  #feed { 
+    max-width: 800px; 
+    top: 380px;
+    left: 50px;
+  }
+  .feed-img { 
+    width: 220px; 
+    height: 150px; 
+  }
+  .feed-content h2 { 
+    font-size: 20px; 
+  }
+  .feed-content p { 
+    font-size: 14px; 
+  }
+  .feed-content small{
+    font-size: 15px;
+    width: 90%; 
+    word-break:break-all ;
+  }
+}
+
+/* ✅ Phones & tablets (≤768px) */
+@media (max-width: 768px) {
+  #feed {
+    position: relative;  /* stack naturally */
+    top: auto;
+    left: auto;
+    width: 100%;
+    margin: 10px;
+  }
+  .feed-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .feed-img {
+    width: 100%;
+    height: auto;
+  }
+  .feed-content h2 { 
+    font-size: 18px; 
+  }
+  .feed-content p { 
+    font-size: 14px; 
+  }
 }

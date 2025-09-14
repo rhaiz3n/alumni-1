@@ -5,18 +5,38 @@ html, body {
   font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
 }
 .eventpage {
-  background: transparent;
-  border: 0;
-  height: 150vh;  /* default */
+  position: relative;
+  height: 100%;
   width: 100%;
   margin: 0;
-  display: block;
+  border: 0;
+  overflow: hidden;
+
+  /* 🔥 Gradient glow */
+  background: linear-gradient(-45deg, 
+    #ff4d4d,   /* red */
+    #800000,   /* maroon */
+    #0077ff,   /* blue */
+    #001f3f,   /* dark blue */
+    #666666    /* gray */
+  );
+  background-size: 400% 400%;
+  animation: glowingGradient 12s ease infinite;
+  color: white;
 }
+
+/* 🌈 Glow animation */
+@keyframes glowingGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
 /* Large monitors (>=1600px) */
 @media (min-width: 1600px) {
   .eventpage {
-    height: 90vh;
+    height: 100vh;
   }
 }
 
@@ -165,77 +185,119 @@ html, body {
       top: 250px; /* this moves the container down */
     }
 
-    .marquee {
-      display: flex;
-      transform: translateX(0);
-    }
 
-    .marq-item {
-      flex: 0 0 auto;
-      width: 576px;
-      height: 450px;
-      background-size: cover;
-      background-position: center;
-      border-radius: 10px;
-      position: relative;
-      margin-right: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
+/* Gallery Container */
+.container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 40px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #5800006b, #1a1a1d54);
+}
 
-    .marq-item button {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+/* Marquee Styling */
+.marquee {
+  display: flex;
+  gap: 30px;
+  transition: transform 0.3s ease;
+}
 
-    .buttons {
-      position: absolute;
-      top: 50%;
-      left: 50px;
-      width: 95%;
-      display: flex;
-      justify-content: space-between;
-      transform: translateY(-50%);
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-    }
+.marq-item {
+  width: 550px;
+  height: 350px;
+  border-radius: 18px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
 
-    .container:hover .buttons {
-      opacity: 1;
-      pointer-events: all;
-    }
+.marq-item::after {
+  content: attr(data-title);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #ffd54f;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
 
-    .buttons button {
-      background-color: rgba(0, 0, 0, 0.6);
-      border: none;
-      color: white;
-      font-size: 24px;
-      padding: 10px 16px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+/* Hover Effects */
+.marq-item:hover {
+  transform: scale(1.08);
+  box-shadow: 0 15px 40px rgba(255, 213, 79, 0.5);
+}
 
-    .buttons button:hover {
-      background-color: rgba(0, 0, 0, 0.8);
-    }
+.marq-item:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
+/* Buttons */
+.buttons button {
+  background: rgba(255, 213, 79, 0.9);
+  border: none;
+  border-radius: 50%;
+  padding: 15px;
+  margin: 10px;
+  cursor: pointer;
+  color: #1a1a1d;
+  font-size: 1.5rem;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.buttons button:hover {
+  background: #ffecb3;
+  transform: scale(1.1);
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  max-width: 80%;
+  max-height: 80%;
+  border-radius: 12px;
+  background: #1a1a1d;
+  padding: 20px;
+  box-shadow: 0 12px 35px rgba(255, 213, 79, 0.3);
+  animation: popUp 0.4s ease;
+}
+
+.modal-content img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* Animation */
+@keyframes popUp {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
 .contact-section {
   position: absolute;
   margin-top: 220vh;

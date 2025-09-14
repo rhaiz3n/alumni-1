@@ -2324,3 +2324,478 @@ form button[type="submit"]:active {
   from { opacity: 1; }
   to { opacity: 0; transform: translateY(-20px); }
 }
+
+
+
+
+
+
+/* -------------------------
+   Modal overlay (hidden by default)
+   ------------------------- */
+#modal-home {
+  display: none;               /* hidden by default */
+  position: fixed;
+  inset: 0;                    /* top:0; right:0; bottom:0; left:0; */
+  background: rgba(0,0,0,0.60);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* -------------------------
+   Modal card
+   ------------------------- */
+#modal-home .modal-home-content {
+  width: 640px;
+  max-width: 100%;
+  max-height: 86vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  color: #fff;
+  box-sizing: border-box;
+  animation: mh-slideUp .28s ease;
+}
+
+/* -------------------------
+   Header
+   ------------------------- */
+#modal-home .modal-home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 8px;
+}
+
+#modal-home .modal-home-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+#modal-home .modal-home-close {
+
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+  border: #00000000;
+  background-color: #00000000;
+}
+#modal-home .modal-home-close {
+  transform: rotate(90deg);
+  color: #ff4d6d;
+}
+
+/* -------------------------
+   Body & controls
+   ------------------------- */
+#modal-home .modal-home-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* generic controls */
+#modal-home .modal-home-body input[type="text"],
+#modal-home .modal-home-body input[type="file"],
+#modal-home .modal-home-body select,
+#modal-home .modal-home-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  box-sizing: border-box;
+  margin-top: 5%;
+  font-size: 14px;
+}
+
+/* placeholder color */
+#modal-home .modal-home-body input::placeholder,
+#modal-home .modal-home-body select option {
+  color: rgba(36, 36, 36, 0.7);
+}
+
+/* focus */
+#modal-home .modal-home-body input:focus,
+#modal-home .modal-home-body select:focus,
+#modal-home .modal-home-body textarea:focus {
+  outline: 2px solid rgba(0,198,255,0.22);
+  background: rgba(255,255,255,0.12);
+  color: #dddddd;
+}
+
+/* submit */
+#modal-home .modal-home-body button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg,#00c6ff,#0072ff);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+#modal-home .modal-home-body button[type="submit"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(0,198,255,0.18);
+}
+
+/* -------------------------
+   Add-on group (text left, radio right)
+   HTML: <label><span>Text</span><input type="radio"...></label>
+   ------------------------- */
+.modal-home-body .addon-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.modal-home-body .addon-group label {
+  display: flex;
+  justify-content: space-between; /* span left, input right */
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* small hover lift */
+.modal-home-body .addon-group label:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.06);
+}
+
+/* left text */
+.modal-home-body .addon-group label span {
+  flex: 1;
+  text-align: left;
+  font-size: 14px;
+  color: #fff;
+}
+
+/* radio on the right */
+.modal-home-body .addon-group input[type="radio"] {
+  margin-left: 12px;
+  transform: scale(1.15);
+  accent-color: #00c6ff; /* modern browsers */
+}
+
+/* progressive enhancement: highlight selected label if :has supported */
+.modal-home-body .addon-group label:has(input:checked) {
+  background: linear-gradient(90deg, rgba(0,198,255,0.08), rgba(0,198,255,0.03));
+  border-color: rgba(0,198,255,0.22);
+}
+
+/* -------------------------
+   Animations & responsive
+   ------------------------- */
+@keyframes mh-slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 520px) {
+  #modal-home .modal-home-content { width: 96%; padding: 16px; max-height: 90vh; }
+  #modal-home .modal-home-header h2 { font-size: 1.15rem; }
+  .modal-home-body .addon-group label span { font-size: 13px; }
+}
+
+
+
+/* 🔹 GCash Button */
+.gcash-button {
+  background-color: #0077ff; /* GCash blue */
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.gcash-button:hover {
+  background-color: #005fcc; /* darker blue */
+  transform: scale(1.05);
+}
+
+.gcash-button:active {
+  transform: scale(0.95);
+}
+
+/* 🔹 GCash Modal */
+.modalg {
+  display: none; 
+  position: fixed;
+  z-index: 1010;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.7); /* dark overlay */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Content */
+.modal-contentg {
+  background: #fff;
+  margin: auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Close Button */
+.modal-content .close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-content .close:hover {
+  color: red;
+}
+
+/* QR Image Container */
+#modalImageContainer img {
+  width: 100%;
+  max-width: 200px;
+  height: 200;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 0px solid #0077ff;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+/* 🔹 Custom GCash Close Button */
+.gcash-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #6e6e6e;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+  border: #00000000;
+  background-color: #00000000;
+}
+
+.gcash-close-btn:hover {
+  transform: rotate(90deg);
+  color: #ff4d6d;
+}
+
+.gcash-button.gcash-disabled {
+  background: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
+
+
+
+
+/* -------------------------
+   Sportfest Modal Overlay
+   ------------------------- */
+.modal-sportfest {
+  display: none; /* hidden by default */
+  position: fixed;
+  inset: 0; /* shorthand for top/right/bottom/left */
+  background: rgba(0,0,0,0.60);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* -------------------------
+   Modal Box
+   ------------------------- */
+.modal-sportfest-content {
+  width: 640px;
+  max-width: 100%;
+  max-height: 86vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  color: #fff;
+  box-sizing: border-box;
+  animation: sf-slideUp .28s ease;
+  position: relative;
+}
+
+/* -------------------------
+   Modal Header
+   ------------------------- */
+.modal-sportfest-content h2 {
+  margin: 0 0 12px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 8px;
+}
+
+/* -------------------------
+   Close Button
+   ------------------------- */
+.modal-sportfest-close {
+  position: absolute;
+  top: 16px;
+  right: 22px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.modal-sportfest-close {
+  transform: rotate(90deg);
+  color: #ff4d6d;
+}
+
+/* -------------------------
+   Form Layout
+   ------------------------- */
+#sportfestForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+/* Inputs + Selects */
+#sportfestForm input,
+#sportfestForm select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+/* Placeholder */
+#sportfestForm input::placeholder,
+#sportfestForm select option {
+  color: rgb(0, 0, 0);
+}
+
+/* Focus */
+#sportfestForm input:focus,
+#sportfestForm select:focus {
+  outline: 2px solid rgba(0,198,255,0.22);
+  background: rgba(255,255,255,0.12);
+  color: #dddddd;
+}
+
+/* -------------------------
+   Submit Button
+   ------------------------- */
+#sportfestForm button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg,#00c6ff,#0072ff);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+#sportfestForm button[type="submit"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(0,198,255,0.18);
+}
+
+/* -------------------------
+   Popup Feedback
+   ------------------------- */
+#sportfestPopup {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2ecc71;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+  transition: all 0.4s ease;
+  z-index: 2000;
+}
+#sportfestPopup.show {
+  visibility: visible;
+  opacity: 1;
+  bottom: 50px;
+}
+
+/* -------------------------
+   Animations & responsive
+   ------------------------- */
+@keyframes sf-slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 520px) {
+  .modal-sportfest-content { 
+    width: 96%; 
+    padding: 16px; 
+    max-height: 90vh; 
+  }
+  .modal-sportfest-content h2 { font-size: 1.15rem; }
+}

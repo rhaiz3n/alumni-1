@@ -48,10 +48,6 @@
     <div class="career-button slide-in">
       <div class="content"><div class="state-layer"><div class="hover-underline1">CAREER</div></div></div>
     </div>
-    
-    <div class="event-button slide-in" onclick="window.location.href='event-page.html'">
-      <div class="content"><div class="state-layer"><div class="hover-underline1">EVENTS</div></div></div>
-    </div>
 
   <div class="gallery-button slide-in" onclick="window.location.href='gallery-user.html?from=homepage.html'">
     <div class="content">
@@ -352,26 +348,12 @@
       <div id="login-toast-message"></div>
     </div>
 
-    <!-- Contact Section -->
-    <div class="contact-section">
-      </a>
-    </div>
 
-<div class="credit-box">
-  📸 Photo credits: Technological University of the Philippines - Cavite
-  40th COMMENCEMENT EXERCISE Here are some snaps from the 40th Commencement Exercise at the Philippine International Convention Center on July 31, 2024. See the magical moments of every TUPCians who reached the end of their college journey.
-</div>
+<div class="credit-box"> To access the Events section, you must first complete the registration or sign-in process.
+Please make sure you are logged in to your TUP-Cavite Alumni Account before continuing.
+If you haven’t registered yet, kindly do so to stay updated and participate in upcoming alumni events. </div>
 
-<div class="gallery">
-  <div class="polaroid p1"><img src="Grad1.png"></div>
-  <div class="polaroid p2"><img src="Grad2.png"></div>
-  <div class="polaroid p3"><img src="Grad3.png"></div>
-  <div class="polaroid p4"><img src="Grad4.png"></div>
-  <div class="polaroid p5"><img src="Grad5.png"></div>
-  <div class="polaroid p6"><img src="Grad6.png"></div>
-  <div class="polaroid p7"><img src="Grad7.png"></div>
-  <div class="polaroid p8"><img src="Grad8.png"></div>
-</div>
+<div id="feed"></div>
 
 
 
@@ -910,18 +892,6 @@ async function loadAnnouncements() {
   }
 }
 
-  // 🔄 Contact section animation
-  document.addEventListener("DOMContentLoaded", function () {
-    const contactSection = document.querySelector('.contact-section');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        contactSection.classList.toggle('slide-up', entry.isIntersecting);
-        contactSection.classList.toggle('slide-down', !entry.isIntersecting);
-      });
-    }, { threshold: 0.1 });
-    observer.observe(contactSection);
-  });
-
   document.addEventListener('DOMContentLoaded', loadAnnouncements);
 
   // 🌐 Page Restriction Based on Role
@@ -947,6 +917,96 @@ async function loadAnnouncements() {
       }
     }, 30);
   });
+
+
+
+  async function loadFeed() {
+  const container = document.getElementById('feed');
+  container.innerHTML = 'Loading feed...';
+
+  try {
+    // 🔹 Fetch only events
+    const eventsRes = await fetch('/api/events');
+    const { events } = await eventsRes.json();
+
+    // Add type field (for consistency)
+    const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
+
+    // Sort by newest first
+    const feed = formattedEvents.sort(
+      (a, b) => new Date(b.datePosted) - new Date(a.datePosted)
+    );
+
+    // Render feed cards
+    container.innerHTML = feed.map((post, index) => {
+      const extraInfo = `🎉 Type of Event: ${post.location || "N/A"}`;
+
+      // ✅ Correct image path from DB
+      const imgSrc = `/api/events/image/${post.id}`;
+
+      // Use eventDateTime if available, otherwise fallback to posted date
+      const countdownTime = post.eventDateTime || post.datePosted;
+
+      return `
+        <div class="feed-card">
+          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ""}
+          <div class="feed-content">
+            <h2>${post.title.toUpperCase()} <small>[Event]</small></h2>
+            <p>${post.description}</p>
+            <small>
+              ${extraInfo} <br>
+              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
+              ⏳ <span class="countdown" data-time="${countdownTime}" id="countdown-${index}"></span>
+            </small>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Countdown updater
+    function updateCountdowns() {
+      document.querySelectorAll(".countdown").forEach(el => {
+        const expireTime = new Date(el.dataset.time);
+        if (isNaN(expireTime.getTime())) {
+          el.textContent = "❌ Invalid Date";
+          return;
+        }
+
+        const diffMs = expireTime - new Date();
+        const card = el.closest(".feed-card");
+
+        if (diffMs <= 0) {
+          el.textContent = "❌ Expired";
+          if (card) {
+            card.style.filter = "grayscale(100%)";
+            card.style.opacity = "0.6";
+          }
+          return;
+        }
+
+        const days = Math.floor(diffMs / (1000*60*60*24));
+        const hours = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
+        const minutes = Math.floor((diffMs % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((diffMs % (1000*60)) / 1000);
+
+        el.textContent = days > 0
+          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
+          : `${hours}h ${minutes}m ${seconds}s left`;
+      });
+    }
+
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+
+  } catch (err) {
+    console.error("❌ Failed to load events:", err);
+    container.textContent = '⚠️ Failed to load events.';
+  }
+}
+
+// Run feed loader on page load
+document.addEventListener('DOMContentLoaded', loadFeed);
+
 </script>
 </body>
 </head>

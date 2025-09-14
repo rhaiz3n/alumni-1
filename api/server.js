@@ -1093,6 +1093,46 @@ app.get('/api/events', async (req, res) => {
   }
 });
 
+app.get('/api/careers', async (req, res) => {
+  try {
+    // ✅ Step 1: Delete careers older than 13 days (5 active + 8 gray)
+    await pool.query(`
+      DELETE FROM careers
+      WHERE NOW() > DATE_ADD(datePosted, INTERVAL 13 DAY)
+    `);
+
+    // ✅ Step 2: Fetch remaining careers
+    const [rows] = await pool.query(`
+      SELECT id, title, description, link, userId, datePosted
+      FROM careers ORDER BY datePosted DESC
+    `);
+
+    const careers = rows.map(row => {
+      const datePosted = new Date(row.datePosted);
+      const now = new Date();
+
+      // Career turns gray after 5 days
+      const grayDate = new Date(datePosted.getTime() + 5 * 24 * 60 * 60 * 1000);
+      const isGray = now >= grayDate;
+
+      return {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        link: row.link,
+        userId: row.userId,
+        datePosted,
+        image: `/api/careers/image/${row.id}`, // ✅ serve via API route
+        isGray
+      };
+    });
+
+    res.json({ careers });
+  } catch (err) {
+    console.error("❌ Error fetching careers:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 
@@ -1366,7 +1406,7 @@ app.post('/api/homeregs', uploadReceipt.single('receipt'), async (req, res) => {
     const [notifResult] = await connection.execute(
       `INSERT INTO notifications (name, message, link, createdAt)
        VALUES (?, ?, ?, ?)`,
-      ['HomeComing event', notifMessage, 'admin-homepage.html', createdAt]
+      ['HomeComing event', notifMessage, 'event-registration.html', createdAt]
     );
 
     await connection.commit();
@@ -1449,6 +1489,7 @@ app.patch('/api/homeregs/:id/status', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////

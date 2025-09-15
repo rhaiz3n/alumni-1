@@ -857,3 +857,305 @@ html, body {
   transform: scale(0.97);
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.15);
 }
+
+
+
+
+
+
+
+
+
+
+/* ---------------------------
+   Employer Dashboard Circle
+---------------------------- */
+.profile-circle-employer {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;   /* ✅ round logo */
+  border: 3px solid #007bff;
+  background-color: #fff;
+  object-fit: cover;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: fixed;
+  top: 350px;
+  left: 20px;
+  z-index: 10;
+}
+
+.profile-circle-employer:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.5);
+}
+
+/* ---------------------------
+   Modal Overlay
+---------------------------- */
+.modal-profile-employer {
+  display: none; /* hidden by default */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* ---------------------------
+   Modal Content Card
+---------------------------- */
+.modal-profile-content-employer {
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 800px;
+  padding: 30px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Smooth entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------------------
+   Employer Profile Card Layout
+---------------------------- */
+.profile-card-employer {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  flex-wrap: wrap;
+  overflow-y: auto;
+}
+
+/* LEFT: Company Logo */
+.profile-left-employer {
+  text-align: center;
+}
+
+.profile-pic-frame-employer {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 4px solid #007bff;
+  overflow: hidden;
+  margin: 0 auto 12px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.profile-pic-employer {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-label-employer {
+  font-size: 0.85rem;
+  color: #ffffff;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* RIGHT: Info & Buttons */
+.profile-right-employer {
+  flex: 1;
+}
+
+.profile-right-employer h2 {
+  margin: 0 0 15px;
+  font-size: 1.8rem;
+  color: #c9c9c9;
+  font-family: 'Albert Sans', serif;
+}
+
+.profile-buttons-employer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.profile-btn-employer {
+  flex: 1;
+  min-width: 180px;
+  background: #f0f2f53d;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.profile-btn-employer:hover {
+  background: #007bff;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.edit-btn-employer {
+  background: #ffc107;
+}
+
+.edit-btn-employer:hover {
+  background: #e0a800;
+  color: #fff;
+}
+
+.save-btn-employer {
+  background: #28a745;
+  display: none;
+}
+
+.save-btn-employer:hover {
+  background: #218838;
+  color: #fff;
+}
+
+/* ---------------------------
+   Employer Details Section
+---------------------------- */
+.profile-details-employer {
+  margin-top: 25px;
+  padding: 20px;
+  border-top: 2px solid #eee;
+  background: #fafafa;
+  border-radius: 12px;
+}
+
+.profile-details-employer p {
+  margin: 12px 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 6px;
+  font-family: 'Albert Sans', serif;
+}
+
+.profile-details-employer strong {
+  color: #007bff;
+  min-width: 150px;
+}
+
+.profile-details-employer input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  width: 60%;
+}
+
+/* ---------------------------
+   Applicants Modal
+---------------------------- */
+.modal-applications-employer {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-app-content-employer {
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 800px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  overflow-y: auto;
+  max-height: 90%;
+}
+
+.applications-table-employer {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  color: white;
+}
+
+.applications-table-employer th,
+.applications-table-employer td {
+  border: 2px solid #dddddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.applications-table-employer th {
+  background: #402bff;
+  color: white;
+}
+
+/* ---------------------------
+   Notices
+---------------------------- */
+.profile-notice-employer {
+  margin-top: 10px;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+#confirmEmployerProfileBtn {
+  margin-top: 12px;
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#confirmEmployerProfileBtn:hover {
+  background-color: #218838;
+}
+
+.hidden { display: none !important; }
+
+/* ---------------------------
+   Responsive
+---------------------------- */
+@media (max-width: 600px) {
+  .modal-profile-content-employer {
+    padding: 20px;
+  }
+
+  .profile-card-employer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-details-employer input {
+    width: 100%;
+  }
+}

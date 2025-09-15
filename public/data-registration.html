@@ -61,7 +61,7 @@
     <thead>
       <tr>
         <th>First Name</th><th>Last Name</th><th>Personal Email</th>
-        <th>Gender</th><th>Username</th><th>Passwords</th>
+        <th>Username</th><th>Passwords</th>
       </tr>
     </thead>
     <tbody id="registeredTableBody"></tbody>
@@ -93,7 +93,7 @@
       tbody.innerHTML = '';
       rows.reverse().forEach(r => {
         const tr = document.createElement('tr');
-        ['firstName', 'lastName', 'personalEmail', 'gender', 'userName', 'passWord'].forEach(key => {
+        ['firstName', 'lastName', 'personalEmail', 'userName', 'passWord'].forEach(key => {
           const td = document.createElement('td');
           td.textContent = r[key] || '';
           tr.appendChild(td);

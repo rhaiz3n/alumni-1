@@ -107,11 +107,11 @@
                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
               />
 
-              <label for="phoneNo">Phone No. *</label>
+              <label for="idRequestPhoneNo">Phone No. *</label>
               <input 
                 type="tel" 
                 name="phoneNo" 
-                id="phoneNo" 
+                id="idRequestPhoneNo" 
                 required 
                 maxlength="12" 
                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
@@ -216,10 +216,10 @@
 
 
 <!-- Profile picture trigger (Dashboard Circle) -->
-<img id="profilePic" 
-     src="/images/default-profile.png" 
-     alt="Profile Picture" 
-     class="profile-circle" 
+<img id="profilePic"
+     src="/images/default-profile.png"
+     alt=""
+     class="profile-circle"
      onclick="openProfileModal()">
 
 <!-- Modal -->
@@ -232,30 +232,54 @@
       <!-- LEFT: Circle Profile Pic -->
       <div class="profile-left">
         <div class="profile-pic-frame">
-          <img id="modalProfilePic" src="/images/default-profile.png" alt="Profile" class="profile-pic">
+          <img id="modalProfilePic" src="public/images/default-profile.png" alt="" class="profile-pic">
         </div>
-        <p class="profile-label">PROFILE PIC</p>
+        <p class="profile-label">PROFILE PICTURE</p>
       </div>
 
       <!-- RIGHT: Name + Buttons -->
       <div class="profile-right">
         <h2 id="name">NAME</h2>
         <div class="profile-buttons">
-          <button id="viewApplicationsBtn" class="profile-btn">📂 View Applications</button>
-          <button id="viewInfoBtn" class="profile-btn">ℹ️ View Information</button>
-          <button id="changePicBtn" class="profile-btn">🖼 Change Profile Picture</button>
+          <button id="viewApplicationsBtn" class="profile-btn">View Applications</button>
+          <!-- Applications Modal -->
+          <div id="applicationsModal" class="modal-applications">
+            <div class="modal-app-content">
+              <h3>MY APPLICATIONS</h3>
+              <table class="applications-table">
+                <thead>
+                  <tr>
+                    <th>COMPANY</th>
+                    <th>POSITION</th>
+                    <th>DATE APPLIED</th>
+                    <th>RESUME</th>
+                  </tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                  <tr><td colspan="4">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+          <button id="changePicBtn" class="profile-btn">Change Profile Picture</button>
           <input type="file" id="uploadProfilePic" accept="image/*" style="display:none;">
-          <button id="editBtn" class="profile-btn edit-btn">✏ Edit Profile</button>
-          <button id="saveBtn" class="profile-btn save-btn" style="display:none;">💾 Save</button>
+          <button id="editBtn" class="profile-btn edit-btn">Edit Profile</button>
+          <button id="saveBtn" class="profile-btn save-btn" style="display:none;">Save</button>
+
+          <!-- 🔹 New: Confirm + Notice -->
+          <div id="profileNotice" class="profile-notice hidden"></div>
+          <button id="confirmProfileBtn" class="profile-btn" style="display:none;">
+            Confirm Profile
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Hidden details (only show when "View Information" is clicked) -->
-    <div id="profile-details" class="profile-details hidden">
-      <p>
-        <strong>Username:</strong> <span id="userName">-</span>
-      </p>
+    <!-- Hidden details (always visible now) -->
+    <div id="profile-details" class="profile-details">
+      <p><strong>Username:</strong> <span id="userName">-</span></p>
       <p>
         <strong>Email:</strong> 
         <span id="personalEmail">-</span>
@@ -276,11 +300,11 @@
       <p><strong>Major:</strong> <span id="major">-</span></p>
       <p><strong>Year Started:</strong> <span id="yearStarted">-</span></p>
       <p><strong>Graduated:</strong> <span id="graduated">-</span></p>
-      <p><strong>Student No.:</strong> <span id="studentNo">-</span></p>
     </div>
 
   </div>
 </div>
+
 
 
 
@@ -386,11 +410,11 @@
         <label>Last Name</label>
         <input type="text" name="lastName" required maxlength="20" oninput="validateNameC(this)">
 
-        <label for="phoneNo">Phone No.</label>
+        <label for="employmentPhoneNo">Phone No.</label>
               <input 
                 type="tel" 
                 name="phoneNo" 
-                id="phoneNo" 
+                id="employmentPhoneNo" 
                 required 
                 maxlength="12" 
                 oninput="this.value = this.value.replace(/[^0-9]/g, '')"
@@ -884,152 +908,151 @@ function showLoginToast(message, type = 'success') {
 
 
 /////////////////////////////////////////////////////////////////////////////////////
+/* ---------------------------
+   Load Profile Data (Shared)
+---------------------------- */
+async function loadProfileData(updateModal = false) {
+  const profilePic = document.getElementById("profilePic");
+  const modalProfilePic = document.getElementById("modalProfilePic");
 
+  try {
+    const res = await fetch("/api/fullInformation/me", {
+      credentials: "include",
+      cache: "no-store"
+    });
+    if (!res.ok) throw new Error("Not logged in");
+
+    const data = await res.json();
+    console.log("📦 Data from API:", data);
+
+    // ✅ Profile picture
+    const pic = data.profilePic || "/images/default-profile.png";
+    if (profilePic) profilePic.src = pic;
+    if (updateModal && modalProfilePic) modalProfilePic.src = pic;
+
+    // ✅ Basic info
+    document.getElementById("name").textContent =
+      [data.firstName, data.lastName].filter(Boolean).join(" ") || "No Name";
+    document.getElementById("userName").textContent = data.userName || "-";
+    document.getElementById("personalEmail").textContent = data.personalEmail || "-";
+    document.getElementById("gender").textContent = data.gender || "-";
+
+    // ✅ Extra info
+    document.getElementById("civilStatus").textContent = data.civilStatus || "-";
+    document.getElementById("dateBirth").textContent = data.dateBirth
+      ? new Date(data.dateBirth).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "-";
+
+    // ✅ Phone number
+    const phoneSpan = document.getElementById("phoneNo");
+    const phoneInput = document.getElementById("editPhoneNo");
+    if (phoneSpan) phoneSpan.textContent = data.phoneNo || "-";
+    if (phoneInput) phoneInput.value = data.phoneNo || "";
+
+    document.getElementById("major").textContent = data.major || "-";
+    document.getElementById("yearStarted").textContent = data.yearStarted || "-";
+    document.getElementById("graduated").textContent = data.graduated || "-";
+    document.getElementById("studentNo").textContent = data.studentNo || "-";
+
+  } catch (err) {
+    console.error("❌ Error loading user info:", err);
+    if (profilePic) profilePic.src = "/images/default-profile.png";
+  }
+}
 
 /* ---------------------------
    Modal Open / Close
 ---------------------------- */
 function openProfileModal() {
   const modal = document.getElementById("modal-profile");
-  const profilePic = document.getElementById("profilePic");
-  const modalProfilePic = document.getElementById("modalProfilePic");
-
   if (!modal) return;
-
-  // Toggle behavior
-  if (modal.style.display === "flex") {
-    closeProfileModal();
-    return;
-  }
-
   modal.style.display = "flex";
-  modalProfilePic.src = (profilePic?.src) || "/images/default-profile.png";
-
-  // Loading state
   document.getElementById("name").textContent = "Loading...";
-
-  // Fetch user info
-  fetch("/api/fullInformation/me", { credentials: "include" })
-    .then(res => {
-      if (!res.ok) throw new Error("Not logged in or no user info found");
-      return res.json();
-    })
-    .then(data => {
-      document.getElementById("name").textContent =
-        [data.firstName, data.lastName].filter(Boolean).join(" ") || "No Name";
-
-      // Basic info
-      document.getElementById("userName").textContent = data.userName || "-";
-      document.getElementById("personalEmail").textContent = data.personalEmail || "-";
-      document.getElementById("gender").textContent = data.gender || "-";
-
-      // Extra info
-      document.getElementById("civilStatus").textContent = data.civilStatus || "-";
-      document.getElementById("dateBirth").textContent = data.dateBirth
-        ? new Date(data.dateBirth).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
-        : "-";
-      document.getElementById("phoneNo").textContent = data.phoneNo || "-";
-      document.getElementById("major").textContent = data.major || "-";
-      document.getElementById("yearStarted").textContent = data.yearStarted || "-";
-      document.getElementById("graduated").textContent = data.graduated || "-";
-      document.getElementById("studentNo").textContent = data.studentNo || "-";
-
-      // Profile picture
-      if (data.profilePic) {
-        modalProfilePic.src = data.profilePic;
-        profilePic.src = data.profilePic;
-      }
-    })
-    .catch(err => {
-      console.error("❌ Error loading user info:", err);
-      document.getElementById("name").textContent = "Error loading info";
-    });
+  loadProfileData(true);
 }
 
 function closeProfileModal() {
-  document.getElementById("modal-profile").style.display = "none";
+  const modal = document.getElementById("modal-profile");
+  if (modal) modal.style.display = "none";
 }
 
 /* ---------------------------
-   Info Toggle + Edit/Save
+   Toggle Info Section
 ---------------------------- */
 function toggleInformation() {
   const details = document.getElementById("profile-details");
-  details.classList.toggle("hidden");
+  if (details) details.classList.toggle("hidden");
 }
 
+/* ---------------------------
+   Enable Edit Mode
+---------------------------- */
 function enableEdit() {
-  // Email
   document.getElementById("personalEmail").style.display = "none";
   document.getElementById("editPersonalEmail").style.display = "inline";
   document.getElementById("editPersonalEmail").value =
     document.getElementById("personalEmail").textContent;
 
-  // Civil Status
   document.getElementById("civilStatus").style.display = "none";
   document.getElementById("editCivilStatus").style.display = "inline";
   document.getElementById("editCivilStatus").value =
     document.getElementById("civilStatus").textContent;
 
-  // Phone No
   document.getElementById("phoneNo").style.display = "none";
   document.getElementById("editPhoneNo").style.display = "inline";
   document.getElementById("editPhoneNo").value =
     document.getElementById("phoneNo").textContent;
 
-  // Switch buttons
   document.getElementById("editBtn").style.display = "none";
   document.getElementById("saveBtn").style.display = "inline";
 }
 
-function saveProfile() {
+/* ---------------------------
+   Save Profile
+---------------------------- */
+async function saveProfile() {
   const updatedData = {
     personalEmail: document.getElementById("editPersonalEmail").value,
     civilStatus: document.getElementById("editCivilStatus").value,
     phoneNo: document.getElementById("editPhoneNo").value,
   };
 
-  fetch("/api/registration/update", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(updatedData),
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        showToast("✅ Profile updated!");
-
-        // Update UI
-        document.getElementById("personalEmail").textContent =
-          updatedData.personalEmail;
-        document.getElementById("civilStatus").textContent =
-          updatedData.civilStatus;
-        document.getElementById("phoneNo").textContent = updatedData.phoneNo;
-
-        // Switch back to view mode
-        document.getElementById("personalEmail").style.display = "inline";
-        document.getElementById("civilStatus").style.display = "inline";
-        document.getElementById("phoneNo").style.display = "inline";
-
-        document.getElementById("editPersonalEmail").style.display = "none";
-        document.getElementById("editCivilStatus").style.display = "none";
-        document.getElementById("editPhoneNo").style.display = "none";
-
-        document.getElementById("editBtn").style.display = "inline";
-        document.getElementById("saveBtn").style.display = "none";
-      } else {
-        showToast("❌ Error: " + data.error, true);
-      }
-    })
-    .catch(err => {
-      console.error("❌ Update error:", err);
-      showToast("Server error while updating", true);
+  try {
+    const res = await fetch("/api/fullInformation/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updatedData),
     });
+    const data = await res.json();
+
+    if (data.success) {
+      showToast("✅ Profile updated!");
+      document.getElementById("personalEmail").textContent = updatedData.personalEmail;
+      document.getElementById("civilStatus").textContent = updatedData.civilStatus;
+      document.getElementById("phoneNo").textContent = updatedData.phoneNo;
+
+      document.getElementById("personalEmail").style.display = "inline";
+      document.getElementById("civilStatus").style.display = "inline";
+      document.getElementById("phoneNo").style.display = "inline";
+
+      document.getElementById("editPersonalEmail").style.display = "none";
+      document.getElementById("editCivilStatus").style.display = "none";
+      document.getElementById("editPhoneNo").style.display = "none";
+
+      document.getElementById("editBtn").style.display = "inline";
+      document.getElementById("saveBtn").style.display = "none";
+    } else {
+      showToast("❌ Error: " + data.error, true);
+    }
+  } catch (err) {
+    console.error("❌ Update error:", err);
+    showToast("Server error while updating", true);
+  }
 }
 
 /* ---------------------------
@@ -1039,7 +1062,6 @@ document.getElementById("uploadProfilePic")?.addEventListener("change", async ev
   const file = event.target.files[0];
   if (!file) return;
 
-  // Instant preview
   const reader = new FileReader();
   reader.onload = e => {
     document.getElementById("modalProfilePic").src = e.target.result;
@@ -1047,18 +1069,17 @@ document.getElementById("uploadProfilePic")?.addEventListener("change", async ev
   };
   reader.readAsDataURL(file);
 
-  // Upload to backend
   const formData = new FormData();
   formData.append("profilePic", file);
 
   try {
-    const res = await fetch("/api/profile/upload-picture", {
+    const res = await fetch("/api/fullInformation/upload-picture", {
       method: "POST",
       body: formData,
       credentials: "include",
     });
-
     const data = await res.json();
+
     if (data.success && data.imageUrl) {
       document.getElementById("modalProfilePic").src = data.imageUrl;
       document.getElementById("profilePic").src = data.imageUrl;
@@ -1073,37 +1094,198 @@ document.getElementById("uploadProfilePic")?.addEventListener("change", async ev
 });
 
 /* ---------------------------
-   Event Bindings
+   Applications Modal
 ---------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  // Existing bindings
-  document.getElementById("viewInfoBtn")?.addEventListener("click", toggleInformation);
-  document.getElementById("editBtn")?.addEventListener("click", enableEdit);
-  document.getElementById("saveBtn")?.addEventListener("click", saveProfile);
+async function loadApplications(userName) {
+  const modal = document.getElementById("applicationsModal");
+  const tableBody = document.getElementById("applicationsTableBody");
 
-  // New binding: open file picker when Change Picture button clicked
-  document.getElementById("changePicBtn")?.addEventListener("click", () => {
-    document.getElementById("uploadProfilePic").click();
-  });
+  console.log("📌 Opening Applications for user:", userName);
+  modal.style.display = "flex";
+  tableBody.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+
+  try {
+    const res = await fetch(`/api/applications/user/${encodeURIComponent(userName)}`, {
+      credentials: "include"
+    });
+    if (!res.ok) throw new Error("Failed to fetch applications");
+
+    const apps = await res.json();
+    console.log("📦 Applications response:", apps);
+
+    if (!apps.length) {
+      tableBody.innerHTML = `<tr><td colspan="4">No applications found.</td></tr>`;
+      return;
+    }
+
+    tableBody.innerHTML = apps.map(app => `
+      <tr>
+        <td>${app.company}</td>
+        <td>${app.careerTitle}</td>
+        <td>${new Date(app.dateSubmitted).toLocaleDateString()}</td>
+        <td><a href="/uploads/resumes/${app.resumePath}" target="_blank">View</a></td>
+      </tr>
+    `).join("");
+
+  } catch (err) {
+    console.error("❌ Error loading applications:", err);
+    tableBody.innerHTML = `<tr><td colspan="4">⚠️ Error loading applications.</td></tr>`;
+  }
+}
+
+/* ---------------------------
+   Enforce Profile Picture Flow
+---------------------------- */
+async function enforceProfilePictureFlow() {
+  try {
+    const res = await fetch("/api/fullInformation/me", { credentials: "include", cache: "no-store" });
+    if (!res.ok) return;
+    const user = await res.json();
+
+    const modal = document.getElementById("modal-profile");
+    const notice = document.getElementById("profileNotice");
+    const confirmBtn = document.getElementById("confirmProfileBtn");
+
+    const pic = user.profilePic || "";
+    const isDefault = !pic || pic.includes("default-profile.png") || pic.includes("/images/default-profile");
+
+    if (user.profileConfirmed === 1) {
+      delete modal.dataset.locked;
+      notice.style.display = "none";
+      confirmBtn.style.display = "none";
+      return;
+    }
+
+    modal.style.display = "flex";
+    modal.dataset.locked = "true";
+
+    if (isDefault) {
+      notice.style.display = "block";
+      notice.textContent = "⚠️ Please upload your profile picture to continue.";
+      confirmBtn.style.display = "inline-block";
+      confirmBtn.disabled = true;
+    } else {
+      notice.style.display = "block";
+      notice.textContent = "✅ Picture uploaded. Click Confirm to continue.";
+      confirmBtn.style.display = "inline-block";
+      confirmBtn.disabled = false;
+    }
+  } catch (err) {
+    console.error("❌ enforceProfilePictureFlow error:", err);
+  }
+}
+
+/* ---------------------------
+   Confirm button
+---------------------------- */
+document.getElementById("confirmProfileBtn")?.addEventListener("click", async () => {
+  try {
+    const res = await fetch("/api/fullInformation/confirm", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      const modal = document.getElementById("modal-profile");
+      delete modal.dataset.locked;
+      modal.style.display = "none";
+      document.getElementById("profileNotice").style.display = "none";
+      document.getElementById("confirmProfileBtn").style.display = "none";
+    } else {
+      alert(data.error || "Please upload a profile picture first.");
+    }
+  } catch (err) {
+    console.error("❌ confirmProfileBtn error:", err);
+    alert("Server error while confirming profile.");
+  }
 });
 
 /* ---------------------------
-   Modal Close (outside click + Esc)
+   Upload Hook for Confirm
 ---------------------------- */
-window.addEventListener("click", function (e) {
-  const modal = document.getElementById("modal-profile");
-  if (e.target === modal) {
-    closeProfileModal();
-  }
+function hookUploadShowConfirm() {
+  const input = document.getElementById("uploadProfilePic");
+  if (!input) return;
+
+  input.addEventListener("change", () => {
+    const tryCheck = async (attempt = 0) => {
+      if (attempt > 8) return;
+      try {
+        const res = await fetch("/api/fullInformation/me", { credentials: "include", cache: "no-store" });
+        if (res.ok) {
+          const u = await res.json();
+          const pic = u.profilePic || "";
+          const isDefault = !pic || pic.includes("default-profile.png") || pic.includes("/images/default-profile");
+
+          if (!isDefault && u.profileConfirmed !== 1) {
+            const confirmBtn = document.getElementById("confirmProfileBtn");
+            if (confirmBtn) {
+              confirmBtn.style.display = "inline-block";
+              confirmBtn.disabled = false;
+            }
+            const notice = document.getElementById("profileNotice");
+            if (notice) notice.textContent = "✅ Picture uploaded. Click Confirm to continue.";
+            return;
+          }
+        }
+      } catch {}
+      setTimeout(() => tryCheck(attempt + 1), 500);
+    };
+    setTimeout(() => tryCheck(0), 400);
+  });
+}
+
+/* ---------------------------
+   Event Bindings
+---------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // Profile modal
+  document.getElementById("profilePic")?.addEventListener("click", openProfileModal);
+
+  // Info toggle
+  document.getElementById("viewInfoBtn")?.addEventListener("click", toggleInformation);
+
+  // Edit / Save
+  document.getElementById("editBtn")?.addEventListener("click", enableEdit);
+  document.getElementById("saveBtn")?.addEventListener("click", saveProfile);
+
+  // Change Picture
+  document.getElementById("changePicBtn")?.addEventListener("click", () => {
+    document.getElementById("uploadProfilePic").click();
+  });
+
+  // Applications
+  document.getElementById("viewApplicationsBtn")?.addEventListener("click", () => {
+    const userName = document.getElementById("userName")?.textContent.trim();
+    if (!userName || userName === "-") {
+      alert("⚠️ No username found.");
+      return;
+    }
+    loadApplications(userName);
+  });
+  document.getElementById("closeApplicationsModal")?.addEventListener("click", () => {
+    document.getElementById("applicationsModal").style.display = "none";
+  });
+
+  // Close modals on outside click
+  window.addEventListener("click", e => {
+    const profileModal = document.getElementById("modal-profile");
+    const appsModal = document.getElementById("applicationsModal");
+    if (e.target === profileModal && profileModal.dataset.locked !== "true") {
+      closeProfileModal();
+    }
+    if (e.target === appsModal) {
+      appsModal.style.display = "none";
+    }
+  });
+
+  // Initial load
+  loadProfileData();
+  enforceProfilePictureFlow();
+  hookUploadShowConfirm();
 });
-
-window.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") {
-    closeProfileModal();
-  }
-});
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 

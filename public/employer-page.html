@@ -113,6 +113,94 @@
   </div>
 </div>
 
+<!-- Employer Logo Trigger (Dashboard Circle) -->
+<img id="employerLogo"
+     src="/images/default-company.png"
+     alt="Company Logo"
+     class="profile-circle-employer"
+     onclick="openEmployerProfileModal()">
+
+<!-- Employer Profile Modal -->
+<div id="modal-employer-profile" class="modal-profile-employer" aria-hidden="true">
+  <div class="modal-profile-content-employer">
+
+    <!-- Profile Card Layout -->
+    <div class="profile-card-employer">
+      <!-- LEFT: Company Logo -->
+      <div class="profile-left-employer">
+        <div class="profile-pic-frame-employer">
+          <img id="modalEmployerLogo" src="/images/default-company.png" alt="" class="profile-pic-employer">
+        </div>
+        <p class="profile-label-employer">COMPANY LOGO</p>
+      </div>
+
+      <!-- RIGHT: Employer Name + Buttons -->
+      <div class="profile-right-employer">
+        <h2 id="employerName">EMPLOYER NAME</h2>
+        <div class="profile-buttons-employer">
+          <button id="viewApplicantsBtn" class="profile-btn-employer">View Applicants</button>
+
+          <!-- Applicants Modal -->
+          <div id="applicantsModal" class="modal-applications-employer" aria-hidden="true">
+            <div class="modal-app-content-employer">
+              <h3>APPLICANTS</h3>
+              <table class="applications-table-employer">
+                <thead>
+                  <tr>
+                    <th>NAME</th>
+                    <th>COURSE</th>
+                    <th>GRADUATED</th>
+                    <th>EMAIL</th>
+                    <th>RESUME</th>
+                  </tr>
+                </thead>
+                <tbody id="applicantsTableBody">
+                  <tr><td colspan="5">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <button id="changeLogoBtn" class="profile-btn-employer">Change Logo</button>
+          <input type="file" id="uploadCompanyLogo" accept="image/*" style="display:none;">
+          <button id="editEmployerBtn" class="profile-btn-employer edit-btn-employer">Edit Profile</button>
+          <button id="saveEmployerBtn" class="profile-btn-employer save-btn-employer" style="display:none;">Save</button>
+
+          <div id="employerProfileNotice" class="profile-notice-employer hidden"></div>
+          <button id="confirmEmployerProfileBtn" class="profile-btn-employer" style="display:none;">Confirm Profile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employer Details -->
+    <div id="employer-profile-details" class="profile-details-employer">
+      <p><strong>Business Name:</strong> <span id="businessName">-</span></p>
+      <p><strong>Business Address:</strong> <span id="businessAddress">-</span></p>
+
+      <p>
+        <strong>Landline:</strong>
+        <span id="landlineNo">-</span>
+        <input type="text" id="editLandlineNo" style="display:none;">
+      </p>
+      <p>
+        <strong>Mobile No.:</strong>
+        <span id="mobileNo">-</span>
+        <input type="text" id="editMobileNo" style="display:none;">
+      </p>
+      <p>
+        <strong>Company Email:</strong>
+        <span id="companyEmail">-</span>
+        <input type="email" id="editCompanyEmail" style="display:none;">
+      </p>
+
+      <p><strong>Website:</strong> <span id="companyWebsite">-</span></p>
+    </div>
+
+  </div>
+</div>
+
+
+
 
 <script type="module">
   import { setupSignOut } from './sign-out.js';
@@ -197,7 +285,246 @@
   // ✅ Modal references
   const modal = document.getElementById('eventModal');
   const editModal = document.getElementById('editModal'); // make sure you actually have <div id="editModal"> in your HTML!
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* ---------------------------
+   Load Employer Profile Data
+---------------------------- */
+async function loadEmployerProfile(updateModal = false) {
+  const logo = document.getElementById("employerLogo");
+  const modalLogo = document.getElementById("modalEmployerLogo");
 
+  try {
+    const res = await fetch("/api/employers/me", {
+      credentials: "include",
+      cache: "no-store"
+    });
+    if (!res.ok) throw new Error("Not logged in");
+
+    const data = await res.json();
+    console.log("📦 Employer Data:", data);
+
+    // ✅ Company logo
+    const pic = data.companyLogo || "/images/default-company.png";
+    if (logo) logo.src = pic;
+    if (updateModal && modalLogo) modalLogo.src = pic;
+
+    // ✅ Basic info
+    document.getElementById("employerName").textContent = data.employerName || "EMPLOYER NAME";
+    document.getElementById("businessName").textContent = data.businessName || "-";
+    document.getElementById("businessAddress").textContent = data.businessAddress || "-";
+    document.getElementById("landlineNo").textContent = data.landlineNo || "-";
+    document.getElementById("mobileNo").textContent = data.mobileNo || "-";
+    document.getElementById("companyEmail").textContent = data.companyEmail || "-";
+    document.getElementById("companyWebsite").textContent = data.companyWebsite || "-";
+
+    // ✅ Inputs for editing
+    document.getElementById("editLandlineNo").value = data.landlineNo || "";
+    document.getElementById("editMobileNo").value = data.mobileNo || "";
+    document.getElementById("editCompanyEmail").value = data.companyEmail || "";
+
+  } catch (err) {
+    console.error("❌ Error loading employer info:", err);
+    if (logo) logo.src = "/images/default-company.png";
+  }
+}
+
+/* ---------------------------
+   Open / Close Employer Profile Modal
+---------------------------- */
+function openEmployerProfileModal() {
+  const modal = document.getElementById("modal-employer-profile");
+  if (!modal) return;
+  modal.style.display = "flex";
+  document.getElementById("employerName").textContent = "Loading...";
+  loadEmployerProfile(true);
+}
+function closeEmployerProfileModal() {
+  const modal = document.getElementById("modal-employer-profile");
+  if (modal) modal.style.display = "none";
+}
+
+/* ---------------------------
+   Enable Edit Mode
+---------------------------- */
+function enableEmployerEdit() {
+  document.getElementById("landlineNo").style.display = "none";
+  document.getElementById("editLandlineNo").style.display = "inline";
+
+  document.getElementById("mobileNo").style.display = "none";
+  document.getElementById("editMobileNo").style.display = "inline";
+
+  document.getElementById("companyEmail").style.display = "none";
+  document.getElementById("editCompanyEmail").style.display = "inline";
+
+  document.getElementById("editEmployerBtn").style.display = "none";
+  document.getElementById("saveEmployerBtn").style.display = "inline";
+}
+
+/* ---------------------------
+   Save Employer Profile
+---------------------------- */
+async function saveEmployerProfile() {
+  const updatedData = {
+    landlineNo: document.getElementById("editLandlineNo").value,
+    mobileNo: document.getElementById("editMobileNo").value,
+    companyEmail: document.getElementById("editCompanyEmail").value,
+  };
+
+  try {
+    const res = await fetch("/api/employers/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updatedData),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      showToast("✅ Employer profile updated!");
+      document.getElementById("landlineNo").textContent = updatedData.landlineNo;
+      document.getElementById("mobileNo").textContent = updatedData.mobileNo;
+      document.getElementById("companyEmail").textContent = updatedData.companyEmail;
+
+      // Switch back to view mode
+      document.getElementById("landlineNo").style.display = "inline";
+      document.getElementById("mobileNo").style.display = "inline";
+      document.getElementById("companyEmail").style.display = "inline";
+
+      document.getElementById("editLandlineNo").style.display = "none";
+      document.getElementById("editMobileNo").style.display = "none";
+      document.getElementById("editCompanyEmail").style.display = "none";
+
+      document.getElementById("editEmployerBtn").style.display = "inline";
+      document.getElementById("saveEmployerBtn").style.display = "none";
+    } else {
+      showToast("❌ Error: " + data.error, true);
+    }
+  } catch (err) {
+    console.error("❌ Update error:", err);
+    showToast("Server error while updating", true);
+  }
+}
+
+/* ---------------------------
+   Company Logo Upload
+---------------------------- */
+document.getElementById("uploadCompanyLogo")?.addEventListener("change", async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById("modalEmployerLogo").src = e.target.result;
+    document.getElementById("employerLogo").src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  const formData = new FormData();
+  formData.append("companyLogo", file);
+
+  try {
+    const res = await fetch("/api/employers/upload-logo", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+    const data = await res.json();
+
+    if (data.success && data.imageUrl) {
+      document.getElementById("modalEmployerLogo").src = data.imageUrl;
+      document.getElementById("employerLogo").src = data.imageUrl;
+      showToast("✅ Company logo updated!");
+    } else {
+      showToast("❌ Upload failed", true);
+    }
+  } catch (err) {
+    console.error("❌ Upload error:", err);
+    showToast("Server error while uploading", true);
+  }
+});
+
+/* ---------------------------
+   Applicants Modal
+---------------------------- */
+async function openApplicantsModal() {
+  const modal = document.getElementById("applicantsModal");
+  const tableBody = document.getElementById("applicantsTableBody");
+
+  if (!modal) return;
+  modal.style.display = "flex";
+  tableBody.innerHTML = `<tr><td colspan="5">⏳ Loading...</td></tr>`;
+
+  try {
+    const res = await fetch("/api/applications/employer", { credentials: "include" });
+    if (!res.ok) throw new Error("Failed to fetch applicants");
+
+    const applicants = await res.json();
+    console.log("📦 Applicants:", applicants);
+
+    if (!applicants.length) {
+      tableBody.innerHTML = `<tr><td colspan="5">⚠️ No applicants yet.</td></tr>`;
+      return;
+    }
+
+    tableBody.innerHTML = applicants.map(app => `
+      <tr>
+        <td>${app.firstName} ${app.lastName}</td>
+        <td>${app.major || "-"}</td>
+        <td>${app.graduated || "-"}</td>
+        <td>${app.email}</td>
+        <td><a href="/uploads/resumes/${app.resumePath}" target="_blank">📄 View</a></td>
+      </tr>
+    `).join("");
+
+  } catch (err) {
+    console.error("❌ Error loading applicants:", err);
+    tableBody.innerHTML = `<tr><td colspan="5">⚠️ Error loading applicants.</td></tr>`;
+  }
+}
+
+function closeApplicantsModal() {
+  const modal = document.getElementById("applicantsModal");
+  if (modal) modal.style.display = "none";
+}
+
+/* ---------------------------
+   Event Bindings
+---------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // Logo click opens profile modal
+  document.getElementById("employerLogo")?.addEventListener("click", openEmployerProfileModal);
+
+  // Edit / Save
+  document.getElementById("editEmployerBtn")?.addEventListener("click", enableEmployerEdit);
+  document.getElementById("saveEmployerBtn")?.addEventListener("click", saveEmployerProfile);
+
+  // Change Logo
+  document.getElementById("changeLogoBtn")?.addEventListener("click", () => {
+    document.getElementById("uploadCompanyLogo").click();
+  });
+
+  // View Applicants
+  document.getElementById("viewApplicantsBtn")?.addEventListener("click", openApplicantsModal);
+
+  // Close modals on outside click
+  window.addEventListener("click", e => {
+    const profileModal = document.getElementById("modal-employer-profile");
+    const applicantsModal = document.getElementById("applicantsModal");
+
+    if (e.target === profileModal) {
+      closeEmployerProfileModal();
+    }
+    if (e.target === applicantsModal) {
+      closeApplicantsModal();
+    }
+  });
+
+  // Initial load
+  loadEmployerProfile();
+});
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // ✅ Feed Loader
   async function loadFeed() {
     const container = document.getElementById('feed');

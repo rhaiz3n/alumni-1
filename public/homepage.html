@@ -976,7 +976,7 @@ async function loadAnnouncements() {
         const card = el.closest(".feed-card");
 
         if (diffMs <= 0) {
-          el.textContent = "❌ Expired";
+          el.textContent = "❌ Close";
           if (card) {
             card.style.filter = "grayscale(100%)";
             card.style.opacity = "0.6";

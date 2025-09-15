@@ -9,6 +9,7 @@ const pool = require('../db/mysql'); // MySQL pool
 const applicationsRoutes = require("./applications.js");
 const careersRoutes = require("./careers.js");
 const profileRoutes = require("./profileRoutes.js");
+const employerRoutes = require("./employerRoutes");
 const { imageUpload, excelUpload, resumeUpload } = require("./uploadConfig");
 const multer = require('multer');
 
@@ -40,6 +41,8 @@ app.use(session({
 app.use("/api/applications", applicationsRoutes);
 app.use("/api/careers", careersRoutes);
 app.use("/api/fullInformation", profileRoutes);
+app.use("/api/employers", employerRoutes);
+
 
 // Public homepage
 app.get("/", (req, res) => {
@@ -54,7 +57,7 @@ app.post("/api/alumni/import", excelUpload.single("file"), (req, res) => {
 // ✅ Serve uploaded files
 app.use(express.static(path.join(__dirname, "../public")));
 app.use("/uploads/resumes", express.static(path.join(__dirname, "../public/uploads/resumes")));
-app.use("/profilePics", express.static(path.join(__dirname, "public/profilePics")));
+app.use("/uploads/profilePics", express.static(path.join(__dirname, "../public/uploads/profilePics")));
 app.use("/uploads", express.static(path.join(__dirname, "../public/uploads"))); // fixed path!
 
 // ----------------------
@@ -104,7 +107,7 @@ async function initTables() {
     )`,
     fullInformation: `CREATE TABLE IF NOT EXISTS fullInformation (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      userName VARCHAR(100),              -- ✅ New column to link with registration.userName
+      userName VARCHAR(100),       -- ✅ Link with registration.userName
       firstName VARCHAR(100),
       lastName VARCHAR(100),
       initial VARCHAR(10),
@@ -117,7 +120,9 @@ async function initTables() {
       major VARCHAR(100),
       yearStarted YEAR,
       graduated YEAR,
-      studentNo VARCHAR(50)
+      studentNo VARCHAR(50),
+      profilePic VARCHAR(255),     -- ✅ Profile picture path
+      profileConfirmed TINYINT(1) NOT NULL DEFAULT 0 -- ✅ 0 = not confirmed, 1 = confirmed
     )`,
     events: `CREATE TABLE IF NOT EXISTS events (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -204,6 +209,8 @@ async function initTables() {
       mobileNo VARCHAR(50) NOT NULL,
       companyEmail VARCHAR(150) NOT NULL,
       companyWebsite VARCHAR(255) NOT NULL,
+      companyLogo VARCHAR(255) DEFAULT '/images/default-company.png',
+      profileConfirmed TINYINT(1) DEFAULT 0,
       preferredUserId VARCHAR(100) UNIQUE,
       preferredPassword VARCHAR(255),
       status VARCHAR(50) DEFAULT 'PENDING',
@@ -224,13 +231,15 @@ async function initTables() {
     )`,
     applications: `CREATE TABLE applications (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      firstName VARCHAR(50) NOT NULL,
-      lastName VARCHAR(50) NOT NULL,
+      userName VARCHAR(50) NOT NULL,     -- who applied
+      careerId INT NOT NULL,             -- which career/job they applied for
+      firstName VARCHAR(100) NOT NULL,
+      lastName VARCHAR(100) NOT NULL,
       phoneNo VARCHAR(20) NOT NULL,
       email VARCHAR(100) NOT NULL,
-      resumePath VARCHAR(255) NOT NULL, -- file path of uploaded PDF
+      resumePath VARCHAR(255) NOT NULL,  -- file path of uploaded PDF
       dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
+    )`
   };
   for (const [name, ddl] of Object.entries(sql)) {
     await pool.query(ddl);
@@ -710,14 +719,12 @@ function formatDate(date) {
 
 
 
-// ✅ New route: get logged-in user's full info
 app.get('/api/fullInformation/me', async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: "Not logged in" });
   }
 
   try {
-    // Get user from registration (basic info)
     const [regRows] = await pool.execute(
       `SELECT id, firstName, lastName, personalEmail, gender, userName 
        FROM registration WHERE id = ?`,
@@ -730,12 +737,11 @@ app.get('/api/fullInformation/me', async (req, res) => {
 
     const user = regRows[0];
 
-    // Look for extra info in fullInformation
     const [infoRows] = await pool.execute(
       `SELECT civilStatus, dateBirth, phoneNo, major, yearStarted, graduated, studentNo
        FROM fullInformation
-       WHERE firstName = ? AND lastName = ? AND gender = ?`,
-      [user.firstName, user.lastName, user.gender]
+       WHERE userName = ?`,
+      [user.userName]
     );
 
     let extraInfo = {};
@@ -746,51 +752,156 @@ app.get('/api/fullInformation/me', async (req, res) => {
       }
     }
 
-    res.json({ ...user, ...extraInfo });
+    const response = { ...user, ...extraInfo };
+    console.log("📤 Sending user data:", response); // 🔍 DEBUG
+    res.json(response);
   } catch (err) {
     console.error("❌ Fetch FullInformation User Error:", err);
     res.status(500).json({ error: "Database error" });
   }
 });
 
-// ✅ New route: update both registration + fullInformation
+
+app.put('/api/employers/me', async (req, res) => {
+  if (!req.session.user || !req.session.user.isEmployer) {
+    return res.status(401).json({ error: "Not logged in as employer" });
+  }
+
+  const { companyEmail, mobileNo, landlineNo } = req.body;
+
+  try {
+    await pool.execute(
+      `UPDATE employers 
+       SET companyEmail = ?, mobileNo = ?, landlineNo = ?
+       WHERE id = ?`,
+      [companyEmail, mobileNo, landlineNo, req.session.user.id]
+    );
+
+    res.json({ success: true, message: "Employer profile updated" });
+  } catch (err) {
+    console.error("❌ Update Employer Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
+// Store uploaded files in /public/uploads/logos
+const storage = multer.diskStorage({
+  destination: "public/uploads/logos",
+  filename: (req, file, cb) => {
+    cb(null, "employer-" + Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage });
+
+app.post("/api/employers/upload-logo", upload.single("logo"), async (req, res) => {
+  if (!req.session.employer) {
+    return res.status(401).json({ error: "Not logged in as employer" });
+  }
+
+  try {
+    const filePath = "/uploads/logos/" + req.file.filename;
+
+    await pool.execute(
+      `UPDATE employers SET logoPath = ? WHERE id = ?`,
+      [filePath, req.session.employer.id]
+    );
+
+    res.json({ success: true, logoPath: filePath });
+  } catch (err) {
+    console.error("❌ Upload Logo Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+app.get('/api/applications/employer', async (req, res) => {
+  if (!req.session.user || !req.session.user.isEmployer) {
+    return res.status(401).json({ error: "Not logged in as employer" });
+  }
+
+  try {
+    const [rows] = await pool.execute(
+      `SELECT a.id, a.firstName, a.lastName, a.phoneNo, a.email, 
+              a.resumePath, a.dateSubmitted
+       FROM applications a
+       WHERE a.careerId IN (
+         SELECT id FROM careers WHERE employerId = ?
+       )`,
+      [req.session.user.id]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Fetch Applicants Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
+
+// Applicants for logged-in employer
+app.get('/api/applications/employer', async (req, res) => {
+  if (!req.session.employer) {
+    return res.status(401).json({ error: "Not logged in as employer" });
+  }
+
+  try {
+    const [rows] = await pool.execute(
+      `SELECT r.firstName, r.lastName, f.major, f.graduated,
+              r.personalEmail AS email, a.resumePath, a.dateSubmitted
+       FROM applications a
+       JOIN registration r ON a.userId = r.id
+       JOIN fullInformation f ON r.userName = f.userName
+       WHERE a.employerId = ?`,
+      [req.session.employer.id]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Fetch Applicants Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
+
+
+// ✅ Update both registration + fullInformation safely
 app.post('/api/fullInformation/update', async (req, res) => {
-  if (!req.session.userId) {
+  if (!req.session.userId || !req.session.user?.userName) {
     return res.status(401).json({ error: 'Not logged in' });
   }
 
-  const { personalEmail, gender, phoneNo, civilStatus } = req.body;
+  let { personalEmail, phoneNo, civilStatus } = req.body;
+  personalEmail = personalEmail ?? null;
+  phoneNo       = phoneNo ?? null;
+  civilStatus   = civilStatus ?? null;
 
   try {
-    // Update registration
+    // 1️⃣ Update registration (email only)
     await pool.execute(
-      `UPDATE registration SET personalEmail=?, gender=? WHERE id=?`,
-      [personalEmail, gender, req.session.userId]
+      `UPDATE registration 
+       SET personalEmail = ? 
+       WHERE id = ?`,
+      [personalEmail, req.session.userId]
     );
 
-    // Also try to update fullInformation if exists
-    const [regUser] = await pool.execute(
-      `SELECT firstName, lastName, gender FROM registration WHERE id=?`,
-      [req.session.userId]
+    // 2️⃣ Update fullInformation by userName (unique & stable)
+    await pool.execute(
+      `UPDATE fullInformation 
+       SET civilStatus = ?, phoneNo = ? 
+       WHERE userName = ?`,
+      [civilStatus, phoneNo, req.session.user.userName]
     );
 
-    if (regUser.length > 0) {
-      const { firstName, lastName, gender } = regUser[0];
-
-      await pool.execute(
-        `UPDATE fullInformation 
-         SET civilStatus = ?, phoneNo = ? 
-         WHERE firstName = ? AND lastName = ? AND gender = ?`,
-        [civilStatus || null, phoneNo || null, firstName, lastName, gender]
-      );
-    }
-
-    res.json({ success: true, message: "Profile updated!" });
+    res.json({ success: true, message: "✅ Profile updated!" });
   } catch (err) {
     console.error("❌ FullInformation Update Error:", err);
     res.status(500).json({ error: "Database error" });
   }
 });
+
+
 
 
 

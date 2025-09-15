@@ -2746,51 +2746,69 @@ form button[type="submit"]:active {
   transform: scale(1.05);
 }
 
-/* Modal background */
-/* Modal container */
+/* ---------------------------
+   Modal Overlay
+---------------------------- */
 .modal-profile {
-  display: none;
+  display: none; /* hidden by default */
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6); /* dark overlay */
+  backdrop-filter: blur(6px);
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1000;
 }
 
-/* Modal content */
+/* ---------------------------
+   Modal Content Card
+---------------------------- */
 .modal-profile-content {
-  background: #dcdcdc; /* gray background */
-  padding: 20px;
-  border-radius: 8px;
-  width: 600px;
-  border: 2px solid #000;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 800px;
+  padding: 30px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.3s ease-out;
 }
 
+/* Smooth entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-
-/* Layout */
+/* ---------------------------
+   Profile Card Layout
+---------------------------- */
 .profile-card {
   display: flex;
+  gap: 30px;
   align-items: center;
-  border: 2px solid #000;
-  padding: 20px;
+  flex-wrap: wrap;
+  overflow-y: auto;
 }
 
-/* Left side */
+/* LEFT: Profile Picture */
 .profile-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 20px;
+  text-align: center;
 }
 
 .profile-pic-frame {
-  width: 120px;
-  height: 120px;
-  border: 3px solid #000;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
+  border: 4px solid #007bff;
   overflow: hidden;
+  margin: 0 auto 12px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
 .profile-pic {
@@ -2800,56 +2818,219 @@ form button[type="submit"]:active {
 }
 
 .profile-label {
-  margin-top: 8px;
-  font-weight: bold;
+  font-size: 0.85rem;
+  color: #ffffff;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
 }
 
-/* Right side */
+/* RIGHT: Info & Buttons */
 .profile-right {
   flex: 1;
 }
 
 .profile-right h2 {
-  margin-bottom: 20px;
+  margin: 0 0 15px;
+  font-size: 1.8rem;
+  color: #c9c9c9;
+  font-family: 'Albert Sans', serif;
 }
 
-/* Buttons */
 .profile-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .profile-btn {
-  border: 2px solid #000;
-  padding: 10px;
+  flex: 1;
+  min-width: 180px;
+  background: #f0f2f53d;
+  border: none;
+  padding: 12px 18px;
   border-radius: 8px;
-  background: white;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  font-weight: bold;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .profile-btn:hover {
-  background: #f0f0f0;
-}
-
-/* Hidden info */
-.profile-details {
-  margin-top: 20px;
-  border-top: 2px solid #000;
-  padding-top: 15px;
-}
-
-.hidden {
-  display: none;
+  background: #007bff;
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 .edit-btn {
-  background: #007bff;
-  color: white;
-  border-color: #0056b3;
+  background: #ffc107;
 }
 
 .edit-btn:hover {
-  background: #0056b3;
+  background: #e0a800;
+  color: #fff;
 }
+
+.save-btn {
+  background: #28a745;
+  display: none;
+}
+
+.save-btn:hover {
+  background: #218838;
+  color: #fff;
+}
+
+/* ---------------------------
+   Profile Details Section
+---------------------------- */
+.profile-details {
+  margin-top: 25px;
+  padding: 20px;
+  border-top: 2px solid #eee;
+  background: #fafafa;
+  border-radius: 12px;
+}
+
+.profile-details p {
+  margin: 12px 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 6px;
+  font-family: 'Albert Sans', serif;
+}
+
+.profile-details strong {
+  color: #007bff;
+  min-width: 150px;
+}
+
+/* Inputs when editing */
+.profile-details input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  width: 60%;
+}
+
+/* ---------------------------
+   Dashboard Profile Circle
+---------------------------- */
+.profile-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 3px solid #007bff;
+  transition: all 0.25s ease;
+}
+
+.profile-circle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.5);
+}
+
+/* ---------------------------
+   Responsive
+---------------------------- */
+@media (max-width: 600px) {
+  .modal-profile-content {
+    padding: 20px;
+  }
+
+  .profile-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-details input {
+    width: 100%;
+  }
+}
+
+
+/* Fullscreen overlay */
+.modal-applications {
+  display: none; /* hidden by default */
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal box */
+.modal-app-content {
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 800px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  overflow-y: auto;
+  max-height: 90%;
+}
+
+/* Table styling */
+.applications-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  color: white;
+}
+
+.applications-table th,
+.applications-table td {
+  border: 5px solid #dddddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.applications-table th {
+  background: #402bff;
+  color: white;
+}
+
+
+
+
+.profile-notice {
+  margin-top: 10px;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+/* Confirm Profile button styling */
+#confirmProfileBtn {
+  margin-top: 12px;
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#confirmProfileBtn:hover { background-color: #218838; }
+
+.hidden { display: none !important; }

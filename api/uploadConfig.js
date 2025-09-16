@@ -67,6 +67,29 @@ const profilePicUpload = multer({
   }
 });
 
+// ✅ Company logo upload
+const companyLogosDir = path.join(__dirname, "../public/uploads/companyLogos");
+fs.mkdirSync(companyLogosDir, { recursive: true });
 
+const logoUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, companyLogosDir),
+    filename: (req, file, cb) => {
+      const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, unique + path.extname(file.originalname));
+    }
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) return cb(new Error("Only images allowed"), false);
+    cb(null, true);
+  }
+});
 
-module.exports = { imageUpload, excelUpload, resumeUpload, profilePicUpload };
+module.exports = { 
+  imageUpload, 
+  excelUpload, 
+  resumeUpload, 
+  profilePicUpload, 
+  logoUpload    // ✅ now available
+};

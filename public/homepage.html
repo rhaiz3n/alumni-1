@@ -285,25 +285,40 @@
             type="text" 
             id="businessAddress" 
             placeholder="Business Address" 
-            maxlength="25" 
+            maxlength="100" 
             oninput="this.value = formatBusinessAddress(this.value)"
           />
           <input 
-            type="tel" 
+            type="text" 
             id="landlineNo" 
             placeholder="Landline Number" 
-            inputmode="numeric" 
             maxlength="15"
-            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            oninput="
+              var v = this.value.toUpperCase();
+              if (/^[0-9]*$/.test(v) || /^N$/.test(v) || /^NA$/.test(v) || /^NON?$/.test(v) || /^NONE$/.test(v)) {
+                this.value = v;
+              } else {
+                this.value = this.value.replace(/[^0-9]/g, '');
+              }
+            "
           />
+
           <input 
-            type="tel" 
+            type="text" 
             id="mobileNo" 
             placeholder="Mobile Number" 
-            inputmode="numeric" 
-            maxlength="12" 
-            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            maxlength="12"
+            oninput="
+              var v = this.value.toUpperCase();
+              if (/^[0-9]*$/.test(v) || /^N$/.test(v) || /^NA$/.test(v) || /^NON?$/.test(v) || /^NONE$/.test(v)) {
+                this.value = v;
+              } else {
+                this.value = this.value.replace(/[^0-9]/g, '');
+              }
+            "
           />
+
+
           <input 
             type="email" 
             id="companyEmail" 
@@ -316,7 +331,7 @@
             type="url" 
             id="companyWebsite" 
             placeholder="Company Website" 
-            maxlength="40" 
+            maxlength="100" 
             oninput="this.value = this.value.replace(/\s/g, '')"
           />
           <input 

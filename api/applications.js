@@ -82,30 +82,30 @@ router.post("/add", upload.single("resume"), async (req, res) => {
 // ✅ Employer: Get applications for a specific career they own
 router.get("/career/:careerId", async (req, res) => {
   try {
-    const sessionUser = req.session.user;
-
-    // 🔒 Must be logged in as employer
-    if (!sessionUser || !sessionUser.isEmployer) {
-      return res.status(401).json({ error: "Unauthorized. Employer login required." });
+    if (!req.session.user || !req.session.user.isEmployer) {
+      return res.status(401).json({ error: "Not logged in as employer" });
     }
 
+    const employerId = req.session.user.preferredUserId; // ✅ comes from login
     const careerId = req.params.careerId;
 
-    // 🔒 Ensure this career belongs to the logged-in employer
+    // ✅ Check if career belongs to this employer
     const [careerCheck] = await pool.execute(
-      "SELECT id FROM careers WHERE id = ? AND employerId = ?",
-      [careerId, sessionUser.id]
+      "SELECT id FROM careers WHERE id = ? AND userId = ?",
+      [careerId, employerId]
     );
 
     if (!careerCheck.length) {
-      return res.status(403).json({ error: "Unauthorized to view applications for this career" });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to view applications for this career" });
     }
 
-    // ✅ Fetch applications for that career
+    // ✅ Fetch applications for this career
     const [apps] = await pool.execute(
       `SELECT id, firstName, lastName, email, phoneNo, resumePath, dateSubmitted
-       FROM applications
-       WHERE careerId = ?
+       FROM applications 
+       WHERE careerId = ? 
        ORDER BY dateSubmitted DESC`,
       [careerId]
     );
@@ -116,6 +116,7 @@ router.get("/career/:careerId", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 
 // ✅ User: Get their own applications

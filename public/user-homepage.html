@@ -217,7 +217,7 @@
 
 <!-- Profile picture trigger (Dashboard Circle) -->
 <img id="profilePic"
-     src="/images/default-profile.png"
+     src="/public/images/default-profile.png"
      alt=""
      class="profile-circle"
      onclick="openProfileModal()">
@@ -232,7 +232,7 @@
       <!-- LEFT: Circle Profile Pic -->
       <div class="profile-left">
         <div class="profile-pic-frame">
-          <img id="modalProfilePic" src="public/images/default-profile.png" alt="" class="profile-pic">
+          <img id="modalProfilePic" src="/public/images/default-profile.png" alt="" class="profile-pic">
         </div>
         <p class="profile-label">PROFILE PICTURE</p>
       </div>
@@ -923,16 +923,15 @@ async function loadProfileData(updateModal = false) {
     if (!res.ok) throw new Error("Not logged in");
 
     const data = await res.json();
-    console.log("📦 Data from API:", data);
 
     // ✅ Profile picture
-    const pic = data.profilePic || "/images/default-profile.png";
+    const pic = data.profilePic || "/public/images/default-profile.png";
     if (profilePic) profilePic.src = pic;
     if (updateModal && modalProfilePic) modalProfilePic.src = pic;
 
     // ✅ Basic info
     document.getElementById("name").textContent =
-      [data.firstName, data.lastName].filter(Boolean).join(" ") || "No Name";
+    ([data.firstName, data.lastName].filter(Boolean).join(" ") || "No Name").toUpperCase()
     document.getElementById("userName").textContent = data.userName || "-";
     document.getElementById("personalEmail").textContent = data.personalEmail || "-";
     document.getElementById("gender").textContent = data.gender || "-";
@@ -960,7 +959,7 @@ async function loadProfileData(updateModal = false) {
 
   } catch (err) {
     console.error("❌ Error loading user info:", err);
-    if (profilePic) profilePic.src = "/images/default-profile.png";
+    if (profilePic) profilePic.src = "/public/images/default-profile.png";
   }
 }
 
@@ -1100,7 +1099,6 @@ async function loadApplications(userName) {
   const modal = document.getElementById("applicationsModal");
   const tableBody = document.getElementById("applicationsTableBody");
 
-  console.log("📌 Opening Applications for user:", userName);
   modal.style.display = "flex";
   tableBody.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
 
@@ -1111,7 +1109,7 @@ async function loadApplications(userName) {
     if (!res.ok) throw new Error("Failed to fetch applications");
 
     const apps = await res.json();
-    console.log("📦 Applications response:", apps);
+
 
     if (!apps.length) {
       tableBody.innerHTML = `<tr><td colspan="4">No applications found.</td></tr>`;
@@ -1147,7 +1145,7 @@ async function enforceProfilePictureFlow() {
     const confirmBtn = document.getElementById("confirmProfileBtn");
 
     const pic = user.profilePic || "";
-    const isDefault = !pic || pic.includes("default-profile.png") || pic.includes("/images/default-profile");
+    const isDefault = !pic || pic.includes("default-profile.png") || pic.includes("/public/images/default-profile.png");
 
     if (user.profileConfirmed === 1) {
       delete modal.dataset.locked;
@@ -1217,7 +1215,7 @@ function hookUploadShowConfirm() {
         if (res.ok) {
           const u = await res.json();
           const pic = u.profilePic || "";
-          const isDefault = !pic || pic.includes("default-profile.png") || pic.includes("/images/default-profile");
+          const isDefault = !pic || pic.includes("default-profile.png") || pic.includes("/public/images/default-profile.png");
 
           if (!isDefault && u.profileConfirmed !== 1) {
             const confirmBtn = document.getElementById("confirmProfileBtn");

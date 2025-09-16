@@ -208,28 +208,55 @@ input[type="date"] {
   width: 95%;
   border-collapse: collapse;
   background: #ffffff; 
+  font-size: 13px;        /* smaller font */
+  line-height: 1.2;       /* reduce row height */
 }
-#registeredTable th, #registeredTable td {
-      border: 1px solid #b8b8b8; 
-      padding: 5px; 
-      text-align: left;
+
+#registeredTable th, 
+#registeredTable td {
+  border: 1px solid #b8b8b8; 
+  padding: 3px 6px;       /* tighter padding */
+  text-align: center;     /* keep everything aligned neatly */
+  vertical-align: middle; /* center text vertically */
 }
 
 #registeredTable th {
   background-color: maroon;
   color: white;
+  font-size: 12px;        /* slightly smaller headers */
+  padding: 5px;
 }
+
+/* Compact "View" button */
+#registeredTable td button {
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 3px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#registeredTable td button:hover {
+  background: #333;
+}
+
 @media print {
   body * {
     visibility: hidden !important;
   }
+
   #registeredTable, #registeredTable * {
     visibility: visible !important;
   }
-    th:nth-child(9),
-  td:nth-child(9) {
+
+  /* ✅ Hide the Profile Picture column (first column) */
+  #registeredTable th:first-child,
+  #registeredTable td:first-child {
     display: none !important;
   }
+
   #registeredTable {
     font-size: 15px;
     margin-top: 0px;
@@ -239,11 +266,8 @@ input[type="date"] {
     top: 0;
     width: 100%;
   }
-  td:last-child,
-  th:last-child {
-    display: none !important;
-  }
 }
+
 #loader-wrapper {
   position: fixed;
   top: 0;

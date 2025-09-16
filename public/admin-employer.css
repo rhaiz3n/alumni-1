@@ -178,7 +178,7 @@ h2 {
   margin-bottom: 20px;
 }
 
-    table { 
+table { 
   position: absolute;
   font-family: 'Albert Sans', sans-serif;
   left: 30px;
@@ -186,21 +186,63 @@ h2 {
   width: 95%;
   border-collapse: collapse;
   background: #ffffff;  
-    }
-    th, td { 
-      border: 1px solid #b8b8b8; 
-      word-wrap: break-word;
-      padding: 5px; 
-      text-align: left; 
-      white-space: normal; 
-       max-width: 120px;
-    }
-    th { 
-      background-color: maroon;
-      color: white;
-      text-align: center;
-      font-size: small;
-    }
+  font-size: 12px;          /* smaller text */
+  table-layout: auto;       /* let columns resize naturally */
+}
+
+th, td { 
+  border: 1px solid #b8b8b8; 
+  padding: 4px 6px;         /* tighter padding */
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+  max-width: 150px;         /* cap column width */
+}
+
+th { 
+  background-color: maroon;
+  color: white;
+  font-size: 11px;          /* smaller headers */
+  padding: 6px;
+}
+
+/* ✅ Status cells more compact */
+td.status {
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* ✅ Buttons tighter */
+td button {
+  margin: 0;
+  padding: 2px 6px;         /* smaller buttons */
+  font-size: 15px;
+  background: #007bff00;
+  border: none;
+  color: rgb(0, 0, 0);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+td button + button {
+  margin-left: 3px;         /* small gap between buttons */
+}
+
+td button:hover {
+  background: #3b9aff5b;
+}
+
+/* ✅ Profile picture */
+td img {
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+}
+
+
       .status {
     font-weight: bold;
     text-transform: uppercase;
@@ -211,16 +253,19 @@ h2 {
     color: #b26a00;
     background: #fff3cd;
     border: 1px solid #b8b8b8;
+    font-size: 10px;
   }
   .status.ACCEPTED {
     color: #155724;
     background: #d4edda;
     border: 1px solid #b8b8b8;
+    font-size: 10px;
   }
   .status.ARCHIVED {
     color: #721c24;
     background: #f8d7da;
     border: 1px solid #b8b8b8;
+    font-size: 10px;
   }
     .accept-btn, .decline-btn, .view-btn {
       position: relative;
@@ -362,3 +407,62 @@ h2 {
     #pageSelect:hover {
       background-color: #8b0000;
     }
+
+
+
+/* Small info modal */
+#infoModal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 2px solid maroon;
+  border-radius: 6px;
+  padding: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  word-wrap: break-word;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  font-size: 20px;
+    font-family: 'Albert Sans', sans-serif;
+}
+#infoModal h3 {
+  margin: 0 0 10px;
+  color: maroon;
+}
+#infoModal .close-btn {
+  float: right;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+}
+#infoModal .close-btn:hover {
+  color: red;
+}
+
+/* Dark background overlay */
+#modalOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+ 
+
+
+
+
+
+
+
+
+
+

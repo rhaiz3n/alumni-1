@@ -2998,11 +2998,13 @@ form button[type="submit"]:active {
   border: 5px solid #dddddd;
   padding: 8px;
   text-align: center;
+  font-family: 'Albert Sans', serif;
 }
 
 .applications-table th {
   background: #402bff;
   color: white;
+  font-family: 'Albert Sans', serif;
 }
 
 

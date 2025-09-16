@@ -101,8 +101,8 @@
         <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
       </select>
 
-      <label for="careerLink">Link</label>
-      <input type="text" id="careerLink" name="link" placeholder="https://example.com">
+      <label for="careerLink">Company Name</label>
+      <input type="text" id="careerLink" name="link" placeholder="Company Name">
 
       <!-- ✅ Styled File Upload -->
       <label for="careerImage" class="file-label">Upload Image</label>
@@ -302,6 +302,35 @@
       <div id="idPostResult" class="result-message"></div>
     </div>
   </div>
+
+
+
+<!-- Circle button -->
+<div id="adminApplicationsCircle" class="circle-btn">
+  <i class="fas fa-bell"></i>
+</div>
+
+<!-- Modal for Admin Applications -->
+<div id="adminApplicationsModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h3>CAREER APPLICATION</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Resume</th>
+          <th>Submitted At</th>
+        </tr>
+      </thead>
+      <tbody id="adminApplicationsTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+
 
   <div id="feed"></div>
 
@@ -990,6 +1019,101 @@ document.addEventListener("DOMContentLoaded", () => {
   const button = document.getElementById("disableGcashBtn");
   button.textContent = enabled ? "Disable User GCash Button" : "Enable User GCash Button";
 });
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// front-end: admin-homepage (modal loader)
+document.addEventListener("DOMContentLoaded", () => {
+  const circleBtn = document.getElementById("adminApplicationsCircle"); // your circle element
+  const modal = document.getElementById("adminApplicationsModal");
+  const closeBtn = modal?.querySelector(".close-btn");
+  const tbody = document.getElementById("adminApplicationsTableBody");
+
+  if (!circleBtn || !modal || !tbody) {
+    console.warn("Admin applications modal elements missing.");
+    return;
+  }
+
+  circleBtn.addEventListener("click", async () => {
+    modal.style.display = "block";
+    await loadApplications();
+  });
+
+  closeBtn?.addEventListener("click", () => modal.style.display = "none");
+  window.addEventListener("click", e => {
+    if (e.target === modal) modal.style.display = "none";
+  });
+
+  async function loadApplications() {
+    tbody.innerHTML = `<tr><td colspan="5">⏳ Loading...</td></tr>`;
+    try {
+      const res = await fetch("/api/admin-applications", { credentials: "include" });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+
+      tbody.innerHTML = "";
+      if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5">No applications found</td></tr>`;
+        return;
+      }
+
+      data.forEach(app => {
+        const tr = document.createElement("tr");
+
+        // Full name (first + last)
+        const tdName = document.createElement("td");
+        tdName.textContent = `${app.firstName || ""} ${app.lastName || ""}`.trim();
+        tr.appendChild(tdName);
+
+        // Phone
+        const tdPhone = document.createElement("td");
+        tdPhone.textContent = app.phoneNo || "";
+        tr.appendChild(tdPhone);
+
+        // Email
+        const tdEmail = document.createElement("td");
+        tdEmail.textContent = app.email || "";
+        tr.appendChild(tdEmail);
+
+        // Resume (link or No Resume)
+        const tdResume = document.createElement("td");
+        if (app.resume) {
+          const resumeHref = app.resume.startsWith("/") ? app.resume : "/uploads/resumes/" + app.resume;
+          const a = document.createElement("a");
+          a.href = resumeHref;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.textContent = "View Resume";
+          tdResume.appendChild(a);
+        } else {
+          tdResume.textContent = "No Resume";
+        }
+        tr.appendChild(tdResume);
+
+        // Submitted at (safely parse)
+        const tdDate = document.createElement("td");
+        if (app.submittedAt) {
+          const d = new Date(app.submittedAt);
+          tdDate.textContent = !isNaN(d.getTime()) ? d.toLocaleString() : app.submittedAt;
+        } else {
+          tdDate.textContent = "";
+        }
+        tr.appendChild(tdDate);
+
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("❌ Error loading applications:", err);
+      tbody.innerHTML = `<tr><td colspan="5">❌ Error loading applications</td></tr>`;
+    }
+  }
+});
+
 
 
 </script>

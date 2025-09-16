@@ -155,4 +155,42 @@ router.post("/confirm", async (req, res) => {
 });
 
 
+router.get("/fullInformation", async (req, res) => {
+  try {
+    const page  = parseInt(req.query.page)  || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const offset = (page - 1) * limit;
+    const search = `%${req.query.search || ""}%`;
+
+    // ✅ Query with correct params
+    const [rows] = await pool.execute(
+      `SELECT id, firstName, lastName, initial, suffix, gender, civilStatus,
+              dateBirth, maiden, phoneNo, major, yearStarted, graduated,
+              studentNo, profilePic
+       FROM fullInformation
+       WHERE firstName LIKE ? OR lastName LIKE ? OR studentNo LIKE ?
+       ORDER BY id DESC
+       LIMIT ? OFFSET ?`,
+      [search, search, search, limit, offset]   // ✅ 5 params for 5 ?
+    );
+
+    // ✅ Count for pagination
+    const [[{ count }]] = await pool.execute(
+      `SELECT COUNT(*) as count
+       FROM fullInformation
+       WHERE firstName LIKE ? OR lastName LIKE ? OR studentNo LIKE ?`,
+      [search, search, search]
+    );
+
+    res.json({
+      rows,
+      totalPages: Math.ceil(count / limit)
+    });
+  } catch (err) {
+    console.error("❌ Error fetching fullInformation:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
 module.exports = router;

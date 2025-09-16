@@ -58,6 +58,7 @@
   <table id="registeredTable" border="1">
     <thead>
       <tr>
+        <th>Profile Picture</th> <!-- 👈 New column with "View" button -->
         <th>First Name</th><th>Last Name</th><th>Initial</th>
         <th>Suffix</th><th>Gender</th><th>Civil Status</th>
         <th>Date of Birth</th><th>Maiden</th><th>Phone No.</th>
@@ -122,23 +123,43 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.innerHTML = '';
       rows.forEach(r => {
         const tr = document.createElement('tr');
+
+        // ✅ Profile Picture column as "View" button
+        const tdPic = document.createElement('td');
+        if (r.profilePic) {
+          const img = document.createElement("img");
+          img.src = r.profilePic;
+          img.alt = "Profile Picture";
+          img.style.width = "40px";
+          img.style.height = "40px";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "50%";
+          img.style.cursor = "pointer";
+          img.addEventListener("click", () => {
+            window.open(r.profilePic, "_blank"); // enlarge when clicked
+          });
+          tdPic.appendChild(img);
+        } else {
+          tdPic.textContent = "No Picture";
+        }
+        tr.appendChild(tdPic);
+
+        // ✅ Other fields
         [
           'firstName','lastName','initial','suffix','gender','civilStatus',
           'dateBirth','maiden','phoneNo','major','yearStarted','graduated','studentNo'
         ].forEach(key => {
           const td = document.createElement('td');
-          
-          // FIXED: Format date field for display
-          if (key === 'dateBirth') {
-            td.textContent = formatDateForDisplay(r[key]);
-          } else {
-            td.textContent = r[key] || '';
-          }
-          
+          td.textContent = key === 'dateBirth'
+            ? formatDateForDisplay(r[key])
+            : (r[key] || '');
           tr.appendChild(td);
         });
+
         tbody.prepend(tr); // latest on top
       });
+
+
 
       buildPagination();
     } catch (err) {

@@ -560,14 +560,14 @@ html, body {
 
 /* Galaxy card */
 .galaxy-card {
-  background: radial-gradient(circle at top left, #440183, #3a3a6e);
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
   border: 2px solid rgba(180, 90, 255, 0.6);
   border-radius: 15px;
   padding: 25px 30px;
   max-width: 500px;
   width: 90%;
   color: #fff;
-  box-shadow: 0 0 30px rgba(150, 0, 255, 0.6), 0 0 60px rgba(0, 200, 255, 0.4);
+  box-shadow: 0 0 30px rgba(128, 0, 17, 0.692), 0 0 60px rgba(255, 0, 0, 0.753);
   position: relative;
   animation: slideIn 0.5s ease;
 }
@@ -612,7 +612,7 @@ html, body {
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.08);
-  color: #666666;
+  color: #ffffff;
   margin-bottom: 12px;
   outline: none;
   transition: border 0.3s ease, box-shadow 0.3s ease;
@@ -1095,6 +1095,7 @@ html, body {
   border-collapse: collapse;
   margin-top: 10px;
   color: white;
+  overflow-x: auto;
 }
 
 .applications-table-employer th,
@@ -1102,6 +1103,7 @@ html, body {
   border: 2px solid #dddddd;
   padding: 8px;
   text-align: center;
+  font-family: 'Albert Sans', serif;
 }
 
 .applications-table-employer th {
@@ -1159,3 +1161,4 @@ html, body {
     width: 100%;
   }
 }
+

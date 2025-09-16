@@ -52,26 +52,35 @@
       </div>
     </div>
 
+
+    <!-- Info Modal -->
+<div id="modalOverlay"></div>
+<div id="infoModal">
+  <span class="close-btn">&times;</span>
+  <h3 id="modalTitle"></h3>
+  <p id="modalContent"></p>
+</div>
+
     <h2>Employer Registration List</h2>
-    <table id="employerTable">
-      <thead>
-        <tr>
-          <th>Employer Name</th>
-          <th>Business Name</th>
-          <th>Business Address</th>
-          <th>Landline No</th>
-          <th>Mobile No</th>
-          <th>Company Email</th>
-          <th>Website</th>
-          <th>User ID</th>
-          <th>Password</th>
-          <th>Status</th>
-          <th>Submitted At</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+<table id="employerTable">
+  <thead>
+    <tr>
+      <th>Profile Picture</th> <!-- 👈 new -->
+      <th>Employer Name</th>
+      <th>Business Name</th>
+      <th>Business Address</th>
+      <th>Landline No</th>
+      <th>Mobile No</th>
+      <th>Company Email</th>
+      <th>Website</th>
+      <th>User ID</th>
+      <th>Status</th>
+      <th>Submitted At</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
     <select id="statusFilter">
         <option value="ALL">All Statuses</option>
@@ -83,171 +92,237 @@
     <select id="pageSelect"></select>
     
 <script>
-const pageSelect = document.getElementById('pageSelect');
-let allEmployers = [];
-let currentPage = 1;
-const LIMIT = 100;
-let totalPages = 1;
-
-// Event: Page dropdown changed
-pageSelect.addEventListener('change', () => {
-  currentPage = +pageSelect.value;
-  renderEmployers();
-});
-
-// Fetch and load all employers
-async function loadEmployers() {
-  const tbody = document.querySelector('#employerTable tbody');
-  tbody.innerHTML = `<tr><td colspan="12">⏳ Loading...</td></tr>`;
-  try {
-    const res = await fetch('/api/employer/list');
-    if (!res.ok) throw new Error('❌ Failed loading employers');
-    const data = await res.json();
-    allEmployers = data.employers || [];
-    renderEmployers();
-  } catch (err) {
-    console.error(err.message);
-    tbody.innerHTML = `<tr><td colspan="12">❌ Error loading data</td></tr>`;
-  }
-}
-
-// Render employers table
-function renderEmployers() {
-  const tbody = document.querySelector('#employerTable tbody');
-  const filterValue = document.getElementById('statusFilter').value || 'ALL';
-  tbody.innerHTML = '';
-
-  const statusPriority = { 'PENDING': 1, 'ACCEPTED': 2, 'ARCHIVED': 3 };
-
-  const sortedEmployers = allEmployers
-    .filter(emp => {
-      const currentStatus = emp.status?.toUpperCase() || 'PENDING';
-      return filterValue === 'ALL' || currentStatus === filterValue;
-    })
-    .sort((a, b) => {
-      const statusA = statusPriority[a.status?.toUpperCase() || 'PENDING'] || 99;
-      const statusB = statusPriority[b.status?.toUpperCase() || 'PENDING'] || 99;
-      return statusA !== statusB
-        ? statusA - statusB
-        : new Date(b.submittedAt) - new Date(a.submittedAt);
-    });
-
-  totalPages = Math.ceil(sortedEmployers.length / LIMIT);
-  buildPagination();
-
-  const start = (currentPage - 1) * LIMIT;
-  const paginatedEmployers = sortedEmployers.slice(start, start + LIMIT);
-
-  paginatedEmployers.forEach(emp => {
-    const currentStatus = emp.status?.toUpperCase() || 'PENDING';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${emp.employerName}</td>
-      <td>${emp.businessName}</td>
-      <td>${emp.businessAddress}</td>
-      <td>${emp.landlineNo}</td>
-      <td>${emp.mobileNo}</td>
-      <td>${emp.companyEmail}</td>
-      <td>${emp.companyWebsite}</td>
-      <td>${emp.preferredUserId}</td>
-      <td>••••••••</td>
-      <td class="status ${currentStatus}">${currentStatus}</td>
-      <td>${formatDate(emp.submittedAt)}</td>
-      <td>
-        <button class="accept-btn" data-id="${emp.id}">Accept</button>
-        <button class="decline-btn" data-id="${emp.id}">Archived</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  attachStatusEventListeners();
-}
-
-// Build pagination <select>
-function buildPagination() {
-  pageSelect.innerHTML = '';
-  for (let i = 1; i <= totalPages; i++) {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = `Page ${i}`;
-    if (i === currentPage) opt.selected = true;
-    pageSelect.appendChild(opt);
-  }
-}
-
-// Date formatter utility
-function formatDate(dateStr) {
-  if (!dateStr) return 'N/A';
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'long',
-    day: '2-digit',
-    year: 'numeric'
-  }).toUpperCase();
-}
-
-// Attach button click events for Accept/Decline
-function attachStatusEventListeners() {
-  document.querySelectorAll('.accept-btn').forEach(btn => {
-    btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ACCEPTED'));
-  });
-  document.querySelectorAll('.decline-btn').forEach(btn => {
-    btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ARCHIVED'));
-  });
-}
-
-// Patch status update
-async function updateStatus(id, status) {
-  const buttons = document.querySelectorAll(`[data-id="${id}"]`);
-  buttons.forEach(btn => btn.disabled = true);
-
-  try {
-    const res = await fetch(`/api/employer/${id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    if (!res.ok) throw new Error('❌ Failed to update status');
-    await loadEmployers();
-  } catch (err) {
-    console.error(err.message);
-  } finally {
-    buttons.forEach(btn => btn.disabled = false);
-  }
-}
-
-// Event: Filter changed
-document.getElementById('statusFilter').addEventListener('change', () => {
-  currentPage = 1;
-  renderEmployers();
-});
-
-// Role check
-const role = sessionStorage.getItem('userRole');
-if (role !== 'admin') {
-  window.location.href = 'homepage.html';
-}
-
-// Loader animation
 document.addEventListener('DOMContentLoaded', () => {
-  let pct = 80;
-  const loader = document.getElementById('loader-wrapper'),
-        bar = document.getElementById('progress-bar'),
-        pctEl = document.getElementById('percentage');
+  const tbody       = document.querySelector('#employerTable tbody');
+  const pageSelect  = document.getElementById('pageSelect');
+  const statusFilter = document.getElementById('statusFilter');
 
-  const iv = setInterval(() => {
-    if (pct < 100) {
-      pct++;
-      bar.style.width = pct + '%';
-      pctEl.textContent = pct + '%';
-    } else {
-      clearInterval(iv);
-      loader.style.display = 'none';
+  const ROWS_PER_PAGE = 100;
+  let currentPage = 1;
+  let totalPages  = 1;
+  let allEmployers = [];
+
+  if (sessionStorage.getItem('userRole') !== 'admin') {
+    window.location.href = 'homepage.html';
+    return;
+  }
+
+  // ✅ Modal references
+  const modalOverlay = document.getElementById("modalOverlay");
+  const infoModal    = document.getElementById("infoModal");
+  const modalTitle   = document.getElementById("modalTitle");
+  const modalContent = document.getElementById("modalContent");
+  const modalClose   = document.querySelector("#infoModal .close-btn");
+
+  // ✅ Helper: open/close modal
+  function openInfoModal(label, value) {
+    modalTitle.textContent = label;
+    modalContent.textContent = value || "N/A";
+    modalOverlay.style.display = "block";
+    infoModal.style.display = "block";
+  }
+  function closeInfoModal() {
+    modalOverlay.style.display = "none";
+    infoModal.style.display = "none";
+  }
+  modalClose.addEventListener("click", closeInfoModal);
+  modalOverlay.addEventListener("click", closeInfoModal);
+
+  // ✅ Helper: Create a "View" button cell
+  function makeViewButtonCell(label, value) {
+    const td = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.textContent = "View";
+    btn.addEventListener("click", () => openInfoModal(label, value));
+    td.appendChild(btn);
+    return td;
+  }
+
+  // Filter change
+  statusFilter.addEventListener('change', () => loadPage(1));
+  pageSelect.addEventListener('change', () => loadPage(+pageSelect.value));
+
+  // Format date
+  function formatDateForDisplay(dateValue) {
+    if (!dateValue) return '';
+    try {
+      const date = new Date(dateValue);
+      if (isNaN(date.getTime())) return dateValue;
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return dateValue;
     }
-  }, 30);
+  }
 
-  loadEmployers();
+  async function loadPage(page = 1) {
+    currentPage = page;
+    tbody.innerHTML = `<tr><td colspan="12">⏳ Loading...</td></tr>`;
+
+    try {
+      const res = await fetch('/api/employer/list');
+      if (!res.ok) throw new Error(await res.text());
+      const { employers } = await res.json();
+      allEmployers = employers || [];
+
+      // ✅ Filter + Sort
+      const statusPriority = { 'PENDING': 1, 'ACCEPTED': 2, 'ARCHIVED': 3 };
+      const filterVal = statusFilter.value || 'ALL';
+
+      const sortedEmployers = allEmployers
+        .filter(emp => {
+          const st = emp.status?.toUpperCase() || 'PENDING';
+          return filterVal === 'ALL' || st === filterVal;
+        })
+        .sort((a, b) => {
+          const sa = statusPriority[a.status?.toUpperCase() || 'PENDING'] || 99;
+          const sb = statusPriority[b.status?.toUpperCase() || 'PENDING'] || 99;
+          return sa !== sb
+            ? sa - sb
+            : new Date(b.submittedAt) - new Date(a.submittedAt);
+        });
+
+      totalPages = Math.ceil(sortedEmployers.length / ROWS_PER_PAGE);
+      buildPagination();
+
+      const start = (currentPage - 1) * ROWS_PER_PAGE;
+      const paginated = sortedEmployers.slice(start, start + ROWS_PER_PAGE);
+
+      tbody.innerHTML = '';
+      paginated.forEach(emp => {
+        const tr = document.createElement('tr');
+        const currentStatus = emp.status?.toUpperCase() || 'PENDING';
+
+        // ✅ Profile Picture
+        const tdPic = document.createElement('td');
+        if (emp.companyLogo) {
+          const img = document.createElement("img");
+          img.src = emp.companyLogo.startsWith('/')
+            ? emp.companyLogo
+            : '/uploads/companyLogos/' + emp.companyLogo;
+          img.alt = "Company Logo";
+          img.style.width = "40px";
+          img.style.height = "40px";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "50%";
+          img.style.cursor = "pointer";
+          img.addEventListener("click", () => {
+            window.open(img.src, "_blank");
+          });
+          tdPic.appendChild(img);
+        } else {
+          tdPic.textContent = "No Picture";
+        }
+        tr.appendChild(tdPic);
+
+        // ✅ Employer Name (show text directly)
+        const tdName = document.createElement('td');
+        tdName.textContent = emp.employerName || '';
+        tr.appendChild(tdName);
+
+        // ✅ Replace long fields with View button
+        tr.appendChild(makeViewButtonCell("Business Name", emp.businessName));
+        tr.appendChild(makeViewButtonCell("Business Address", emp.businessAddress));
+        tr.appendChild(makeViewButtonCell("Landline", emp.landlineNo));
+        tr.appendChild(makeViewButtonCell("Mobile", emp.mobileNo));
+        tr.appendChild(makeViewButtonCell("Company Email", emp.companyEmail));
+        tr.appendChild(makeViewButtonCell("Website", emp.companyWebsite));
+
+        // ✅ User ID
+        const tdUser = document.createElement('td');
+        tdUser.textContent = emp.preferredUserId || '';
+        tr.appendChild(tdUser);
+
+        // ✅ Status
+        const tdStatus = document.createElement('td');
+        tdStatus.textContent = currentStatus;
+        tdStatus.className = `status ${currentStatus}`;
+        tr.appendChild(tdStatus);
+
+        // ✅ Submitted Date
+        const tdDate = document.createElement('td');
+        tdDate.textContent = formatDateForDisplay(emp.submittedAt);
+        tr.appendChild(tdDate);
+
+        // ✅ Actions
+        const tdAction = document.createElement('td');
+        tdAction.innerHTML = `
+          <button class="accept-btn" data-id="${emp.id}">Accept</button>
+          <button class="decline-btn" data-id="${emp.id}">Archived</button>
+        `;
+        tr.appendChild(tdAction);
+
+        tbody.appendChild(tr);
+      });
+
+      attachStatusEvents();
+    } catch (err) {
+      console.error('❌ Error loading employers:', err);
+      tbody.innerHTML = `<tr><td colspan="12">Error loading employers</td></tr>`;
+    }
+  }
+
+  function buildPagination() {
+    pageSelect.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const opt = new Option(`Page ${i}`, i, i === currentPage, i === currentPage);
+      pageSelect.appendChild(opt);
+    }
+  }
+
+  function attachStatusEvents() {
+    document.querySelectorAll('.accept-btn').forEach(btn => {
+      btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ACCEPTED'));
+    });
+    document.querySelectorAll('.decline-btn').forEach(btn => {
+      btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ARCHIVED'));
+    });
+  }
+
+  async function updateStatus(id, status) {
+    const buttons = document.querySelectorAll(`[data-id="${id}"]`);
+    buttons.forEach(b => b.disabled = true);
+    try {
+      const res = await fetch(`/api/employer/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      await loadPage(currentPage);
+    } catch (err) {
+      console.error('❌ Update error:', err);
+    } finally {
+      buttons.forEach(b => b.disabled = false);
+    }
+  }
+
+  // Initial load
+  loadPage();
+
+  // Loader animation
+  let pct = 80;
+  const loader = document.getElementById("loader-wrapper"),
+        bar = document.getElementById("progress-bar"),
+        pctEl = document.getElementById("percentage");
+
+  if (loader && bar && pctEl) {
+    const iv = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        bar.style.width = pct + "%";
+        pctEl.textContent = pct + "%";
+      } else {
+        clearInterval(iv);
+        loader.style.display = "none";
+      }
+    }, 30);
+  }
 });
 </script>
+
 </body>
 </html>

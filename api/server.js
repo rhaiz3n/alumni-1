@@ -10,6 +10,9 @@ const applicationsRoutes = require("./applications.js");
 const careersRoutes = require("./careers.js");
 const profileRoutes = require("./profileRoutes.js");
 const employerRoutes = require("./employerRoutes");
+const adminApplicationsRoutes = require("./adminApplications");
+const { sendOtpEmail } = require('../GmailMailer');
+
 const { imageUpload, excelUpload, resumeUpload } = require("./uploadConfig");
 const multer = require('multer');
 
@@ -42,6 +45,7 @@ app.use("/api/applications", applicationsRoutes);
 app.use("/api/careers", careersRoutes);
 app.use("/api/fullInformation", profileRoutes);
 app.use("/api/employers", employerRoutes);
+app.use("/api/admin-applications", adminApplicationsRoutes);
 
 
 // Public homepage
@@ -67,6 +71,27 @@ app.locals.io = io;
 io.on("connection", socket => {
   console.log("🔌 Socket connected:", socket.id);
 });
+
+app.post("/send-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, message: "Email is required" });
+
+    // generate random 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    // send email
+    await sendOtpEmail(email, otp);
+
+    res.json({ success: true, message: "OTP sent", otp }); // ⚠️ don't return otp in production
+  } catch (err) {
+    console.error("❌ /send-otp error:", err);
+    res.status(500).json({ success: false, message: "Failed to send OTP" });
+  }
+});
+
+
+
 
 // Create tables if not exist
 async function initTables() {
@@ -825,9 +850,10 @@ app.get('/api/applications/employer', async (req, res) => {
               a.resumePath, a.dateSubmitted
        FROM applications a
        WHERE a.careerId IN (
-         SELECT id FROM careers WHERE employerId = ?
-       )`,
-      [req.session.user.id]
+         SELECT id FROM careers WHERE userId = ?
+       )
+       ORDER BY a.dateSubmitted DESC`,
+      [req.session.user.preferredUserId]  // ✅ use employer's login ID
     );
 
     res.json(rows);
@@ -836,6 +862,7 @@ app.get('/api/applications/employer', async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+
 
 
 
@@ -863,6 +890,38 @@ app.get('/api/applications/employer', async (req, res) => {
   }
 });
 
+// ----------------------
+// Admin Applications Route
+// ----------------------
+app.get("/api/admin-applications", async (req, res) => {
+  try {
+    // Ensure only logged-in employers can see their own apps
+    const employerId = req.session.userId; // 👈 set when login
+    if (!employerId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT 
+        a.firstName, 
+        a.lastName, 
+        a.phoneNo, 
+        a.email, 
+        a.resumePath, 
+        a.dateSubmitted
+      FROM applications a
+      JOIN careers c ON a.careerId = c.id
+      WHERE c.employerId = ?
+      ORDER BY a.dateSubmitted DESC`,
+      [employerId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Error fetching applications:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 
 

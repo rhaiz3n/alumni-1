@@ -577,6 +577,10 @@
 
 
 
+<div class="user-name">
+  <i class="fas fa-user-circle"></i>
+  <span id="displayName"></span>
+</div>
 
 
 
@@ -1304,125 +1308,121 @@ function showToast(message, isError = false) {
 
 
 
-
-
-
+// ===== User Feed Loader (Events + Careers with UTC countdown) =====
 async function loadFeed() {
-  const container = document.getElementById('feed');
-  container.innerHTML = 'Loading feed...';
+  const container = document.getElementById("feed");
+  container.innerHTML = "Loading feed...";
+
+  // Always parse as UTC (backend must send ISO strings with Z)
+  function parseDate(input) {
+    if (!input) return null;
+    const d = new Date(input);
+    return isNaN(d.getTime()) ? null : d;
+  }
 
   try {
-    const role = sessionStorage.getItem("userRole");  // "admin", "employer", "user"
-    const userId = sessionStorage.getItem("userId");  // stored on login
-    let careersUrl;
+    const role = sessionStorage.getItem("userRole"); // "user" | "employer"
+    const careersUrl =
+      role === "employer" ? "/api/careers" : "/api/careers/public";
 
-    if (role === "admin") {
-      careersUrl = "/api/careers/all";       // Admin → all careers
-    } else if (role === "employer") {
-      careersUrl = "/api/careers";           // Employer → only their careers (session-based)
-    } else {
-      careersUrl = "/api/careers/public";    // User → public careers (you need to make this route)
-    }
-
-    // Fetch events + careers together
     const [eventsRes, careersRes] = await Promise.all([
       fetch("/api/events"),
-      fetch(careersUrl)
+      fetch(careersUrl),
     ]);
 
-    if (!eventsRes.ok || !careersRes.ok) {
-      throw new Error('Failed to fetch events or careers.');
-    }
+    if (!eventsRes.ok || !careersRes.ok) throw new Error("Failed to fetch");
 
     const { events } = await eventsRes.json();
     const { careers } = await careersRes.json();
 
-    const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
-    const formattedCareers = careers.map(c => ({ ...c, type: 'Career' }));
+    const feed = [
+      ...(events || []).map(e => ({ ...e, type: "Event" })),
+      ...(careers || []).map(c => ({ ...c, type: "Career" })),
+    ].sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-    const feed = [...formattedEvents, ...formattedCareers]
-      .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
-
-    // Render feed (same as before)
     container.innerHTML = feed.map((post, index) => {
-      const extraInfo = post.type === 'Event'
-        ? `🎉 Type of Event: ${post.location || 'N/A'}`
-        : `🏢 Company: ${post.link || 'N/A'}`;
+      const imgSrc =
+        post.type === "Career"
+          ? `/api/careers/image/${post.id}`
+          : `/api/events/image/${post.id}`;
 
-      const imgSrc = `/api/${post.type.toLowerCase()}s/image/${post.id}`;
+      const extraInfo =
+        post.type === "Event"
+          ? `🎉 Event Type: ${post.location || "N/A"}`
+          : `🏢 Company: ${post.link || "N/A"}`;
 
-      let countdownTime;
-      if (post.type === 'Career') {
-        countdownTime = new Date(post.datePosted).getTime() + 5 * 24 * 60 * 60 * 1000;
-      } else if (post.type === 'Event') {
-        countdownTime = new Date(post.eventDateTime || post.datePosted).getTime();
+      let deadlineDate = null;
+      if (post.type === "Career") {
+        const posted = parseDate(post.datePosted) || new Date();
+        deadlineDate = new Date(posted.getTime() + 5 * 24 * 60 * 60 * 1000);
+      } else if (post.type === "Event") {
+        deadlineDate =
+          parseDate(post.eventDateTime) || parseDate(post.datePosted);
       }
+
+      const deadlineMs = deadlineDate ? deadlineDate.getTime() : "";
 
       return `
         <div class="feed-card" id="feed-card-${post.id}">
-          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ''}
+          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ""}
           <div class="feed-content">
-            <h2>${post.title?.toUpperCase() || ''} <small>[${post.type}]</small></h2>
-            <p>${post.description || ''}</p>
+            <h2>${(post.title || "").toUpperCase()} <small>[${post.type}]</small></h2>
+            <p>${post.description || ""}</p>
             <small>
-              ${extraInfo} <br>
-              🕒 Posted: ${new Date(post.datePosted).toLocaleString()} <br>
-              ⏳ <span class="countdown" data-time="${countdownTime}" id="countdown-${index}"></span>
+              ${extraInfo}<br>
+              🕒 Posted: ${new Date(post.datePosted).toLocaleString()}<br>
+              ⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span>
             </small>
-            ${post.type === 'Career'
-              ? `<button class="register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
-              : `<button class="register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
+            ${
+              post.type === "Career"
+                ? `<button class="register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
+                : `<button class="register-btn" data-id="${post.id}" data-type="Event">Register</button>`
+            }
           </div>
-        </div>
-      `;
-    }).join('');
+        </div>`;
+    }).join("");
 
-    // Handle Apply/Register clicks
-    container.addEventListener('click', e => {
-      const btn = e.target.closest('.register-btn');
+    // Handle register clicks
+    container.addEventListener("click", e => {
+      const btn = e.target.closest(".register-btn");
       if (!btn) return;
-
-      const type = btn.getAttribute('data-type');
-      const id = btn.getAttribute('data-id');
+      const type = btn.dataset.type;
+      const id = btn.dataset.id;
       const post = feed.find(p => p.id == id && p.type === type);
 
-      if (type === 'Career' && typeof window.openCareerSurvey === 'function') {
+      if (type === "Career" && window.openCareerSurvey) {
         window.openCareerSurvey(post);
-      } else if (type === 'Event' && typeof window.openRegistrationModal === 'function') {
+      } else if (type === "Event" && window.openRegistrationModal) {
         window.openRegistrationModal(post);
-      } else {
-        alert('No action defined for this post.');
       }
     });
 
-    // Countdown updater (unchanged)
+    // Countdown updater
     function updateCountdowns() {
-      document.querySelectorAll('.countdown').forEach(el => {
-        const expireTime = new Date(Number(el.dataset.time));
-        const now = new Date();
-        const diffMs = expireTime - now;
+      const now = Date.now();
+      document.querySelectorAll(".countdown").forEach(el => {
+        const ms = Number(el.dataset.time);
+        if (!ms || isNaN(ms)) return (el.textContent = "—");
 
-        const card = el.closest('.feed-card');
-        const btn = card?.querySelector('.register-btn');
+        const diff = ms - now;
+        const card = el.closest(".feed-card");
+        const btn = card?.querySelector(".register-btn");
 
-        if (diffMs <= 0) {
-          el.textContent = '❌ Closed';
-          if (card) card.style.filter = 'grayscale(100%)';
+        if (diff <= 0) {
+          el.textContent = "❌ Closed";
+          card.style.filter = "grayscale(100%)";
           if (btn) {
             btn.disabled = true;
-            btn.textContent = '❌ Closed';
+            btn.textContent = "❌ Closed";
           }
           return;
         }
 
-        const days = Math.floor(diffMs / (1000*60*60*24));
-        const hours = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
-        const minutes = Math.floor((diffMs % (1000*60*60)) / (1000*60));
-        const seconds = Math.floor((diffMs % (1000*60)) / 1000);
-
-        el.textContent = days > 0
-          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
-          : `${hours}h ${minutes}m ${seconds}s left`;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        el.textContent = d > 0 ? `${d}d ${h}h ${m}m ${s}s left` : `${h}h ${m}m ${s}s left`;
       });
     }
 
@@ -1430,12 +1430,14 @@ async function loadFeed() {
     setInterval(updateCountdowns, 1000);
 
   } catch (err) {
-    console.error('❌ Failed to load feed:', err);
-    container.textContent = '⚠️ Failed to load feed.';
+    console.error("❌ Failed to load feed:", err);
+    container.textContent = "⚠️ Failed to load feed.";
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadFeed);
+document.addEventListener("DOMContentLoaded", loadFeed);
+
+
 
 
 // 🔹 Master modal opener
@@ -1711,8 +1713,8 @@ function validateName(input) {
 }
 
 function validateMiddleInitial(input) {
-  // Allow only 1 uppercase letter
-  input.value = input.value.replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 1);
+  // Keep only one alphabetic character (A–Z or a–z)
+  input.value = input.value.replace(/[^a-zA-Z]/g, '').slice(0, 1);
 }
 
 function validateTeamName(input) {
@@ -2053,6 +2055,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// Fetch logged-in user info
+fetch('/api/auth/me')
+  .then(res => {
+    if (!res.ok) throw new Error("Not logged in");
+    return res.json();
+  })
+  .then(user => {
+    document.getElementById('displayName').textContent =
+      `${(user.firstName || "").toUpperCase()} ${(user.lastName || "").toUpperCase()}`;
+  })
+  .catch(() => {
+    document.getElementById('displayName').textContent = "GUEST";
+  });
 
 
 </script>

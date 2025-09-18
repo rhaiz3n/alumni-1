@@ -46,6 +46,7 @@ function authorizeAdmin(req, res, next) {
 // POST /api/applications/add
 // ---------------------------
 router.post("/add", upload.single("resume"), async (req, res) => {
+  const conn = await pool.getConnection();
   try {
     const { firstName, lastName, phoneNo, email, careerId } = req.body;
 
@@ -57,12 +58,15 @@ router.post("/add", upload.single("resume"), async (req, res) => {
       return res.status(400).json({ error: "Resume (PDF) is required" });
     }
 
-    // ✅ Save with userName so we can fetch later
-    await pool.execute(
-      `INSERT INTO applications (userName, firstName, lastName, phoneNo, email, resumePath, careerId)
+    await conn.beginTransaction();
+
+    // ✅ Step 1: Insert into applications
+    const [result] = await conn.execute(
+      `INSERT INTO applications 
+        (userName, firstName, lastName, phoneNo, email, resumePath, careerId)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
-        req.session.user.userName, // ✅ logged-in user
+        req.session.user.userName,
         firstName,
         lastName,
         phoneNo,
@@ -72,12 +76,38 @@ router.post("/add", upload.single("resume"), async (req, res) => {
       ]
     );
 
-    res.json({ success: true });
+    const newAppId = result.insertId;
+
+    // ✅ Step 2: Copy into archive (explicit mapping)
+    // Step 2: Copy into archive (mirror)
+    await conn.execute(
+      `INSERT INTO applications_archive
+        (originalAppId, userName, careerId, employerId, careerTitle, companyName,
+         firstName, lastName, phoneNo, email, resumePath, dateSubmitted)
+       SELECT 
+         a.id, a.userName, a.careerId, c.userId AS employerId, c.title AS careerTitle, c.link AS companyName,
+         a.firstName, a.lastName, a.phoneNo, a.email, a.resumePath, a.dateSubmitted
+       FROM applications a
+       JOIN careers c ON a.careerId = c.id
+       WHERE a.id = ?`,
+      [newAppId]
+    );
+
+
+    await conn.commit();
+    res.json({ success: true, applicationId: newAppId });
   } catch (err) {
+    await conn.rollback();
     console.error("❌ Application insert error:", err);
     res.status(500).json({ error: "Server error" });
+  } finally {
+    conn.release();
   }
 });
+
+
+
+
 
 // ✅ Employer: Get applications for a specific career they own
 router.get("/career/:careerId", async (req, res) => {
@@ -86,7 +116,7 @@ router.get("/career/:careerId", async (req, res) => {
       return res.status(401).json({ error: "Not logged in as employer" });
     }
 
-    const employerId = req.session.user.preferredUserId; // ✅ comes from login
+    const employerId = req.session.user.preferredUserId; // 👈 comes from login
     const careerId = req.params.careerId;
 
     // ✅ Check if career belongs to this employer
@@ -101,13 +131,21 @@ router.get("/career/:careerId", async (req, res) => {
         .json({ error: "Unauthorized to view applications for this career" });
     }
 
-    // ✅ Fetch applications for this career
+    // ✅ Fetch applications from archive (safe even if originals deleted)
     const [apps] = await pool.execute(
-      `SELECT id, firstName, lastName, email, phoneNo, resumePath, dateSubmitted
-       FROM applications 
-       WHERE careerId = ? 
+      `SELECT 
+          id,
+          firstName,
+          lastName,
+          email,
+          phoneNo,
+          resumePath,
+          dateSubmitted,
+          archivedAt
+       FROM applications_archive
+       WHERE careerId = ? AND employerId = ?
        ORDER BY dateSubmitted DESC`,
-      [careerId]
+      [careerId, employerId]
     );
 
     res.json(apps);
@@ -119,25 +157,31 @@ router.get("/career/:careerId", async (req, res) => {
 
 
 
-// ✅ User: Get their own applications
+
 router.get("/user/:userName", async (req, res) => {
   const { userName } = req.params;
   try {
     const [rows] = await pool.query(
-      `SELECT a.id, a.resumePath, a.dateSubmitted,
-              c.title AS careerTitle,
-              c.link AS company
-       FROM applications a
-       JOIN careers c ON a.careerId = c.id
-       WHERE a.userName = ?
-       ORDER BY a.dateSubmitted DESC`,
+      `SELECT
+         aa.originalAppId    AS id,
+         aa.resumePath,
+         aa.dateSubmitted,
+         aa.careerTitle      AS careerTitle,
+         aa.companyName      AS company
+       FROM applications_archive aa
+       WHERE aa.userName = ?
+       ORDER BY aa.dateSubmitted DESC`,
       [userName]
     );
+
     res.json(rows);
   } catch (err) {
-    console.error("❌ Failed to fetch user applications:", err);
+    console.error("❌ Failed to fetch user applications (archive):", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
 
 module.exports = router;

@@ -1720,6 +1720,7 @@ html, body {
   left: 100px;
 }
 
+/* Feed card layout */
 .feed-card {
   display: flex;
   align-items: flex-start;
@@ -1733,38 +1734,41 @@ html, body {
   transition: all 0.3s ease;
   font-family: Arial, sans-serif;
   text-align: justify;
-}
-
-.feed-img {
-  width: 250px;
-  height: 160px;
-  object-fit: cover;
+  position: absolute;
+  /* ensure the card itself doesn't preserve whitespace that prevents wrapping */
+  white-space: normal !important;
+    position: relative;
   border-radius: 8px;
-  flex-shrink: 0;
+  overflow: hidden;
 }
 
-.feed-content {
-  flex: 1;
-}
-
-.feed-content h2 {
-  margin: 0 0 10px;
-  font-size: 22px;
-  color: #333;
-  font-family: Arial, sans-serif;
-}
-
-.feed-content p {
-  margin: 5px 0;
-  line-height: 1.4;
-  font-family: Arial, sans-serif;
-}
-
-.feed-content small {
+/* Image column: keep it from stretching the content area */
+.feed-img {
+  flex: 0 0 220px;     /* fixed image column width (adjust as needed) */
+  max-width: 220px;
+  width: 100%;
+  height: auto;
   display: block;
-  margin-top: 10px;
-  color: #777;
-  font-family: Arial, sans-serif;
+  border-radius: 8px;
+}
+
+/* Content column: must be allowed to shrink inside a flex container */
+.feed-content {
+  flex: 1 1 0%;
+  min-width: 0;        /* <-- CRITICAL: allows flex child to shrink and wrap */
+  overflow: hidden;
+}
+
+/* Paragraphs and other long text inside content: force breaks */
+.feed-content p,
+.feed-content small,
+.feed-content .meta,
+.feed-content h2 {
+  white-space: normal;           /* don't preserve long single-line whitespace */
+  overflow-wrap: anywhere;       /* modern browsers: break long words anywhere */
+  word-break: break-word;        /* fallback / older browsers */
+  hyphens: auto;                 /* optional: enable hyphenation if supported */
+  margin: 0 0 0.5rem 0;
 }
 
 /* ✅ Large PC screens (≥1600px) */
@@ -2194,6 +2198,18 @@ html, body {
 .circle-btn:hover {
   background: #800000;
   transform: scale(1.05);
+}
+.circle-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px; /* space between circle and label */
+}
+
+.circle-btn-label {
+  font-size: 12px;
+  color: #444;
+  text-align: center;
 }
 
 /* =========================

@@ -156,7 +156,8 @@ async function initTables() {
       location VARCHAR(255),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
       eventDateTime DATETIME,
-      image LONGBLOB  -- ✅ store actual image as binary
+      image LONGBLOB,  -- ✅ store actual image as binary
+      status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
 
     careers: `CREATE TABLE IF NOT EXISTS careers (
@@ -166,7 +167,8 @@ async function initTables() {
       link VARCHAR(255),
       userId VARCHAR(100),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
-      image LONGBLOB  -- ✅ store actual image as binary
+      image LONGBLOB,  -- ✅ store actual image as binary
+      status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
     homeregs: `CREATE TABLE IF NOT EXISTS homeregs (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -254,16 +256,36 @@ async function initTables() {
       message TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
-    applications: `CREATE TABLE applications (
+    applications: `CREATE TABLE applications_archive (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      userName VARCHAR(50) NOT NULL,     -- who applied
-      careerId INT NOT NULL,             -- which career/job they applied for
+      originalAppId INT NOT NULL,           -- reference to applications.id
+      userName VARCHAR(50) NOT NULL,
+      careerId INT NOT NULL,
+      careerTitle VARCHAR(200) NOT NULL,
+      companyName VARCHAR(200) NOT NULL,
       firstName VARCHAR(100) NOT NULL,
       lastName VARCHAR(100) NOT NULL,
       phoneNo VARCHAR(20) NOT NULL,
       email VARCHAR(100) NOT NULL,
-      resumePath VARCHAR(255) NOT NULL,  -- file path of uploaded PDF
-      dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP
+      resumePath VARCHAR(255) NOT NULL,
+      dateSubmitted DATETIME,
+      archivedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    applications_archive: `CREATE TABLE applications_archive (
+      id INT AUTO_INCREMENT PRIMARY KEY,       -- archive’s own ID
+      originalAppId INT NOT NULL,              -- reference to applications.id
+      userName VARCHAR(50) NOT NULL,
+      careerId INT NOT NULL,
+      employerId VARCHAR(100) NOT NULL,        -- ✅ match careers.userId (VARCHAR)
+      careerTitle VARCHAR(200) NOT NULL,
+      companyName VARCHAR(200) NOT NULL,
+      firstName VARCHAR(100) NOT NULL,
+      lastName VARCHAR(100) NOT NULL,
+      phoneNo VARCHAR(20) NOT NULL,
+      email VARCHAR(100) NOT NULL,
+      resumePath VARCHAR(255) NOT NULL,
+      dateSubmitted DATETIME,
+      archivedAt DATETIME DEFAULT CURRENT_TIMESTAMP
     )`
   };
   for (const [name, ddl] of Object.entries(sql)) {
@@ -271,7 +293,31 @@ async function initTables() {
     console.log(`✅ Initialized table: ${name}`);
   }
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Example: login route
+app.get('/api/auth/me', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+  res.json(req.session.user);
+});
+
+// ✅ Get logged-in employer info
+app.get('/api/employer/me', (req, res) => {
+  if (!req.session.user || !req.session.user.isEmployer) {
+    return res.json({ role: 'guest' });
+  }
+
+  res.json({
+    role: 'employer',
+    employerId: req.session.user.id,
+    userId: req.session.user.preferredUserId,
+    employerName: req.session.user.employerName || '' // ✅ ensure it exists
+  });
+});
+
+
 app.post('/api/alumni', async (req, res) => {
   try {
     const b = req.body;
@@ -706,6 +752,10 @@ app.post('/api/registration/login', async (req, res) => {
     req.session.user = {
       id: user.id,
       userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      personalEmail: user.personalEmail,
+      gender: user.gender,
       isAdmin
     };
     req.session.userId = user.id;
@@ -839,6 +889,7 @@ app.post("/api/employers/upload-logo", upload.single("logo"), async (req, res) =
   }
 });
 
+// ✅ Employer: Get applications for their careers (from archive)
 app.get('/api/applications/employer', async (req, res) => {
   if (!req.session.user || !req.session.user.isEmployer) {
     return res.status(401).json({ error: "Not logged in as employer" });
@@ -846,22 +897,29 @@ app.get('/api/applications/employer', async (req, res) => {
 
   try {
     const [rows] = await pool.execute(
-      `SELECT a.id, a.firstName, a.lastName, a.phoneNo, a.email, 
-              a.resumePath, a.dateSubmitted
-       FROM applications a
-       WHERE a.careerId IN (
-         SELECT id FROM careers WHERE userId = ?
-       )
-       ORDER BY a.dateSubmitted DESC`,
-      [req.session.user.preferredUserId]  // ✅ use employer's login ID
+      `SELECT 
+         aa.originalAppId   AS id,
+         aa.firstName,
+         aa.lastName,
+         aa.phoneNo,
+         aa.email,
+         aa.resumePath,
+         aa.dateSubmitted,
+         aa.careerTitle,
+         aa.companyName
+       FROM applications_archive aa
+       WHERE aa.employerId = ?
+       ORDER BY aa.dateSubmitted DESC`,
+      [req.session.user.preferredUserId]  // ✅ employer's login ID
     );
 
     res.json(rows);
   } catch (err) {
-    console.error("❌ Fetch Applicants Error:", err);
+    console.error("❌ Fetch Applicants Error (archive):", err);
     res.status(500).json({ error: "Database error" });
   }
 });
+
 
 
 
@@ -874,54 +932,72 @@ app.get('/api/applications/employer', async (req, res) => {
 
   try {
     const [rows] = await pool.execute(
-      `SELECT r.firstName, r.lastName, f.major, f.graduated,
-              r.personalEmail AS email, a.resumePath, a.dateSubmitted
-       FROM applications a
-       JOIN registration r ON a.userId = r.id
-       JOIN fullInformation f ON r.userName = f.userName
-       WHERE a.employerId = ?`,
+      `SELECT 
+         r.firstName, 
+         r.lastName, 
+         f.major, 
+         f.graduated,
+         r.personalEmail AS email, 
+         aa.resumePath, 
+         aa.dateSubmitted,
+         aa.careerTitle, 
+         aa.companyName
+       FROM applications_archive aa
+       JOIN registration r 
+         ON aa.userName = r.userName
+       LEFT JOIN fullInformation f 
+         ON r.userName = f.userName
+       WHERE aa.employerId = ?
+       ORDER BY aa.dateSubmitted DESC`,
       [req.session.employer.id]
     );
 
     res.json(rows);
   } catch (err) {
-    console.error("❌ Fetch Applicants Error:", err);
+    console.error("❌ Fetch Applicants Error (archive):", err);
     res.status(500).json({ error: "Database error" });
   }
 });
+
 
 // ----------------------
 // Admin Applications Route
 // ----------------------
 app.get("/api/admin-applications", async (req, res) => {
   try {
-    // Ensure only logged-in employers can see their own apps
-    const employerId = req.session.userId; // 👈 set when login
+    const employerId = req.session.user?.userName; // 👈 this is the admin username
     if (!employerId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     const [rows] = await pool.query(
       `SELECT 
-        a.firstName, 
-        a.lastName, 
-        a.phoneNo, 
-        a.email, 
-        a.resumePath, 
-        a.dateSubmitted
-      FROM applications a
-      JOIN careers c ON a.careerId = c.id
-      WHERE c.employerId = ?
-      ORDER BY a.dateSubmitted DESC`,
+         aa.firstName, 
+         aa.lastName, 
+         aa.phoneNo, 
+         aa.email, 
+         aa.resumePath, 
+         aa.dateSubmitted, 
+         aa.archivedAt,
+         aa.careerTitle,
+         aa.companyName
+       FROM applications_archive aa
+       WHERE aa.employerId = ?   -- ✅ match admin username from careers.userId
+       ORDER BY aa.dateSubmitted DESC`,
       [employerId]
     );
 
     res.json(rows);
   } catch (err) {
-    console.error("❌ Error fetching applications:", err);
+    console.error("❌ Error fetching applications (archive):", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
+
+
 
 
 
@@ -998,6 +1074,7 @@ app.post('/api/employer/login', async (req, res) => {
     req.session.user = {
       id: employer.id,
       preferredUserId: employer.preferredUserId,
+      employerName: employer.employerName,  // 🔥 important
       isEmployer: true
     };
 
@@ -1205,16 +1282,13 @@ app.get('/api/fullInformation', async (req, res) => {
 
 app.post('/api/events/add', imageUpload.single('image'), async (req, res) => {
   try {
-    const { title, description, location, eventDate, eventTime } = req.body;
-    const eventDateTime = `${eventDate} ${eventTime}`;
+    const { title, description, location, eventDateTime } = req.body;
 
-    // ✅ Use buffer instead of filename
     let imageBuffer = null;
     if (req.file) {
-      imageBuffer = req.file.buffer; // This is the actual binary data
+      imageBuffer = req.file.buffer;
     }
 
-    // ✅ Insert into DB (store binary in `image` column, not filename)
     await pool.query(
       `INSERT INTO events (title, description, location, eventDateTime, image, datePosted)
        VALUES (?, ?, ?, ?, ?, NOW())`,
@@ -1228,20 +1302,46 @@ app.post('/api/events/add', imageUpload.single('image'), async (req, res) => {
   }
 });
 
+// ================== EVENTS API ==================
+app.get("/api/events", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM events ORDER BY datePosted DESC");
 
-// 📌 GET: Events List
+    // ✅ Reformat eventDateTime so frontend reads it correctly
+    const events = rows.map(event => {
+      let formattedDateTime = null;
+
+      if (event.eventDateTime) {
+        // Convert MySQL DATETIME to ISO string without timezone
+        const dt = new Date(event.eventDateTime);
+        formattedDateTime = dt.toISOString().slice(0, 19).replace("T", " ");
+        
+        // 👇 Now convert to "YYYY-MM-DDTHH:mm:ss" (ISO-like without Z)
+        formattedDateTime = formattedDateTime.replace(" ", "T");
+      }
+
+      return {
+        ...event,
+        eventDateTime: formattedDateTime
+      };
+    });
+
+    res.json({ events });
+  } catch (err) {
+    console.error("❌ Failed to fetch events:", err);
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
+});
+
+
+// 📌 GET: Events List (Only Active)
 app.get('/api/events', async (req, res) => {
   try {
-    // Auto-delete events older than 5 days
-    await pool.query(`
-      DELETE FROM events 
-      WHERE eventDateTime < NOW() - INTERVAL 5 DAY
-    `);
-
-    // Fetch events (ordered by eventDateTime)
     const [rows] = await pool.query(
       `SELECT id, title, description, location, datePosted, eventDateTime 
-       FROM events ORDER BY eventDateTime DESC`
+       FROM events 
+       WHERE status = 'active'
+       ORDER BY eventDateTime DESC`
     );
 
     const events = rows.map(row => {
@@ -1256,7 +1356,6 @@ app.get('/api/events', async (req, res) => {
         location: row.location,
         datePosted: new Date(row.datePosted),
         eventDateTime,
-        // ✅ New: serve via API route
         image: `/api/events/${row.id}/image`,
         isGray
       };
@@ -1269,25 +1368,23 @@ app.get('/api/events', async (req, res) => {
   }
 });
 
+
+
+// 📌 GET: Careers List (Only Active)
 app.get('/api/careers', async (req, res) => {
   try {
-    // ✅ Step 1: Delete careers older than 20 days (5 active + 15 gray)
-    await pool.query(`
-      DELETE FROM careers
-      WHERE NOW() > DATE_ADD(datePosted, INTERVAL 20 DAY)
-    `);
-
-    // ✅ Step 2: Fetch remaining careers
     const [rows] = await pool.query(`
       SELECT id, title, description, link, userId, datePosted
-      FROM careers ORDER BY datePosted DESC
+      FROM careers 
+      WHERE status = 'active'
+      ORDER BY datePosted DESC
     `);
 
     const careers = rows.map(row => {
       const datePosted = new Date(row.datePosted);
       const now = new Date();
 
-      // Career turns gray after 5 days
+      // Career still turns gray after 5 days
       const grayDate = new Date(datePosted.getTime() + 5 * 24 * 60 * 60 * 1000);
       const isGray = now >= grayDate;
 
@@ -1298,7 +1395,7 @@ app.get('/api/careers', async (req, res) => {
         link: row.link,
         userId: row.userId,
         datePosted,
-        image: `/api/careers/image/${row.id}`, // ✅ serve via API route
+        image: `/api/careers/image/${row.id}`,
         isGray
       };
     });
@@ -1309,6 +1406,8 @@ app.get('/api/careers', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 
 
@@ -1347,12 +1446,12 @@ app.put('/api/events/:id', imageUpload.single('image'), async (req, res) => {
 
 
 
-// 📌 DELETE: Remove Event (with image file cleanup)
+// 📌 HARD DELETE Event
 app.delete('/api/events/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    // ✅ Delete DB record directly
+    // hard delete from events table only
     const [result] = await pool.execute(
       `DELETE FROM events WHERE id = ?`,
       [id]
@@ -1362,12 +1461,13 @@ app.delete('/api/events/:id', async (req, res) => {
       return res.status(404).json({ error: 'Event not found' });
     }
 
-    res.json({ success: true });
+    res.json({ success: true, message: 'Event hard deleted' });
   } catch (err) {
-    console.error("❌ Event delete error:", err);
+    console.error("❌ Event hard delete error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 
@@ -1502,19 +1602,30 @@ app.put('/api/careers/:id', async (req, res) => {
   }
 });
 
+// 📌 HARD DELETE Career (but keep applications)
 app.delete('/api/careers/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
-    const [result] = await pool.execute( // ✅ no .promise()
+    // hard delete from careers table only
+    const [result] = await pool.execute(
       `DELETE FROM careers WHERE id = ?`,
       [id]
     );
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'Career not found' });
-    res.json({ success: true });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Career not found' });
+    }
+
+    res.json({ success: true, message: 'Career hard deleted, applications preserved' });
   } catch (err) {
+    console.error("❌ Career hard delete error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
 
 app.get('/api/careers/last-post/:userId', async (req, res) => {
   const userId = req.params.userId;

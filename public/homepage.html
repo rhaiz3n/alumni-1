@@ -935,43 +935,89 @@ async function loadAnnouncements() {
 
 
 
-  async function loadFeed() {
+ // ===== Homepage Feed Loader (Events only, with robust countdown) =====
+async function loadFeed() {
   const container = document.getElementById('feed');
   container.innerHTML = 'Loading feed...';
 
-  try {
-    // 🔹 Fetch only events
-    const eventsRes = await fetch('/api/events');
-    const { events } = await eventsRes.json();
+  // Parse flexible datetime strings into a JS Date (local)
+  function parseFlexibleDateTime(input) {
+    if (!input && input !== 0) return null;
 
-    // Add type field (for consistency)
-    const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
+    if (input instanceof Date) {
+      return isNaN(input.getTime()) ? null : input;
+    }
+
+    if (typeof input === 'number' || /^\d+$/.test(String(input).trim())) {
+      const n = Number(input);
+      const d = new Date(n);
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    const s = String(input).trim();
+
+    const isoMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if (isoMatch) {
+      const [, yy, mm, dd, hh, min, sec = '0'] = isoMatch;
+      return new Date(Number(yy), Number(mm) - 1, Number(dd), Number(hh), Number(min), Number(sec));
+    }
+
+    const mySqlMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if (mySqlMatch) {
+      const [, yy, mm, dd, hh, min, sec = '0'] = mySqlMatch;
+      return new Date(Number(yy), Number(mm) - 1, Number(dd), Number(hh), Number(min), Number(sec));
+    }
+
+    const usMatch = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+    if (usMatch) {
+      const [, mo, da, yr, hhRaw, min, sec = '0', ampm] = usMatch;
+      let hh = Number(hhRaw);
+      if (ampm) {
+        const up = ampm.toUpperCase();
+        if (up === 'PM' && hh !== 12) hh += 12;
+        if (up === 'AM' && hh === 12) hh = 0;
+      }
+      return new Date(Number(yr), Number(mo) - 1, Number(da), hh, Number(min), Number(sec));
+    }
+
+    const fallback = new Date(s);
+    return isNaN(fallback.getTime()) ? null : fallback;
+  }
+
+  try {
+    // 🔹 Only fetch events
+    const eventsRes = await fetch('/api/events');
+    if (!eventsRes.ok) throw new Error('Failed to fetch events');
+
+    const { events } = await eventsRes.json();
+    const formattedEvents = (events || []).map(e => ({ ...e, type: 'Event' }));
 
     // Sort by newest first
     const feed = formattedEvents.sort(
       (a, b) => new Date(b.datePosted) - new Date(a.datePosted)
     );
 
-    // Render feed cards
     container.innerHTML = feed.map((post, index) => {
-      const extraInfo = `🎉 Type of Event: ${post.location || "N/A"}`;
-
-      // ✅ Correct image path from DB
+      const extraInfo = `🎉 Location: ${post.location || "N/A"}`;
       const imgSrc = `/api/events/image/${post.id}`;
 
-      // Use eventDateTime if available, otherwise fallback to posted date
-      const countdownTime = post.eventDateTime || post.datePosted;
+      let deadlineDate = parseFlexibleDateTime(post.eventDateTime) || parseFlexibleDateTime(post.datePosted);
+      let raw = post.eventDateTime || post.datePosted;
+      if (raw && raw.endsWith("Z")) raw = raw.replace("Z", "");
+      deadlineDate = parseFlexibleDateTime(raw);
+
+      const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
 
       return `
-        <div class="feed-card">
+        <div class="feed-card" id="post-Event-${post.id}">
           ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ""}
           <div class="feed-content">
-            <h2>${post.title.toUpperCase()} <small>[Event]</small></h2>
-            <p>${post.description}</p>
+            <h2>${(post.title || '').toUpperCase()} <small>[Event]</small></h2>
+            <p>${post.description || ''}</p>
             <small>
               ${extraInfo} <br>
               🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
-              ⏳ <span class="countdown" data-time="${countdownTime}" id="countdown-${index}"></span>
+              ⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span>
             </small>
           </div>
         </div>
@@ -980,18 +1026,19 @@ async function loadAnnouncements() {
 
     // Countdown updater
     function updateCountdowns() {
+      const now = Date.now();
       document.querySelectorAll(".countdown").forEach(el => {
-        const expireTime = new Date(el.dataset.time);
-        if (isNaN(expireTime.getTime())) {
-          el.textContent = "❌ Invalid Date";
+        const ms = Number(el.dataset.time);
+        if (!ms || isNaN(ms)) {
+          el.textContent = "—";
           return;
         }
 
-        const diffMs = expireTime - new Date();
+        const diffMs = ms - now;
         const card = el.closest(".feed-card");
 
         if (diffMs <= 0) {
-          el.textContent = "❌ Close";
+          el.textContent = "❌ Closed";
           if (card) {
             card.style.filter = "grayscale(100%)";
             card.style.opacity = "0.6";
@@ -999,10 +1046,10 @@ async function loadAnnouncements() {
           return;
         }
 
-        const days = Math.floor(diffMs / (1000*60*60*24));
-        const hours = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
-        const minutes = Math.floor((diffMs % (1000*60*60)) / (1000*60));
-        const seconds = Math.floor((diffMs % (1000*60)) / 1000);
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
 
         el.textContent = days > 0
           ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
@@ -1021,6 +1068,7 @@ async function loadAnnouncements() {
 
 // Run feed loader on page load
 document.addEventListener('DOMContentLoaded', loadFeed);
+
 
 </script>
 </body>

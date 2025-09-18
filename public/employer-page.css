@@ -422,6 +422,7 @@ html, body {
   left: 100px;
 }
 
+/* Feed card layout */
 .feed-card {
   display: flex;
   align-items: flex-start;
@@ -434,38 +435,42 @@ html, body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
   font-family: Arial, sans-serif;
-}
-
-.feed-img {
-  width: 250px;
-  height: 160px;
-  object-fit: cover;
+  text-align: justify;
+  position: absolute;
+  /* ensure the card itself doesn't preserve whitespace that prevents wrapping */
+  white-space: normal !important;
+    position: relative;
   border-radius: 8px;
-  flex-shrink: 0;
+  overflow: hidden;
 }
 
-.feed-content {
-  flex: 1;
-}
-
-.feed-content h2 {
-  margin: 0 0 10px;
-  font-size: 22px;
-  color: #333;
-  font-family: Arial, sans-serif;
-}
-
-.feed-content p {
-  margin: 5px 0;
-  line-height: 1.4;
-  font-family: Arial, sans-serif;
-}
-
-.feed-content small {
+/* Image column: keep it from stretching the content area */
+.feed-img {
+  flex: 0 0 220px;     /* fixed image column width (adjust as needed) */
+  max-width: 220px;
+  width: 100%;
+  height: auto;
   display: block;
-  margin-top: 10px;
-  color: #777;
-  font-family: Arial, sans-serif;
+  border-radius: 8px;
+}
+
+/* Content column: must be allowed to shrink inside a flex container */
+.feed-content {
+  flex: 1 1 0%;
+  min-width: 0;        /* <-- CRITICAL: allows flex child to shrink and wrap */
+  overflow: hidden;
+}
+
+/* Paragraphs and other long text inside content: force breaks */
+.feed-content p,
+.feed-content small,
+.feed-content .meta,
+.feed-content h2 {
+  white-space: normal;           /* don't preserve long single-line whitespace */
+  overflow-wrap: anywhere;       /* modern browsers: break long words anywhere */
+  word-break: break-word;        /* fallback / older browsers */
+  hyphens: auto;                 /* optional: enable hyphenation if supported */
+  margin: 0 0 0.5rem 0;
 }
 
 /* ✅ Large PC screens (≥1600px) */
@@ -567,7 +572,6 @@ html, body {
   max-width: 500px;
   width: 90%;
   color: #fff;
-  box-shadow: 0 0 30px rgba(128, 0, 17, 0.692), 0 0 60px rgba(255, 0, 0, 0.753);
   position: relative;
   animation: slideIn 0.5s ease;
 }
@@ -612,7 +616,7 @@ html, body {
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.08);
-  color: #ffffff;
+  color: #1b1b1b;
   margin-bottom: 12px;
   outline: none;
   transition: border 0.3s ease, box-shadow 0.3s ease;
@@ -623,7 +627,7 @@ html, body {
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.08);
-  color: #666666;
+  color: #ffffff;
   margin-bottom: 12px;
   outline: none;
   transition: border 0.3s ease, box-shadow 0.3s ease;
@@ -635,7 +639,7 @@ html, body {
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.08);
-  color: #666666;
+  color: #ffffff;
   margin-bottom: 12px;
   outline: none;
   transition: border 0.3s ease, box-shadow 0.3s ease;
@@ -1104,6 +1108,8 @@ html, body {
   padding: 8px;
   text-align: center;
   font-family: 'Albert Sans', serif;
+  overflow-y: auto;
+  max-height: 100%;
 }
 
 .applications-table-employer th {
@@ -1162,3 +1168,73 @@ html, body {
   }
 }
 
+
+
+.employer-header {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;   /* always caps */
+  color: #333;
+  cursor: pointer;
+  position: absolute;
+  transition: color 0.3s ease;
+}
+
+/* Normal state */
+.employer-header {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;   /* always caps */
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+/* Hover effect */
+.employer-header:hover {
+  color: transparent;
+  background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+  background-size: 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: rainbow 10s linear infinite;
+}
+
+.employer-header:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Rainbow animation */
+@keyframes rainbow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .employer-header {
+    font-size: 20px;
+    top: 212px;
+    left: 12%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .employer-header {
+    font-size: 20px;
+    top: 215px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .employer-header {
+    font-size: 90px;
+    top: 35px;
+    left: 35%;
+  }
+}

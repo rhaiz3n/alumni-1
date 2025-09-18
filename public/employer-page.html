@@ -155,6 +155,7 @@
                     <th>PHONE NO.</th>
                     <th>EMAIL</th>
                     <th>RESUME</th>
+                    <th>SUBMITTED AT</th> <!-- ✅ new column -->
                   </tr>
                 </thead>
                 <tbody id="applicantsTableBody">
@@ -204,6 +205,10 @@
 </div>
 
 
+<div class="employer-header">
+  <i class="fas fa-user-circle"></i>
+  <span id="employerNameDisplay"></span>
+</div>
 
 
 <script type="module">
@@ -525,7 +530,6 @@ async function openApplicantsModal() {
     if (!res.ok) throw new Error("Failed to fetch applicants");
 
     const applicants = await res.json();
-
     tbody.innerHTML = applicants.length
       ? applicants.map(app => `
         <tr>
@@ -533,9 +537,10 @@ async function openApplicantsModal() {
           <td>${app.phoneNo || "-"}</td>
           <td>${app.email || "-"}</td>
           <td><a href="/uploads/resumes/${app.resumePath}" target="_blank">VIEW</a></td>
+          <td>${app.dateSubmitted ? new Date(app.dateSubmitted).toLocaleString() : "-"}</td>
         </tr>
       `).join("")
-      : `<tr><td colspan="5">📭 No applicants yet</td></tr>`;
+      : `<tr><td colspan="5">No applications found</td></tr>`;
   } catch (err) {
     console.error("❌ Error loading applicants:", err);
     tbody.innerHTML = `<tr><td colspan="5">⚠️ Failed to load applicants</td></tr>`;
@@ -796,6 +801,18 @@ async function toggleApplications(careerId) {
     modal.style.display = 'none';
     loadFeed(); // reload feed after posting
   };
+
+
+fetch('/api/employer/me')
+  .then(res => res.json())
+  .then(user => {
+    const nameEl = document.getElementById("employerNameDisplay");
+    if (user.role === "employer" && user.employerName) {
+      nameEl.textContent = user.employerName.toUpperCase(); // ✅ safe now
+    } else {
+      nameEl.textContent = "GUEST";
+    }
+  });
 </script>
 
 </body>

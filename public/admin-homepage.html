@@ -49,13 +49,11 @@
       </select>
 
       <label for="location">Indicate Type of Event</label>
-      <input type="text" id="location" name="location" placeholder="Type of Event" required>
+      <input type="text" id="location" name="location" placeholder="Type of Event" required maxlength="95">
 
-      <label for="eventDate">Event Schedule</label>
-      <div class="event-datetime">
-        <input type="date" id="eventDate" name="eventDate" required>
-        <input type="time" id="eventTime" name="eventTime" required>
-      </div>
+
+      <label for="eventDateTime">Event Schedule</label>
+      <input type="datetime-local" id="eventDateTime" name="eventDateTime" required>
 
       <!-- ✅ Styled File Upload -->
       <label for="eventImage" class="file-label">Upload Image</label>
@@ -258,7 +256,6 @@
     <div class="inbox-header">Admin Inbox</div>
     <div id="inboxContentList" class="inbox-list"></div>
     <div class="inbox-footer">
-      <button id="clearInboxBtn">Clear All</button>
     </div>
   </div>
 
@@ -306,8 +303,11 @@
 
 
 <!-- Circle button -->
-<div id="adminApplicationsCircle" class="circle-btn">
-  <i class="fas fa-bell"></i>
+<div class="circle-btn-container">
+  <div id="adminApplicationsCircle" class="circle-btn">
+    <i class="fas fa-clipboard-list"></i>
+  </div>
+  <span class="circle-btn-label">Applications</span>
 </div>
 
 <!-- Modal for Admin Applications -->
@@ -669,37 +669,84 @@ function initNotificationSystem() {
 
   fetch('/api/admin/inbox')
     .then(res => res.json())
-    .then(data => data.forEach(renderNotification));
+    .then(data => {
+      // 🆕 Ensure newest is at the top initially
+      data.reverse().forEach(renderNotification);
+    });
 
   const socket = io();
   socket.on('newNotification', renderNotification);
 }
 
 
-// ===== Admin Feed Loader =====
+// ===== Admin Feed Loader (robust datetime parsing + ms-based countdown + delete) =====
 async function loadFeed() {
   const container = document.getElementById('feed');
   container.innerHTML = 'Loading feed...';
 
+  // Parse flexible datetime strings into a JS Date (local)
+  function parseFlexibleDateTime(input) {
+    if (!input && input !== 0) return null;
+
+    if (input instanceof Date) {
+      return isNaN(input.getTime()) ? null : input;
+    }
+
+    if (typeof input === 'number' || /^\d+$/.test(String(input).trim())) {
+      const n = Number(input);
+      const d = new Date(n);
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    const s = String(input).trim();
+
+    const isoMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if (isoMatch) {
+      const [, yy, mm, dd, hh, min, sec = '0'] = isoMatch;
+      return new Date(Number(yy), Number(mm) - 1, Number(dd), Number(hh), Number(min), Number(sec));
+    }
+
+    const mySqlMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if (mySqlMatch) {
+      const [, yy, mm, dd, hh, min, sec = '0'] = mySqlMatch;
+      return new Date(Number(yy), Number(mm) - 1, Number(dd), Number(hh), Number(min), Number(sec));
+    }
+
+    const usMatch = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+    if (usMatch) {
+      const [, mo, da, yr, hhRaw, min, sec = '0', ampm] = usMatch;
+      let hh = Number(hhRaw);
+      if (ampm) {
+        const up = ampm.toUpperCase();
+        if (up === 'PM' && hh !== 12) hh += 12;
+        if (up === 'AM' && hh === 12) hh = 0;
+      }
+      return new Date(Number(yr), Number(mo) - 1, Number(da), hh, Number(min), Number(sec));
+    }
+
+    const fallback = new Date(s);
+    return isNaN(fallback.getTime()) ? null : fallback;
+  }
+
   try {
-    // Fetch all events and all careers
     const [eventsRes, careersRes] = await Promise.all([
       fetch('/api/events'),
-      fetch('/api/careers/all') // fetch all careers for admin
+      fetch('/api/careers/all')
     ]);
+
+    if (!eventsRes.ok || !careersRes.ok) {
+      throw new Error('Failed to fetch feed data');
+    }
 
     const { events } = await eventsRes.json();
     const { careers } = await careersRes.json();
 
-    // Add type field
-    const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
-    const formattedCareers = careers.map(c => ({ ...c, type: 'Career' }));
+    const formattedEvents = (events || []).map(e => ({ ...e, type: 'Event' }));
+    const formattedCareers = (careers || []).map(c => ({ ...c, type: 'Career' }));
 
-    // Merge + sort by datePosted (newest first)
     const feed = [...formattedEvents, ...formattedCareers]
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-    // Render feed cards
     container.innerHTML = feed.map((post, index) => {
       let extraInfo = "";
       if (post.type === "Event") {
@@ -708,49 +755,53 @@ async function loadFeed() {
         extraInfo = `🏢 Company Name: ${post.link || "N/A"}`;
       }
 
-      // ✅ Correct image path from DB
       let imgSrc = "";
+      if (post.type === "Career") imgSrc = `/api/careers/image/${post.id}`;
+      else if (post.type === "Event") imgSrc = `/api/events/image/${post.id}`;
+
+      let deadlineDate = null;
       if (post.type === "Career") {
-        imgSrc = `/api/careers/image/${post.id}`;
+        const postedTime = parseFlexibleDateTime(post.datePosted) || new Date();
+        deadlineDate = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000);
       } else if (post.type === "Event") {
-        imgSrc = `/api/events/image/${post.id}`;
+        deadlineDate = parseFlexibleDateTime(post.eventDateTime) || parseFlexibleDateTime(post.datePosted);
+        let raw = post.eventDateTime || post.datePosted;
+        if (raw && raw.endsWith("Z")) raw = raw.replace("Z", "");
+        deadlineDate = parseFlexibleDateTime(raw);
       }
 
-      let countdownTime;
-      if (post.type === "Career") {
-        const postedTime = new Date(post.datePosted);
-        countdownTime = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString();
-      } else if (post.type === "Event") {
-        countdownTime = post.eventDateTime || post.datePosted;
-      }
+      const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
 
       return `
-        <div class="feed-card">
+        <div class="feed-card" id="post-${post.type}-${post.id}" style="position: relative;">
+          <button class="delete-btn" onclick="deletePost('${post.type}', ${post.id})"
+            style="position:absolute;top:5px;right:5px;background:#e63946;color:#fff;border:none;padding:5px 8px;cursor:pointer;border-radius:4px;">
+            ✖
+          </button>
           ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ""}
           <div class="feed-content">
-            <h2>${post.title.toUpperCase()} <small>[${post.type}]</small></h2>
-            <p>${post.description}</p>
+            <h2>${(post.title || '').toUpperCase()} <small>[${post.type}]</small></h2>
+            <p>${post.description || ''}</p>
             <small>
               ${extraInfo} <br>
               🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
-              ⏳ <span class="countdown" data-time="${countdownTime}" id="countdown-${index}"></span>
+              ⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span>
             </small>
           </div>
         </div>
       `;
     }).join('');
 
-
-    // Countdown updater
     function updateCountdowns() {
+      const now = Date.now();
       document.querySelectorAll(".countdown").forEach(el => {
-        const expireTime = new Date(el.dataset.time);
-        if (isNaN(expireTime.getTime())) {
-          el.textContent = "❌ Invalid Date";
+        const ms = Number(el.dataset.time);
+        if (!ms || isNaN(ms)) {
+          el.textContent = "—";
           return;
         }
 
-        const diffMs = expireTime - new Date();
+        const diffMs = ms - now;
         const card = el.closest(".feed-card");
 
         if (diffMs <= 0) {
@@ -758,14 +809,20 @@ async function loadFeed() {
           if (card) {
             card.style.filter = "grayscale(100%)";
             card.style.opacity = "0.6";
+            // ✅ Keep delete button red and visible
+            const delBtn = card.querySelector(".delete-btn");
+            if (delBtn) {
+              delBtn.style.filter = "none";
+              delBtn.style.opacity = "1";
+            }
           }
           return;
         }
 
-        const days = Math.floor(diffMs / (1000*60*60*24));
-        const hours = Math.floor((diffMs % (1000*60*60*24)) / (1000*60*60));
-        const minutes = Math.floor((diffMs % (1000*60*60)) / (1000*60));
-        const seconds = Math.floor((diffMs % (1000*60)) / 1000);
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
 
         el.textContent = days > 0
           ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
@@ -782,8 +839,32 @@ async function loadFeed() {
   }
 }
 
+
+// ===== Delete Post (Admin only) =====
+  async function deletePost(type, id) {
+    showConfirm("❗Are you sure you want to delete this post?", async () => {
+      try {
+        const url = type === "Event" ? `/api/events/${id}` : `/api/careers/${id}`;
+        const res = await fetch(url, { method: "DELETE" });
+        if (res.ok) {
+          document.getElementById(`post-${type}-${id}`)?.remove();
+          showToast("✅ Post deleted successfully!", "success");
+        } else {
+          showToast("❌ Failed to delete post.", "error");
+        }
+      } catch (err) {
+        console.error("Error deleting post:", err);
+        showToast("⚠️ Error occurred while deleting.", "warning");
+      }
+    });
+  }
+
+
 // Run feed loader on page load
 document.addEventListener('DOMContentLoaded', loadFeed);
+
+
+
 
 
 
@@ -824,7 +905,7 @@ function closeModal(id) {
 document.addEventListener("DOMContentLoaded", () => {
   const userRole = sessionStorage.getItem("userRole"); // ✅ get role
 
-  // ================== EVENT MODAL ==================
+ // ================== EVENT MODAL ==================
   const eventModal = document.getElementById('modal-event');
   const openEventBtn = document.querySelector('.event-button');
   const closeEventBtn = eventModal.querySelector('.close');
@@ -855,11 +936,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formData = new FormData(eventForm);
 
-    // 👉 combine date + time into one hidden field
+    // 👉 Combine date + time into one field for DB
     const eventDate = formData.get("eventDate");
     const eventTime = formData.get("eventTime");
     if (eventDate && eventTime) {
-      formData.set("eventDateTime", `${eventDate}T${eventTime}`);
+      formData.set("eventDateTime", `${eventDate} ${eventTime}`);
     }
 
     try {
@@ -867,7 +948,6 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: formData
       });
-
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Event creation failed");
@@ -886,6 +966,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("❌ " + err.message, "error");
     }
   });
+
 
   // ================== CAREER MODAL ==================
   const careerModal = document.getElementById('modal-career');

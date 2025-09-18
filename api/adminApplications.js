@@ -7,40 +7,41 @@ const pool = require("../db/mysql");
 // Returns applications for careers that belong to the logged-in user
 router.get("/", async (req, res) => {
   try {
-    // must be logged in
-    if (!req.session?.user) return res.status(401).json({ error: "Not logged in" });
+    if (!req.session?.user) {
+      return res.status(401).json({ error: "Not logged in" });
+    }
 
-    // session may contain different properties depending on your login flow.
-    // Try username and numeric id (covers both cases).
-    const sessionUserName = req.session.user.userName || "";
-    const sessionUserId = req.session.user.id || "";
+    // ✅ Use userName instead of numeric ID
+    const sessionUserId = req.session.user.userName;
 
-    // Query: join applications -> careers and filter by careers.userId
-    // Alias columns to match front-end expectations: resume and submittedAt
     const sql = `
       SELECT
-        a.firstName,
-        a.lastName,
-        a.phoneNo,
-        a.email,
-        a.resumePath AS resume,
-        a.dateSubmitted AS submittedAt,
-        a.userName AS applicantUserName,
-        a.careerId
-      FROM applications a
-      JOIN careers c ON a.careerId = c.id
-      WHERE c.userId = ? OR c.userId = ?
-      ORDER BY a.dateSubmitted DESC
+        aa.firstName,
+        aa.lastName,
+        aa.phoneNo,
+        aa.email,
+        aa.resumePath AS resume,
+        aa.dateSubmitted AS submittedAt,
+        aa.userName AS applicantUserName,
+        aa.careerId,
+        aa.careerTitle,
+        aa.companyName,
+        aa.archivedAt
+      FROM applications_archive aa
+      WHERE aa.employerId = ?   -- stored as careers.userId (VARCHAR)
+      ORDER BY aa.dateSubmitted DESC
     `;
 
-    const [rows] = await pool.query(sql, [sessionUserName, sessionUserId]);
+    const [rows] = await pool.query(sql, [sessionUserId]);
 
-    // rows is an array; send it back
     res.json(rows);
   } catch (err) {
-    console.error("❌ Error fetching admin applications:", err);
+    console.error("❌ Error fetching admin applications (archive):", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
 
 module.exports = router;

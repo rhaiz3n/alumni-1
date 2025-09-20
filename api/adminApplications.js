@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
         aa.careerTitle,
         aa.companyName,
         aa.archivedAt
-      FROM applications_archive aa
+      FROM applicant aa
       WHERE aa.employerId = ?   -- stored as careers.userId (VARCHAR)
       ORDER BY aa.dateSubmitted DESC
     `;

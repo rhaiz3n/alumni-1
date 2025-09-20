@@ -12,6 +12,7 @@ const profileRoutes = require("./profileRoutes.js");
 const employerRoutes = require("./employerRoutes");
 const adminApplicationsRoutes = require("./adminApplications");
 const { sendOtpEmail } = require('../GmailMailer');
+const XLSX = require('xlsx');
 
 const { imageUpload, excelUpload, resumeUpload } = require("./uploadConfig");
 const multer = require('multer');
@@ -98,18 +99,13 @@ async function initTables() {
   const sql = {
     alumni: `CREATE TABLE IF NOT EXISTS alumni (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      firstName VARCHAR(100),
-      lastName VARCHAR(100),
+      firstName VARCHAR(100) NOT NULL,
+      lastName VARCHAR(100) NOT NULL,
       initial VARCHAR(10),
       suffix VARCHAR(10),
-      civilStatus VARCHAR(50),
-      dateBirth DATE,
-      gender VARCHAR(20),
-      phoneNo VARCHAR(50),
-      major VARCHAR(100),
-      yearStarted YEAR,
-      graduated YEAR,
-      studentNo VARCHAR(50)
+      dateBirth DATE NOT NULL,
+      major VARCHAR(100) NOT NULL,
+      graduated YEAR NOT NULL
     )`,
     responses: `CREATE TABLE IF NOT EXISTS responses (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -256,9 +252,8 @@ async function initTables() {
       message TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
-    applications: `CREATE TABLE applications_archive (
+    applications: `CREATE TABLE IF NOT EXISTS applications (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      originalAppId INT NOT NULL,           -- reference to applications.id
       userName VARCHAR(50) NOT NULL,
       careerId INT NOT NULL,
       careerTitle VARCHAR(200) NOT NULL,
@@ -268,10 +263,10 @@ async function initTables() {
       phoneNo VARCHAR(20) NOT NULL,
       email VARCHAR(100) NOT NULL,
       resumePath VARCHAR(255) NOT NULL,
-      dateSubmitted DATETIME,
-      archivedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (careerId) REFERENCES careers(id) ON DELETE CASCADE
     )`,
-    applications_archive: `CREATE TABLE applications_archive (
+    applicant: `CREATE TABLE applicant (
       id INT AUTO_INCREMENT PRIMARY KEY,       -- archive’s own ID
       originalAppId INT NOT NULL,              -- reference to applications.id
       userName VARCHAR(50) NOT NULL,
@@ -286,7 +281,7 @@ async function initTables() {
       resumePath VARCHAR(255) NOT NULL,
       dateSubmitted DATETIME,
       archivedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`
+    )`,
   };
   for (const [name, ddl] of Object.entries(sql)) {
     await pool.query(ddl);
@@ -318,29 +313,192 @@ app.get('/api/employer/me', (req, res) => {
 });
 
 
+// ✅ Insert alumni (single form submit)
 app.post('/api/alumni', async (req, res) => {
   try {
     const b = req.body;
-    
-    // Convert undefined values to null
+
+    // Helper: format date for MySQL (YYYY-MM-DD)
+    function formatDates(value) {
+      if (!value) return null;
+      const d = new Date(value);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
     const values = [
       b.firstName || null,
       b.lastName || null,
       b.initial || null,
       b.suffix || null,
+      formatDates(b.dateBirth) || null, // ✅ format before insert
       b.major || null,
       b.graduated || null
     ];
 
     const [result] = await pool.execute(`
       INSERT INTO alumni (
-        firstName, lastName, initial, suffix, major, graduated
-      ) VALUES (?, ?, ?, ?, ?, ?)
+        firstName, lastName, initial, suffix, dateBirth, major, graduated
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `, values);
 
     res.json({ id: result.insertId });
   } catch (err) {
-    console.error('Alumni insert error:', err);
+    console.error('❌ Alumni insert error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// ✅ Fetch alumni (with formatted dateBirth for frontend)
+// ✅ Fetch alumni with pagination + search
+app.get('/api/alumni', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search ? `%${req.query.search}%` : '%%';
+    const offset = (page - 1) * limit;
+
+    // Filter with search (checks firstName, lastName, major, graduated)
+    const [rows] = await pool.query(
+      `SELECT * FROM alumni 
+       WHERE firstName LIKE ? OR lastName LIKE ? OR major LIKE ? OR graduated LIKE ?
+       ORDER BY id DESC
+       LIMIT ? OFFSET ?`,
+      [search, search, search, search, limit, offset]
+    );
+
+    const [[{ count }]] = await pool.query(
+      `SELECT COUNT(*) as count FROM alumni 
+       WHERE firstName LIKE ? OR lastName LIKE ? OR major LIKE ? OR graduated LIKE ?`,
+      [search, search, search, search]
+    );
+
+    // Format date of birth nicely
+    function formatDates(value) {
+      if (!value) return null;
+      return new Date(value).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    const formatted = rows.map(r => ({
+      ...r,
+      dateBirth: formatDates(r.dateBirth)
+    }));
+
+    const totalPages = Math.ceil(count / limit);
+
+    res.json({ rows: formatted, totalPages });
+  } catch (err) {
+    console.error('❌ Alumni fetch error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+// ✅ Excel Upload with proper date handling
+app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    let wb, sheet, rows;
+    try {
+      wb = XLSX.read(req.file.buffer, { type: 'buffer', raw: false });
+      sheet = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(sheet, { raw: false });
+    } catch (xlsxError) {
+      console.error('XLSX parsing error:', xlsxError);
+      return res.status(400).json({ error: 'Invalid Excel file format' });
+    }
+
+    if (!rows || rows.length === 0) {
+      return res.status(400).json({ error: 'Excel file is empty' });
+    }
+
+    console.log(`Processing ${rows.length} rows from Excel file`);
+
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const stmt = `
+      INSERT INTO alumni (
+        firstName, lastName, initial, suffix, dateBirth, major, graduated
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    function formatDates(value) {
+      if (!value) return null;
+      const d = new Date(value);
+      if (isNaN(d)) return null;  // skip invalid dates
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    let insertedCount = 0;
+    let errors = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+
+      // Skip row if it looks like a header
+      const rowValues = Object.values(row).map(v => (v || '').toString().toLowerCase());
+      if (rowValues.includes('full name') && rowValues.includes('last name')) {
+        console.log(`Skipping header row ${i + 1}`);
+        continue;
+      }
+
+      // Extract data
+      const firstName = row['First Name'] || row['firstName'] || '';
+      const lastName  = row['Last Name']  || row['lastName'] || '';
+      const initial   = row['Middle Initial'] || '';
+      const suffix    = row['Suffix'] || '';
+      const program   = row['Program'] || row['Course'] || '';
+      const course    = row['Course'] || row['Program'] || '';
+      const yearGraduated = row['Year Graduated'] || row['Graduated'] || '';
+
+      // Skip row if required fields are missing
+      if (!firstName || !lastName || !program || !yearGraduated) {
+        console.warn(`Skipping row ${i + 1}: missing required fields`);
+        continue;
+      }
+
+      // Insert into DB
+      try {
+        await connection.execute(stmt, [firstName, lastName, initial, suffix, program, course, yearGraduated]);
+      } catch (err) {
+        console.error(`❌ Error inserting row ${i + 1}:`, err.message);
+      }
+    }
+
+
+    await connection.commit();
+    connection.release();
+
+    res.json({ success: true, totalRows: rows.length, inserted: insertedCount, errors });
+
+  } catch (err) {
+    console.error('Excel upload error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+app.delete('/api/alumni/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM alumni WHERE id = ?', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Delete error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -414,7 +572,7 @@ app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res
       sheet = wb.Sheets[wb.SheetNames[0]];
       rows = XLSX.utils.sheet_to_json(sheet, { raw: false });
     } catch (xlsxError) {
-      console.error('XLSX parsing error:', xlsxError);
+      console.error('❌ XLSX parsing error:', xlsxError);
       return res.status(400).json({ error: 'Invalid Excel file format' });
     }
 
@@ -422,15 +580,15 @@ app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res
       return res.status(400).json({ error: 'Excel file is empty' });
     }
 
-    console.log(`Processing ${rows.length} rows from Excel file`);
+    console.log(`📊 Processing ${rows.length} rows from Excel file`);
 
     const connection = await pool.getConnection();
     await connection.beginTransaction();
 
     const stmt = `
       INSERT INTO alumni (
-        firstName, lastName, initial, suffix, major, graduated
-      ) VALUES (?, ?, ?, ?, ?, ?)
+        firstName, lastName, initial, suffix, dateBirth, major, graduated
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     let insertedCount = 0;
@@ -439,15 +597,15 @@ app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       try {
-      const values = [
-        row['FirstName'] || row['FIRSTNAME'] || row['firstName'] || row['First Name'] || row['FIRST NAME'] ||row['first Name'] ||null,
-        row['LastName']  || row['LASTNAME']  || row['lastName']  || row['Last Name']  ||row['LAST NAME']  ||row['last Name']  ||null,
-        row['Initial']    || row['INITIAL']    || row['initial']   || row['Middle Initial']   || row['MIDDLE INITIAL']   || row['middle initial']   || null,
-        row['Suffix']     || row['SUFFIX']     || row['suffix']    || null,
-        row['Major']      || row['MAJOR / COURSE']     || row['Course'] || row['major'] || null,
-        row['Year Graduated']  || row['YEAR GRADUATED']  || row['year graduated'] || null
-      ];
-
+        const values = [
+          row['FirstName'] || row['FIRSTNAME'] || row['firstName'] || row['First Name'] || row['FIRST NAME'] || row['first Name'] || null,
+          row['LastName']  || row['LASTNAME']  || row['lastName']  || row['Last Name']  || row['LAST NAME']  || row['last Name'] || null,
+          row['Initial']   || row['INITIAL']   || row['initial']   || row['Middle Initial'] || row['MIDDLE INITIAL'] || row['middle initial'] || null,
+          row['Suffix']    || row['SUFFIX']    || row['suffix']    || null,
+          row['DateBirth'] || row['DATEBIRTH'] || row['dateBirth'] || row['Date of Birth'] || row['DATE OF BIRTH'] || row['dob'] || null,
+          row['Major']     || row['MAJOR / COURSE'] || row['Course'] || row['major'] || null,
+          row['Graduated'] || row['Year Graduated'] || row['YEAR GRADUATED'] || row['year graduated'] || null
+        ];
 
         await connection.execute(stmt, values);
         insertedCount++;
@@ -463,10 +621,11 @@ app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res
     res.json({ success: true, totalRows: rows.length, inserted: insertedCount, errors });
 
   } catch (err) {
-    console.error('Excel upload error:', err);
+    console.error('❌ Excel upload error:', err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 
@@ -717,6 +876,41 @@ app.post('/api/registration/add', async (req, res) => {
 });
 
 
+// POST /api/verify-dob
+app.post("/api/verify-dob", async (req, res) => {
+  try {
+    const { firstName, lastName, dob } = req.body; // dob should be YYYY-MM-DD
+
+    if (!firstName || !lastName || !dob) {
+      return res.status(400).json({ valid: false, error: "Missing fields" });
+    }
+
+    // Query stored DOB from DB
+    const [rows] = await pool.execute(
+      `SELECT dateBirth FROM alumni WHERE firstName = ? AND lastName = ? LIMIT 1`,
+      [firstName, lastName]
+    );
+
+    if (rows.length === 0) {
+      return res.json({ valid: false, error: "No matching record found" });
+    }
+
+    const dbDob = rows[0].dateBirth;
+
+    // If your column is DATE type in MySQL, format it
+    const inputDob = new Date(dob).toISOString().split("T")[0]; // "2001-06-23"
+    const storedDob = new Date(dbDob).toISOString().split("T")[0];
+
+    if (inputDob === storedDob) {
+      return res.json({ valid: true });
+    } else {
+      return res.json({ valid: false, error: "Date of Birth does not match" });
+    }
+  } catch (err) {
+    console.error("DOB verification error:", err);
+    res.status(500).json({ valid: false, error: "Server error" });
+  }
+});
 
 
 
@@ -907,7 +1101,7 @@ app.get('/api/applications/employer', async (req, res) => {
          aa.dateSubmitted,
          aa.careerTitle,
          aa.companyName
-       FROM applications_archive aa
+       FROM applicant aa
        WHERE aa.employerId = ?
        ORDER BY aa.dateSubmitted DESC`,
       [req.session.user.preferredUserId]  // ✅ employer's login ID
@@ -942,7 +1136,7 @@ app.get('/api/applications/employer', async (req, res) => {
          aa.dateSubmitted,
          aa.careerTitle, 
          aa.companyName
-       FROM applications_archive aa
+       FROM applicant aa
        JOIN registration r 
          ON aa.userName = r.userName
        LEFT JOIN fullInformation f 
@@ -981,7 +1175,7 @@ app.get("/api/admin-applications", async (req, res) => {
          aa.archivedAt,
          aa.careerTitle,
          aa.companyName
-       FROM applications_archive aa
+       FROM applicant aa
        WHERE aa.employerId = ?   -- ✅ match admin username from careers.userId
        ORDER BY aa.dateSubmitted DESC`,
       [employerId]

@@ -1,290 +1,441 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ALUMNI LIST | TUP - Cavite</title>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
-  <!-- Font Awesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <!-- Font Awesome for Social Media Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-  <link rel="icon" type="image/png" href="/Logo2.png">
+  <style>
+    /* Minimal inline styles for clean matte-white look */
+    body { background:#8d8d8d; color:#111827; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    .topbar { background:#fff; border-bottom:1px solid #e6e9ee; }
+    .card-surface { background:#fff; border:1px solid #eef2f6; border-radius:10px; box-shadow:0 6px 18px rgba(16,24,40,0.04);}
+    .excel-drop { border:1px dashed #d9e2ec; border-radius:8px; padding:14px; text-align:center; cursor:pointer; background:#fbfdff; }
+    .excel-drop.dragover { background:#eef6ff; border-color:#93c5fd; }
+    .btn-primary-accent { background:#0b5cff; border:none; color:#fff; }
+    .small-muted { color:#64748b; font-size:.88rem; }
+    .form-control, .form-select { border-radius:8px; }
+    .table thead th { border-bottom:3px solid #000000; font-size: 15px;}
+    /* Responsiveness tweaks */
+    @media (max-width: 769px) {
+      .topbar .container { gap: .10rem; }
+    }
+    /* Loader overlay */
+    #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
+    .progress-bar-custom { left: 100px; width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
+@media print {
+  body * {
+    visibility: hidden; /* Hide everything */
+  }
 
+  #tbody, #tbody * {
+    visibility: visible; /* Show the table */
+  }
 
-  <link rel="stylesheet" href="alumni-Database.css" />
+  #tbody {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide the Actions column when printing */
+  #tbody th:last-child,
+  #tbody td:last-child {
+    display: none;
+  }
+}
+
+  </style>
 </head>
 <body>
-  <div class="alumnidatabasepage">
-    <img class="Navbar" src="Navbar.png" />
-    <div class="Line1"></div>
-    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
-    
-    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
-    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">←</span></button>
-    
-    <div class="a-l-u-m-n-i slide-in">
-      <span class="a-l-u-m-n-i-span">A</span>
-      <span class="a-l-u-m-n-i-span2">l u m n i</span>
-      <span class="d-a-t-a-b-a-s-e-span">D</span>
-      <span class="d-a-t-a-b-a-s-e-span2">A T A B A S E</span>
+  <!-- Topbar -->
+  <nav class="topbar py-2">
+    <div class="container d-flex align-items-center gap-3">
+      <a class="btn btn-outline-secondary btn-sm" href="admin-homepage.html" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
+      <div>
+        <div class="fw-bold">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+        <div class="small-muted">Alumni Database — Admin</div>
+      </div>
+      <div class="ms-auto d-flex gap-2">
+        <button id="printBtn" class="btn btn-light btn-sm" title="Print"><i class="fa-solid fa-print"></i></button>
+        <button id="openAddBtn" class="btn btn-primary-accent btn-sm"><i class="fa-solid fa-plus me-1"></i> Add</button>
+      </div>
     </div>
+  </nav>
 
-    <div id="loader-wrapper">
-      <div class="loader-content">
-          <span class="loading-span">T</span>
-          <span class="loading-span2">ECHNOLOGICAL</span>
-          <span class="loading-span">U</span>
-          <span class="loading-span2">NIVERSITY OF THE</span>
-          <span class="loading-span">P</span>
-          <span class="loading-span2">HILIPPINES - </span>
-          <span class="loading-span">C</span>
-          <span class="loading-span2">AVITE</span>
+  <!-- Main -->
+  <main class="container my-4">
+    <div class="row g-4">
+      <!-- Left: controls -->
+      <div class="col-lg-4">
+        <div class="card-surface p-3">
+          <label class="form-label small-muted mb-1">Search</label>
+          <input id="searchInput" class="form-control mb-3" placeholder="Search by name, major, year..." />
 
-        <div class="progress-container">
-          <div class="progress-bar" id="progress-bar"></div>
+          <label class="form-label small-muted mb-1">Upload Excel (.xlsx / .xls)</label>
+          <div id="excelDrop" class="excel-drop mb-3" tabindex="0">
+            <div style="font-size:18px;"><i class="fa-regular fa-file-excel"></i></div>
+            <div class="fw-semibold mt-2">Drop file here or click to choose</div>
+            <div class="small-muted mt-1">Bulk insert alumni</div>
+            <input id="excelInput" type="file" accept=".xlsx,.xls" style="display:none" />
+          </div>
+
+          <label class="form-label small-muted mb-1">Page</label>
+          <select id="pageSelect" class="form-select mb-3"></select>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="small-muted">Showing <span id="countSpan">—</span></div>
+            <div><button id="refreshBtn" class="btn btn-outline-secondary btn-sm">Refresh</button></div>
+          </div>
         </div>
-        <div class="percentage" id="percentage">0%</div>
-        <div class="footer-text">LOADING PLEASE WAIT</div>
+      </div>
+
+      <!-- Right: table -->
+      <div class="col-lg-8">
+        <div class="card-surface p-3">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="alumniTable">
+              <thead>
+                <tr>
+                  <th>FIRST NAME</th>
+                  <th>LAST NAME</th>
+                  <th>INITIAL</th>
+                  <th>SUFFIX</th>
+                  <th>DATE OF BIRTH</th>
+                  <th>COURSE</th>
+                  <th>GRADUATED</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <nav class="mt-3">
+            <ul id="pagination" class="pagination justify-content-center mb-0"></ul>
+          </nav>
+        </div>
       </div>
     </div>
+  </main>
 
-    <button id="openModal">➕ Add Alumni</button>
-    <button id="printTableBtn">🖨️ Print Table</button>
-    <input type="text" id="searchInput" placeholder="Search..." />
-
-    <div id="excelDropZone" class="excel-drop-zone">
-      <p><strong style="color: #ffffff;">Drop your Excel file here</strong></p>
-    </div>
-
-    <select id="pageSelect"></select>
-
-    <table id="alumniTable" border="0" cellspacing="0" cellpadding="0">
-      <thead>
-        <tr>
-          <th>FIRST NAME</th>
-          <th>LAST NAME</th>
-          <th>INITIAL</th>
-          <th>SUFFIX</th>
-          <th>MAJOR / COURSE</th>
-          <th>GRADUATED</th>
-        </tr>
-      </thead>
-      <tbody id="alumniTbody"></tbody>
-    </table>
-
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <button class="close" onclick="closeModal()">&times;</button>
-    <h2>Add Alumni</h2>
-    
-    <form id="alumniForm" class="form-grid">
-      <label for="firstName">First Name</label>
-      <input type="text" id="firstName" required>
-
-      <label for="lastName">Last Name</label>
-      <input type="text" id="lastName" required>
-
-      <label for="initial">Initial</label>
-      <input type="text" id="initial">
-
-      <label for="suffix">Suffix</label>
-      <input type="text" id="suffix">
-
-      <label for="major">Major / Course</label>
-      <input type="text" id="major">
-
-      <label for="graduated">Graduated</label>
-      <input type="text" id="graduated" placeholder="e.g. 2023">
-
-      <div class="modal-actions">
-        <button type="submit" class="btn btn-submit">✔ Submit</button>
-        <button type="button" class="btn btn-cancel" onclick="closeModal()">✖ Cancel</button>
+    <!-- Loader (Bootstrap replacement) -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div style="text-align:center;">
+      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+      <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
+        <div id="progress-bar" class="progress-bar-custom"></div>
       </div>
-    </form>
+      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
+    </div>
   </div>
-</div>
+
+  <!-- Add Alumni Modal -->
+  <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <form id="formAdd" class="needs-validation" novalidate>
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="fa-solid fa-user-plus me-2"></i> Add Alumni</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">First name</label>
+                <input id="firstName" class="form-control" required maxlength="30" placeholder="First name"
+                       oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'').replace(/\s{2,}/g,' ').replace(/^\s+/,'').replace(/^([a-z])/,(m)=>m.toUpperCase())">
+                <div class="invalid-feedback">Required</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Last name</label>
+                <input id="lastName" class="form-control" required maxlength="30" placeholder="Last name"
+                       oninput="this.value=this.value.replace(/[^A-Za-z ]/g,'').replace(/\s{2,}/g,' ').replace(/^\s+/,'').replace(/^([a-z])/,(m)=>m.toUpperCase())">
+                <div class="invalid-feedback">Required</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Middle initial</label>
+                <input id="initial" class="form-control" required maxlength="1" placeholder="M"
+                       oninput="this.value=this.value.replace(/[^A-Za-z]/g,'').toUpperCase()">
+                <div class="invalid-feedback">Required</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Suffix</label>
+                <select id="suffix" class="form-select">
+                  <option value="NONE">NONE</option><option>JR</option><option>SR</option><option>I</option><option>II</option><option>III</option><option>IV</option><option>V</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Date of Birth</label>
+                <input id="dateBirth" type="date" class="form-control" required>
+                <div class="invalid-feedback">Required</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Major / Course</label>
+                <select id="major" class="form-select" required>
+                  <option value="">Select Major</option>
+                  <option value="BET">BET</option>
+                  <option value="BTVTED">BTVTED</option>
+                  <option value="Electrician">Electrician</option>
+                  <option value="Mechanic">Mechanic</option>
+                  <option value="Education">Education</option>
+                  <option value="Software Developer">Software Developer</option>
+                  <option value="Network Engineer">Network Engineer</option>
+                  <option value="Telecommunications Engineer">Telecommunications Engineer</option>
+                  <option value="Electrical Engineer">Electrical Engineer</option>
+                  <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="invalid-feedback">Required</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">If Other (specify)</label>
+                <input id="majorOther" type="text" class="form-control" placeholder="Specify other major" disabled>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Graduated (Year)</label>
+                <select id="graduated" class="form-select" required></select>
+                <div class="invalid-feedback">Required</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary-accent"><i class="fa-solid fa-paper-plane me-1"></i> Publish</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body">
+          <div style="font-size:2rem;color:#dc2626"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <p class="mt-3">Delete this record?</p>
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <button id="confirmYes" class="btn btn-danger">Yes, Delete</button>
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index:14000">
+    <div id="toastWrap"></div>
+  </div>
+
+  <!-- Bootstrap bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
-    <div id="toast" class="toast"></div>
-    
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const modal        = document.getElementById('modal');
-  const tbody        = document.querySelector('#alumniTable tbody');
-  const pageSelect   = document.getElementById('pageSelect');
-  const printBtn     = document.getElementById('printTableBtn');
-  const openBtn      = document.getElementById('openModal');
-  const searchInput  = document.getElementById('searchInput');
-  const loader       = document.getElementById('loader-wrapper');
-  const bar          = document.getElementById('progress-bar');
-  const pctEl        = document.getElementById('percentage');
-  const dz           = document.getElementById('excelDropZone');
-  const toast        = document.getElementById('toast');
+  const addModalEl = document.getElementById('addModal');
+  const addModal = new bootstrap.Modal(addModalEl);
+  const confirmModalEl = document.getElementById('confirmModal');
+  const confirmModal = new bootstrap.Modal(confirmModalEl);
 
-  // ✅ Only the fields boss requested
-  const FIELDS = ['firstName', 'lastName', 'initial', 'suffix', 'major', 'graduated'];
-  const ROWS_PER_PAGE = 100;
-  let currentPage = 1, totalPages = 1;
+  const openAddBtn = document.getElementById('openAddBtn');
+  const printBtn = document.getElementById('printBtn');
+  const excelDrop = document.getElementById('excelDrop');
+  const excelInput = document.getElementById('excelInput');
+  const searchInput = document.getElementById('searchInput');
+  const pageSelect = document.getElementById('pageSelect');
+  const tbody = document.getElementById('tbody');
+  const graduatedSelect = document.getElementById('graduated');
+  const majorSelect = document.getElementById('major');
+  const majorOther = document.getElementById('majorOther');
+  const toastWrap = document.getElementById('toastWrap');
+  const refreshBtn = document.getElementById('refreshBtn');
 
-  // 🔐 Access Control
-  if (sessionStorage.getItem('userRole') !== 'admin') {
-    window.location.href = 'homepage.html';
+  let currentPage = 1;
+  const ROWS_PER_PAGE = 10;
+
+  // Populate Graduated Year dropdown
+  const startYear = 1980;
+  const currentYear = new Date().getFullYear();
+  for(let y=currentYear; y>=startYear; y--){
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    graduatedSelect.appendChild(opt);
   }
 
-  // Loader bar animation
-  (() => {
-    let pct = 80;
-    const iv = setInterval(() => {
-      if (pct < 100) {
-        pct++;
-        bar.style.width = pct + '%';
-        pctEl.textContent = pct + '%';
-      } else {
-        clearInterval(iv);
-        loader.style.display = 'none';
-      }
-    }, 30);
-  })();
+  // Open Add Modal
+  openAddBtn.addEventListener('click', () => addModal.show());
 
-  // ✅ Modal helpers
-  function openModal() {
-    modal.style.display = 'flex';
-    modal.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
-    const first = modal.querySelector('input');
-    if (first) first.focus();
-  }
-  function closeModal() {
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden','true');
-    document.body.style.overflow = '';
-  }
-
-  // Open/Close triggers
-  openBtn.onclick = openModal;
-  window.closeModal = closeModal;
-
-  // Close on overlay click
-  window.addEventListener('click', e => {
-    if (e.target === modal) closeModal();
+  // Major select behavior
+  majorSelect.addEventListener('change', () => {
+    majorOther.disabled = majorSelect.value !== 'Other';
+    if(majorSelect.value !== 'Other') majorOther.value = '';
   });
 
-  // Close on Esc key
-  window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModal();
-  });
+  // Print table
+  printBtn.addEventListener('click', ()=>window.print());
 
-  // ✅ Submit Alumni Form
-  document.getElementById('alumniForm').onsubmit = async (e) => {
+  // Excel Drop & Input
+  excelDrop.addEventListener('click', () => excelInput.click());
+  excelInput.addEventListener('change', async (e) => handleExcel(e.target.files[0]));
+
+  excelDrop.addEventListener('dragover', (e)=>{e.preventDefault(); excelDrop.classList.add('dragover');});
+  excelDrop.addEventListener('dragleave', ()=>{excelDrop.classList.remove('dragover');});
+  excelDrop.addEventListener('drop', (e)=>{e.preventDefault(); excelDrop.classList.remove('dragover'); handleExcel(e.dataTransfer.files[0]);});
+
+  async function handleExcel(file){
+    if(!file) return;
+    if(!file.name.match(/\.(xlsx|xls)$/i)){ showToast('Not an Excel file', 'danger'); return; }
+    const formData = new FormData();
+    formData.append('file', file);
+    try{
+      const res = await fetch('/api/alumni/upload-excel',{method:'POST', body:formData});
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Upload failed');
+      showToast(`✅ Inserted ${data.inserted} rows!`, 'success');
+      loadTable();
+    }catch(err){ showToast('❌ ' + err.message,'danger'); }
+  }
+
+  // Form submission
+  const formAdd = document.getElementById('formAdd');
+  formAdd.addEventListener('submit', async (e)=>{
     e.preventDefault();
-    const payload = {};
-    FIELDS.forEach(id => {
-      payload[id] = document.getElementById(id).value.trim();
-    });
+    if(!formAdd.checkValidity()) { formAdd.classList.add('was-validated'); return; }
 
-    try {
-      const res = await fetch('/api/alumni', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Failed to save');
-      showToast('✅ Saved successfully!');
-      e.target.reset();
-      closeModal();
-      loadPage(1, searchInput.value.trim());
-    } catch (err) {
-      showToast('❌ ' + err.message, 'error');
-    }
-  };
+    const payload = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName: document.getElementById('lastName').value.trim(),
+      initial: document.getElementById('initial').value.trim(),
+      suffix: document.getElementById('suffix').value,
+      dateBirth: document.getElementById('dateBirth').value,
+      major: majorSelect.value === 'Other' ? majorOther.value.trim() : majorSelect.value,
+      graduated: graduatedSelect.value
+    };
 
-  // ✅ Print Table
-  printBtn.onclick = () => window.print();
+    try{
+      const res = await fetch('/api/alumni',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Failed to save');
+      showToast('✅ Saved successfully', 'success');
+      formAdd.reset(); formAdd.classList.remove('was-validated');
+      addModal.hide();
+      loadTable();
+    }catch(err){ showToast('❌ '+err.message,'danger'); }
+  });
 
-  // ✅ Pagination + Search
-  pageSelect.onchange = () => loadPage(+pageSelect.value, searchInput.value.trim());
-  searchInput.oninput = () => loadPage(1, searchInput.value.trim());
-
-  // ✅ Load Alumni Data
-  async function loadPage(page = 1, search = '') {
-    currentPage = page;
-    try {
-      const res = await fetch(`/api/alumni?page=${page}&limit=${ROWS_PER_PAGE}&search=${encodeURIComponent(search)}`);
-      const { rows, totalPages: tp } = await res.json();
-      totalPages = tp;
+  // Load table
+  async function loadTable(){
+    try{
+      const search = encodeURIComponent(searchInput.value.trim());
+      const res = await fetch(`/api/alumni?page=${currentPage}&limit=${ROWS_PER_PAGE}&search=${search}`);
+      const data = await res.json();
+      const rows = data.rows || data;
+      const totalPages = data.totalPages || 1;
       tbody.innerHTML = '';
-      rows.reverse().forEach(r => {
+
+      rows.forEach(r=>{
         const tr = document.createElement('tr');
-        FIELDS.forEach(k => {
-          const td = document.createElement('td');
-          td.textContent = r[k] || '';
-          tr.appendChild(td);
-        });
-        tbody.prepend(tr);
+        tr.innerHTML = `
+          <td>${r.firstName||''}</td>
+          <td>${r.lastName||''}</td>
+          <td>${r.initial||''}</td>
+          <td>${r.suffix||''}</td>
+          <td>${r.dateBirth||''}</td>
+          <td>${r.major||''}</td>
+          <td>${r.graduated||''}</td>
+          <td>
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </td>
+        `;
+        const delBtn = tr.querySelector('button');
+        delBtn.addEventListener('click', ()=>confirmDelete(r.id));
+        tbody.appendChild(tr);
       });
 
-      // Pagination dropdown
+      // Pagination
       pageSelect.innerHTML = '';
-      for (let i = 1; i <= totalPages; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `Page ${i}`;
-        if (i === currentPage) opt.selected = true;
+      for(let i=1;i<=totalPages;i++){
+        const opt = document.createElement('option'); opt.value=i; opt.textContent=i;
+        if(i===currentPage) opt.selected=true;
         pageSelect.appendChild(opt);
       }
-    } catch (err) {
-      console.error('❌ Load failed:', err);
-      alert('Failed to load data.');
-    }
+    }catch(err){ showToast('❌ Failed to load table','danger'); console.error(err); }
   }
 
- dz.addEventListener('dragover', e => {
-    e.preventDefault();
-    dz.style.background = '#ccc';
-  });
-  dz.addEventListener('dragleave', e => {
-    e.preventDefault();
-    dz.style.background = '';
-  });
-  dz.addEventListener('drop', async e => {
-    e.preventDefault();
-    dz.style.background = '';
-    const file = e.dataTransfer.files[0];
-    if (!file?.name.match(/\.(xlsx|xls)$/i)) return alert('Not an Excel file');
+  pageSelect.addEventListener('change', ()=>{ currentPage = +pageSelect.value; loadTable(); });
+  searchInput.addEventListener('input', ()=>{ currentPage=1; loadTable(); });
+  refreshBtn.addEventListener('click', ()=>loadTable());
 
-    const form = new FormData();
-    form.append('file', file);
-
-    try {
-      const res = await fetch('/api/alumni/upload-excel', {
-        method: 'POST',
-        body: form
-      });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j.error || 'Failed upload');
-      showToast(`✅ Inserted ${j.inserted} rows!`);
-      loadPage(1, searchInput.value.trim());
-    } catch (err) {
-      showToast('❌ Upload error: ' + err.message, 'error');
-    }
+  // Confirm delete
+  let deleteId = null;
+  function confirmDelete(id){
+    deleteId = id;
+    confirmModal.show();
+  }
+  document.getElementById('confirmYes').addEventListener('click', async ()=>{
+    if(!deleteId) return;
+    try{
+      const res = await fetch(`/api/alumni/${deleteId}`,{method:'DELETE'});
+      if(!res.ok) throw new Error('Delete failed');
+      showToast('✅ Deleted', 'success');
+      loadTable();
+    }catch(err){ showToast('❌ '+err.message,'danger'); }
+    confirmModal.hide();
+    deleteId = null;
   });
 
-  // ✅ Toast Notification
-  function showToast(message, type = 'success') {
-    toast.textContent = message;
-    toast.className = `toast show ${type}`;
-    setTimeout(() => {
-      toast.className = 'toast';
-    }, 3000);
+  // Toast
+  function showToast(msg, type='success'){
+    const t = document.createElement('div');
+    t.className = `toast align-items-center text-white bg-${type} border-0`;
+    t.role='alert'; t.ariaLive='assertive'; t.ariaAtomic='true';
+    t.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div>`;
+    toastWrap.appendChild(t);
+    const bsToast = new bootstrap.Toast(t,{delay:3000});
+    bsToast.show();
+    t.addEventListener('hidden.bs.toast', ()=>t.remove());
   }
 
-  loadPage();
+  loadTable();
 });
+
+  /*******************************
+   * Loader progress
+   *******************************/
+  document.addEventListener('DOMContentLoaded', () => {
+    let p = 0;
+    const bar = document.getElementById('progress-bar');
+    const pct = document.getElementById('percentage');
+    const wrap = document.getElementById('loader-wrapper');
+    const iv = setInterval(() => {
+      p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
+      bar.style.width = p + '%';
+      pct.textContent = p + '%';
+      if (p >= 100) {
+        clearInterval(iv);
+        wrap.style.display = 'none';
+      }
+    }, 70);
+  });
 </script>
 
 </body>

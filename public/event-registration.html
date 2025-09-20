@@ -1,285 +1,448 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Homecoming Registrations</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Homecoming Registrations Dashboard</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
-  <!-- Font Awesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <!-- Font Awesome for Social Media Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet"/>
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
   <link rel="icon" type="image/png" href="/Logo2.png">
 
+  <style>
+    /* --- Overall layout & typography --- */
+    :root {
+      --accent: #0d6efd;
+      --bg: #f8f9fa;
+      --muted: #6c757d;
+    }
+    body {
+      font-family: 'Albert Sans', sans-serif;
+      background: var(--bg);
+      color: #222;
+    }
 
-  <link rel="stylesheet" href="event-registration.css" />
+
+    /* --- Navbar --- */
+    .navbar-brand img { height: 40px; }
+    .navbar .btn-back { white-space: nowrap; }
+
+    /* --- Page header --- */
+    .page-title { font-weight: 700; margin-top: 1rem; text-align: center; }
+
+    /* --- Table --- */
+    .table thead.table-dark th { vertical-align: middle; }
+    .status-badge { font-weight:700; padding: .35em .6em; border-radius: .375rem; display:inline-block; }
+
+    .status-PENDING { background: #fff3cd; color: #856404; }
+    .status-ACCEPTED { background: #d1e7dd; color: #0f5132; }
+    .status-DECLINED { background: #f8d7da; color: #842029; }
+
+    /* --- popup warning (receipt not available) --- */
+    .popup-warning {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ffc107;
+      color: #000;
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+      display: none;
+      z-index: 3200;
+    }
+    .popup-warning.show { display: block; }
+
+    /* --- Print rules: by default hide everything but table when printing --- */
+    @media print {
+      body * { visibility: hidden; }
+      #printZone, #printZone * { visibility: visible; }
+      #printZone { position: absolute; left:0; top:0; width:100%; }
+      /* hide action buttons in print */
+      #registrationsTable .action-btn { display: none !important; }
+    }
+
+    /* --- Small helpers --- */
+    .controls-row .form-control, .controls-row .form-select { min-width: 150px; }
+    .me-sm-2 { margin-right: .5rem !important; }
+        /* Loader overlay */
+    #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
+    .progress-bar-custom { left: 100px; width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
+
+  </style>
 </head>
 <body>
-  <div class="eventpage">
-    <img class="Navbar" src="Navbar.png" />
-    <div class="Line1"></div>
-    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
-    
-    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
-    <button class="back-button" onclick="location.href='admin-homepage.html'">←</button>
-    
-    <div class="a-l-u-m-n-i slide-in">
-      <span class="a-l-u-m-n-i-span">E</span>
-      <span class="a-l-u-m-n-i-span2">v e n t</span>
-      <span class="d-a-t-a-b-a-s-e-span">H</span>
-      <span class="d-a-t-a-b-a-s-e-span2">O M E C O M I N G</span>
+
+
+  <!-- Navbar (matches basketball design) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid px-3">
+      <a class="navbar-brand d-flex align-items-center" href="admin-homepage.html">
+        <img src="Logo.png" alt="Logo" class="me-2">
+        <span>TUPC Events</span>
+      </a>
+
+      <div class="ms-auto d-flex gap-2 align-items-center">
+        <select id="sportSelect" class="form-select form-select-sm" style="width:170px;">
+          <option value="" disabled selected>Sport Fest</option>
+          <option value="mensBasketball">Men's Basketball</option>
+          <option value="womensVolleyball">Women's Volleyball</option>
+          <option value="mensVolleyball">Men's Volleyball</option>
+          <option value="chess">Chess</option>
+          <option value="darts">Darts</option>
+        </select>
+
+        <button class="btn btn-outline-light btn-back" onclick="location.href='admin-homepage.html'">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+      </div>
     </div>
+  </nav>
 
-    <div id="loader-wrapper">
-      <div class="loader-content">
-          <span class="loading-span">T</span>
-          <span class="loading-span2">ECHNOLOGICAL</span>
-          <span class="loading-span">U</span>
-          <span class="loading-span2">NIVERSITY OF THE</span>
-          <span class="loading-span">P</span>
-          <span class="loading-span2">HILIPPINES - </span>
-          <span class="loading-span">C</span>
-          <span class="loading-span2">AVITE</span>
+  <!-- Header -->
+  <div class="container text-center mt-4">
+    <h2 class="page-title">Homecoming Registrations Dashboard</h2>
+  </div>
 
-        <div class="progress-container">
-          <div class="progress-bar" id="progress-bar"></div>
+  <!-- Controls (search, filter, page select, print) -->
+  <div class="container mt-3">
+    <div class="row controls-row g-2 align-items-center">
+      <div class="col-md-4 col-sm-12">
+        <input id="searchInput" class="form-control" placeholder="Search by name…" />
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <select id="statusFilter" class="form-select">
+          <option value="ALL">All Statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="ACCEPTED">Accepted</option>
+          <option value="DECLINED">Declined</option>
+        </select>
+      </div>
+
+      <div class="col-md-2 col-sm-6">
+        <select id="pageSelect" class="form-select"></select>
+      </div>
+
+      <div class="col-md-3 col-sm-12 text-md-end">
+        <button id="printAcceptedBtn" class="btn btn-primary w-100">
+          <i class="fas fa-print"></i> Print Accepted
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print title shown only during print action -->
+  <h4 id="registrationsPrintTitle" class="text-center mt-3 d-none">Accepted Registrations</h4>
+
+  <!-- Table area (this is the print zone) -->
+  <div id="printZone" class="container mt-3">
+    <div class="table-responsive">
+      <table id="registrationsTable" class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>NAME</th>
+            <th>GENDER</th>
+            <th>PROGRAM</th>
+            <th>YEAR</th>
+            <th>ADDS-ON</th>
+            <th>RECEIPT</th>
+            <th>STATUS</th>
+            <th>RESPONSE</th>
+            <th>SUBMITTED DATE</th>
+          </tr>
+        </thead>
+        <tbody id="regBody">
+          <tr><td colspan="9">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Receipt Modal (Bootstrap) -->
+  <div class="modal fade" id="receiptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" id="printReceiptArea">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Receipt</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="percentage" id="percentage">0%</div>
-        <div class="footer-text">LOADING PLEASE WAIT</div>
+        <div class="modal-body">
+          <div id="receiptBody" class="text-center"></div>
+          <div class="text-center mt-3">
+            <button id="printReceiptBtn" class="btn btn-outline-primary"><i class="fas fa-print"></i> Print Receipt</button>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <h1>Homecoming Registration List</h1>
-    <button class="btn-print">🖨️ Print Approved Only</button>
-    <input type="text" id="searchInput" placeholder="Search by name…" />
-
-    <table>
-      <thead>
-        <tr>
-          <th>NAME</th><th>GENDER</th><th>PROGRAM</th><th>YEAR</th><th>ADDS-ON</th><th>RECEIPT</th><th>STATUS</th><th>RESPONSE</th><th>SUBMITTED DATE</th>
-        </tr>
-      </thead>
-      <tbody id="regBody"><tr><td colspan="8">Loading…</td></tr></tbody>
-    </table>
-
-    <!-- Modal Viewer -->
-    <div id="imgModal">
-      <div class="modal-content">
-        <span class="close-btn" id="closeImgModal">&times;</span>
-        <img id="receiptImg" src="" alt="Receipt" />
+    <!-- Loader (Bootstrap replacement) -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div style="text-align:center;">
+      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+      <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
+        <div id="progress-bar" class="progress-bar-custom"></div>
       </div>
+      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
     </div>
+  </div>
 
-    <div id="receiptWarningPopup" class="popup-warning">
-      ⚠️ No receipt available.
-    </div>
 
-    <div class="filter-bar">
-      <select id="statusFilter">
-        <option value="ALL">STATUS</option>
-        <option value="PENDING">Pending</option>
-        <option value="ACCEPTED">Accepted</option>
-        <option value="DECLINED">Declined</option>
-      </select>
-    </div>
-    
-    <select id="pageSelect"></select>
+  <!-- Popup warning for missing receipt -->
+  <div id="receiptWarningPopup" class="popup-warning">⚠️ No receipt available.</div>
 
-    <div class="dropdown-container">
-      <select id="sportSelect">
-        <option value="" disabled selected>Sport Fest</option>
-        <option value="mensBasketball">Men's Basketball</option>
-        <option value="womensVolleyball">Women's Volleyball</option>
-        <option value="mensVolleyball">Men's Volleyball</option>
-        <option value="chess">Chess</option>
-        <option value="darts">Darts</option>
-      </select>
-    </div>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const tbody = document.getElementById('regBody');
-  const statusFilter = document.getElementById('statusFilter');
-  const pageSelect = document.getElementById('pageSelect');
-  const searchInput = document.getElementById('searchInput'); // Make sure this exists in DOM
-  const imgModal = document.getElementById('imgModal');
-  const receiptImg = document.getElementById('receiptImg');
-  const closeImgModal = document.getElementById('closeImgModal');
+  <!-- Original backend JS adapted to Bootstrap layout & badges -->
+  <script>
+  (function () {
+    // Elements
+    const tbody = document.getElementById('regBody');
+    const statusFilter = document.getElementById('statusFilter');
+    const pageSelect = document.getElementById('pageSelect');
+    const searchInput = document.getElementById('searchInput');
+    const receiptWarningPopup = document.getElementById('receiptWarningPopup');
+    const receiptModalEl = document.getElementById('receiptModal');
+    const receiptModal = new bootstrap.Modal(receiptModalEl);
+    const receiptBody = document.getElementById('receiptBody');
+    const modalTitle = document.getElementById('modalTitle');
 
-  let regs = [];
-  let currentPage = 1;
-  const LIMIT = 100;
-  let totalPages = 1;
+    let regs = [];
+    let currentPage = 1;
+    const LIMIT = 100;
+    let totalPages = 1;
+    let showOnlyAccepted = false;
 
-  // Ensure search input exists before using
-  if (!searchInput) {
-    console.warn('Warning: searchInput field not found in DOM!');
-  }
+    // Helper: map status to badge HTML
+    function statusBadge(status) {
+      const s = (status || 'PENDING').toUpperCase();
+      if (s === 'ACCEPTED') return `<span class="status-badge status-ACCEPTED">ACCEPTED</span>`;
+      if (s === 'DECLINED') return `<span class="status-badge status-DECLINED">DECLINED</span>`;
+      return `<span class="status-badge status-PENDING">PENDING</span>`;
+    }
 
-  pageSelect.addEventListener('change', () => {
-    currentPage = +pageSelect.value;
-    loadPage();
-  });
+    // Load page list/paged registrations
+    async function loadPage() {
+      try {
+        const searchVal = searchInput ? encodeURIComponent(searchInput.value.trim()) : '';
+        const url = `/api/homeregs?page=${currentPage}&limit=${LIMIT}` + (searchVal ? `&search=${searchVal}` : '');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
 
-  if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      currentPage = 1;
-      loadPage();
-    });
-  }
+        regs = data.registrations || [];
+        totalPages = data.totalPages || 1;
 
-  async function updateStatus(id, newStatus) {
-    try {
-      const res = await fetch(`/api/homeregs/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        buildPagination();
+        renderTable();
+      } catch (err) {
+        console.error('loadPage error:', err);
+        tbody.innerHTML = `<tr><td colspan="9">❌ Failed to load data</td></tr>`;
+      }
+    }
+
+    function buildPagination() {
+      pageSelect.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = `Page ${i}`;
+        if (i === currentPage) opt.selected = true;
+        pageSelect.appendChild(opt);
+      }
+    }
+
+    function renderTable() {
+      const filterValue = statusFilter?.value || 'ALL';
+      tbody.innerHTML = '';
+
+      // Ordering: pending, accepted, declined
+      const statusOrder = { PENDING: 0, ACCEPTED: 1, DECLINED: 2 };
+      const sorted = regs.slice().sort((a, b) => {
+        const s1 = statusOrder[(a.status || 'PENDING').toUpperCase()];
+        const s2 = statusOrder[(b.status || 'PENDING').toUpperCase()];
+        if (s1 !== s2) return s1 - s2;
+        return b.id - a.id;
       });
-      if (!res.ok) throw new Error(await res.text());
-      loadPage(); // Refresh table after update
-    } catch (err) {
-      alert('❌ ' + err.message);
+
+      sorted.forEach(r => {
+        const currentStatus = (r.status || 'PENDING').toUpperCase();
+
+        if (filterValue !== 'ALL' && currentStatus !== filterValue) return;
+        if (showOnlyAccepted && currentStatus !== 'ACCEPTED') return;
+
+        const submitted = r.submittedAt ? new Date(r.submittedAt).toLocaleDateString('en-US', {
+          month: 'long', day: '2-digit', year: 'numeric'
+        }).toUpperCase() : 'N/A';
+
+        const tr = document.createElement('tr');
+
+        // If your backend returns firstName/middleInitial/lastName instead of name, try to use them,
+        // otherwise fallback to r.name if provided:
+        const displayName = (r.firstName || r.name) ? ((r.firstName ? `${r.firstName} ${r.middleInitial || ''} ${r.lastName || ''}` : r.name) ).trim() : 'N/A';
+
+        tr.innerHTML = `
+          <td>${displayName}</td>
+          <td>${r.sex || ''}</td>
+          <td>${r.program || r.course || ''}</td>
+          <td>${r.yearGraduated || r.year || ''}</td>
+          <td>${r.addon || ''}</td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-info action-btn view-btn">View</button>
+          </td>
+          <td class="text-center">${statusBadge(currentStatus)}</td>
+          <td class="text-center">
+            <button class="btn btn-success btn-sm action-btn accept-btn">Accept</button>
+            <button class="btn btn-danger btn-sm action-btn decline-btn">Decline</button>
+          </td>
+          <td class="text-center">${submitted}</td>
+        `;
+        tbody.appendChild(tr);
+
+        // Attach actions (use correct id from record)
+        const id = r.id || r._id || r.registrationId;
+        if (tr.querySelector('.accept-btn')) tr.querySelector('.accept-btn').addEventListener('click', () => updateStatus(id, 'ACCEPTED', tr));
+        if (tr.querySelector('.decline-btn')) tr.querySelector('.decline-btn').addEventListener('click', () => updateStatus(id, 'DECLINED', tr));
+        if (tr.querySelector('.view-btn')) tr.querySelector('.view-btn').addEventListener('click', () => {
+          if (!r.image && !r.receipt) {
+            receiptWarningPopup.classList.add('show');
+            setTimeout(() => receiptWarningPopup.classList.remove('show'), 3000);
+            return;
+          }
+          showReceipt(r);
+        });
+      });
     }
-  }
 
-  async function loadPage() {
-    try {
-      const searchVal = searchInput ? encodeURIComponent(searchInput.value.trim()) : '';
-      const url = `/api/homeregs?page=${currentPage}&limit=${LIMIT}` + (searchVal ? `&search=${searchVal}` : '');
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-
-      regs = data.registrations || [];
-      totalPages = data.totalPages || 1;
-
-      buildPagination();
-      renderTable();
-    } catch (err) {
-      console.error('loadPage error:', err);
-      tbody.innerHTML = `<tr><td colspan="8">❌ Failed to load data</td></tr>`;
+    async function updateStatus(id, newStatus, tr) {
+      try {
+        const res = await fetch(`/api/homeregs/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        // Reload page to reflect change
+        await loadPage();
+      } catch (err) {
+        alert('❌ ' + err.message);
+      }
     }
-  }
 
-  function buildPagination() {
-    pageSelect.innerHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = `Page ${i}`;
-      if (i === currentPage) opt.selected = true;
-      pageSelect.appendChild(opt);
-    }
-  }
-
-  function renderTable() {
-    const filterValue = document.getElementById('statusFilter')?.value || 'ALL';
-    tbody.innerHTML = '';
-
-    // Sort: PENDING first, then ACCEPTED, then DECLINED (by id DESC within each group)
-    const statusOrder = { PENDING: 0, ACCEPTED: 1, DECLINED: 2 };
-    const sorted = regs.slice().sort((a, b) => {
-      const s1 = statusOrder[(a.status || 'PENDING').toUpperCase()];
-      const s2 = statusOrder[(b.status || 'PENDING').toUpperCase()];
-      if (s1 !== s2) return s1 - s2;
-      return b.id - a.id; // Newest first within same status
-    });
-
-    sorted.forEach(r => {
-      const currentStatus = r.status?.toUpperCase() || 'PENDING';
-
-      if (filterValue !== 'ALL' && currentStatus !== filterValue) return;
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${r.firstName} ${r.middleInitial || ''} ${r.lastName}</td>
-        <td>${r.sex}</td><td>${r.program}</td><td>${r.yearGraduated}</td>
-        <td>${r.addon}</td>
-        <td><button class="view-btn">View</button></td>
-        <td class="status ${currentStatus}">${currentStatus}</td>
-        <td>
-          <button class="accept-btn">Accept</button>
-          <button class="decline-btn">Decline</button>
-        <td>${r.submittedAt ? new Date(r.submittedAt).toLocaleDateString('en-US', {
-          month: 'long',
-          day: '2-digit',
-          year: 'numeric'
-        }).toUpperCase() : 'N/A'}</td>
-        </td>`;
-
-      tbody.appendChild(tr);
-
-      tr.querySelector('.accept-btn').addEventListener('click', () => updateStatus(r.id, 'ACCEPTED'));
-      tr.querySelector('.decline-btn').addEventListener('click', () => updateStatus(r.id, 'DECLINED'));
-
-      tr.querySelector('.view-btn').addEventListener('click', () => {
-        if (!r.image) {
-          const popup = document.getElementById('receiptWarningPopup');
-          popup.classList.add('show');
-          setTimeout(() => popup.classList.remove('show'), 3500);
+    // Show receipt - keep flexible: if r.image is URL show image; if backend needs fetching, try endpoint
+    async function showReceipt(r) {
+      modalTitle.textContent = `Receipt: ${ (r.firstName ? `${r.firstName} ${r.lastName || ''}` : r.name) || '' }`;
+      receiptBody.innerHTML = '';
+      try {
+        if (r.image) {
+          // image url present in data
+          receiptBody.innerHTML = `<img src="${r.image}" alt="receipt" class="img-fluid rounded" />`;
+          receiptModal.show();
           return;
         }
-        receiptImg.src = r.image;
-        imgModal.style.display = 'flex';
-      });
-    });
-  }
-  document.getElementById('statusFilter').addEventListener('change', renderTable);
-
-
-  document.querySelector('.btn-print').addEventListener('click', () => {
-      document.querySelectorAll('#regBody tr').forEach(row => {
-        const status = row.querySelector('.status')?.innerText;
-        row.style.display = status === 'ACCEPTED' ? '' : 'none';
-      });
-      window.print();
-      document.querySelectorAll('#regBody tr').forEach(r => r.style.display = '');
-    });
-
-    closeImgModal.addEventListener('click', () => imgModal.style.display = 'none');
-    imgModal.addEventListener('click', e => {
-      if (e.target === imgModal) imgModal.style.display = 'none';
-    });
-
-    loadPage();  
-  });
-  // Hide loader and initialize
-  document.addEventListener('DOMContentLoaded', () => {
-    let pct = 80;
-    const loader = document.getElementById('loader-wrapper'),
-          bar = document.getElementById('progress-bar'),
-          pctEl = document.getElementById('percentage');
-
-    const iv = setInterval(() => {
-      if (pct < 100) {
-        pct++;
-        bar.style.width = pct + '%';
-        pctEl.textContent = pct + '%';
-      } else {
-        clearInterval(iv);
-        loader.style.display = 'none';
+        // fallback: try to fetch receipt via API (if your backend supports it)
+        const id = r.id || r._id || r.registrationId;
+        const res = await fetch(`/api/homeregs/${id}/receipt`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.receipt) {
+            receiptBody.innerHTML = data.receipt;
+          } else {
+            receiptBody.innerHTML = '<p>No receipt available</p>';
+          }
+        } else {
+          receiptBody.innerHTML = '<p>No receipt available</p>';
+        }
+        receiptModal.show();
+      } catch (err) {
+        receiptBody.innerHTML = '<p>Failed to load receipt</p>';
+        receiptModal.show();
       }
-    }, 30);
+    }
+
+    // PRINT accepted only: hide non-accepted rows, trigger print, then restore
+    document.getElementById('printAcceptedBtn').addEventListener('click', () => {
+      showOnlyAccepted = true;
+      registrationsPrintTitle.classList.remove('d-none');
+      document.body.classList.add('print-registrations');
+      renderTable();
+      setTimeout(() => window.print(), 100);
+    });
+
+    // After print restore
+    window.addEventListener('afterprint', () => {
+      showOnlyAccepted = false;
+      document.body.classList.remove('print-registrations');
+      registrationsPrintTitle.classList.add('d-none');
+      renderTable();
+    });
+
+    // Pagination & filters events
+    pageSelect.addEventListener('change', () => { currentPage = +pageSelect.value; loadPage(); });
+    statusFilter.addEventListener('change', () => { currentPage = 1; renderTable(); });
+    if (searchInput) searchInput.addEventListener('input', () => { currentPage = 1; loadPage(); });
+
+    // Sport dropdown navigation (keeps behavior)
+    document.getElementById('sportSelect').addEventListener('change', function () {
+      const sport = this.value;
+      const allowed = ['womensVolleyball', 'mensVolleyball', 'chess', 'darts'];
+      if (allowed.includes(sport)) {
+        const target = new URL('allSport.html', window.location.origin);
+        target.searchParams.set('sportType', sport);
+        window.location.href = target.toString();
+      } else if (sport === 'mensBasketball') {
+        window.location.href = 'mensBasketball.html';
+      }
+    });
+
+    // Print receipt button in modal
+    document.getElementById('printReceiptBtn').addEventListener('click', () => {
+      document.body.classList.add('print-receipt');
+      setTimeout(() => {
+        window.print();
+        document.body.classList.remove('print-receipt');
+      }, 100);
+    });
+
+  /*******************************
+   * Loader progress
+   *******************************/
+  document.addEventListener('DOMContentLoaded', () => {
+    let p = 0;
+    const bar = document.getElementById('progress-bar');
+    const pct = document.getElementById('percentage');
+    const wrap = document.getElementById('loader-wrapper');
+    const iv = setInterval(() => {
+      p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
+      bar.style.width = p + '%';
+      pct.textContent = p + '%';
+      if (p >= 100) {
+        clearInterval(iv);
+        wrap.style.display = 'none';
+      }
+    }, 70);
   });
 
-  // When Sport dropdown changes
-  document.getElementById('sportSelect').addEventListener('change', function () {
-    const sport = this.value;
-    const allowed = ['womensVolleyball', 'mensVolleyball', 'chess', 'darts'];
-    if (allowed.includes(sport)) {
-      const target = new URL('allSport.html', window.location.origin);
-      target.searchParams.set('sportType', sport);
-      window.location.href = target.toString();
-    } else if (sport === 'mensBasketball') {
-      window.location.href = 'mensBasketball.html';
-    }
-  });
+    // Admin role guard (keeps original)
     const role = sessionStorage.getItem('userRole');
-  if (role !== 'admin') {
-    window.location.href = 'homepage.html';
-  }
-</script>
+    if (role !== 'admin') {
+      window.location.href = 'homepage.html';
+      return;
+    }
+
+    // initial load
+    loadPage();
+  })();
+  </script>
 </body>
 </html>

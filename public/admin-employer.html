@@ -1,328 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ALUMNI LIST | TUP - Cavite</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Employer Registrations | TUP - Cavite</title>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
-  <!-- Font Awesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <!-- Font Awesome for Social Media Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
-  <link rel="icon" type="image/png" href="/Logo2.png">
-
-
-  <link rel="stylesheet" href="admin-employer.css" />
+  <style>
+    :root{--accent:#0d6efd;--bg:#f8f9fa}
+    body{font-family:'Albert Sans',sans-serif;background:var(--bg);color:#222}
+    /* Loader (basketball style) */
+    #loader-wrapper{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:3000}
+    .progress-container{width:250px;height:10px;background:#e9ecef;border-radius:6px;overflow:hidden}
+    .progress-bar-inner{height:100%;width:0;background:var(--accent);transition:width .25s ease}
+    /* Navbar / header */
+    .navbar-brand img{height:40px}
+    .page-title{font-weight:700;margin-top:1rem;text-align:center}
+    /* Table badges */
+    .badge-PENDING{background:#fff3cd;color:#856404;padding:.35em .6em;border-radius:.375rem}
+    .badge-ACCEPTED{background:#d1e7dd;color:#0f5132;padding:.35em .6em;border-radius:.375rem}
+    .badge-ARCHIVED{background:#f8d7da;color:#842029;padding:.35em .6em;border-radius:.375rem}
+    /* Modal for viewing long fields */
+    #infoModal{display:none;position:fixed;inset:0;z-index:3500;align-items:center;justify-content:center}
+    #infoModal .modal-panel{background:#fff;padding:20px;border-radius:8px;max-width:720px;width:94%;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+    #infoModal .close-btn{position:absolute;right:16px;top:12px;border:none;background:transparent;font-size:1.25rem;cursor:pointer}
+    /* Popup */
+    .popup-warning{position:fixed;bottom:20px;right:20px;background:#ffc107;color:#000;padding:10px 14px;border-radius:6px;display:none;z-index:3600}
+    .popup-warning.show{display:block}
+    /* Print rules: only print #printZone (table) and hide action buttons */
+    @media print{
+      body *{visibility:hidden}
+      #printZone, #printZone *{visibility:visible}
+      #printZone{position:absolute;left:0;top:0;width:100%}
+      #employerTable .action-btn{display:none !important}
+    }
+    .controls-row .form-control,.controls-row .form-select{min-width:150px}
+    img.company-logo{width:40px;height:40px;object-fit:cover;border-radius:50%;cursor:pointer}
+  </style>
 </head>
 <body>
-  <div class="employerpage">
-    <img class="Navbar" src="Navbar.png" />
-    <div class="Line1"></div>
-    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
-    
-    <a href="admin-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
-    <button class="back-button" onclick="location.href='admin-homepage.html'"><span class="underline-slide">←</span></button>
-    
-    <div class="a-l-u-m-n-i slide-in">
-      <span class="a-l-u-m-n-i-span">E</span>
-      <span class="a-l-u-m-n-i-span2">MPLOYER</span>
-      <span class="d-a-t-a-b-a-s-e-span">R</span>
-      <span class="d-a-t-a-b-a-s-e-span2">EGISTRATION</span>
+  <!-- Loader -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div class="text-center">
+      <h5 class="mb-2">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</h5>
+      <div class="progress-container my-2"><div id="loader-bar" class="progress-bar-inner"></div></div>
+      <div id="loader-pct" class="text-muted">0%</div>
+      <div class="text-muted small mt-2">LOADING PLEASE WAIT</div>
     </div>
+  </div>
 
-    <div id="loader-wrapper">
-      <div class="loader-content">
-          <span class="loading-span">T</span>
-          <span class="loading-span2">ECHNOLOGICAL</span>
-          <span class="loading-span">U</span>
-          <span class="loading-span2">NIVERSITY OF THE</span>
-          <span class="loading-span">P</span>
-          <span class="loading-span2">HILIPPINES - </span>
-          <span class="loading-span">C</span>
-          <span class="loading-span2">AVITE</span>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid px-3">
+      <a class="navbar-brand d-flex align-items-center" href="admin-homepage.html">
+        <img src="Logo.png" alt="Logo" class="me-2">TUPC Events
+      </a>
+      <div class="ms-auto d-flex gap-2 align-items-center">
 
-        <div class="progress-container">
-          <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="percentage" id="percentage">0%</div>
-        <div class="footer-text">LOADING PLEASE WAIT</div>
+
+        <button class="btn btn-outline-light" onclick="location.href='admin-homepage.html'"><i class="fas fa-arrow-left"></i> Back</button>
       </div>
     </div>
+  </nav>
 
+  <!-- Header -->
+  <div class="container text-center mt-4">
+    <h2 class="page-title">Employer Registration List</h2>
+  </div>
 
-    <!-- Info Modal -->
-<div id="modalOverlay"></div>
-<div id="infoModal">
-  <span class="close-btn">&times;</span>
-  <h3 id="modalTitle"></h3>
-  <p id="modalContent"></p>
-</div>
+  <!-- Controls -->
+  <div class="container mt-3">
+    <div class="row controls-row g-2 align-items-center">
+      <div class="col-md-4 col-sm-12">
+        <input id="searchInput" class="form-control" placeholder="Search employer name…" />
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <select id="statusFilter" class="form-select">
+          <option value="ALL">All Statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="ACCEPTED">Accepted</option>
+          <option value="ARCHIVED">Archived</option>
+        </select>
+      </div>
+      <div class="col-md-2 col-sm-6">
+        <select id="pageSelect" class="form-select"></select>
+      </div>
+      <div class="col-md-3 col-sm-12 text-md-end">
+        <button id="printAcceptedBtn" class="btn btn-primary w-100"><i class="fas fa-print"></i> Print Accepted</button>
+      </div>
+    </div>
+  </div>
 
-    <h2>Employer Registration List</h2>
-<table id="employerTable">
-  <thead>
-    <tr>
-      <th>Profile Picture</th> <!-- 👈 new -->
-      <th>Employer Name</th>
-      <th>Business Name</th>
-      <th>Business Address</th>
-      <th>Landline No</th>
-      <th>Mobile No</th>
-      <th>Company Email</th>
-      <th>Website</th>
-      <th>User ID</th>
-      <th>Status</th>
-      <th>Submitted At</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <!-- Print title (shown during print) -->
+  <h4 id="printTitle" class="text-center mt-3 d-none">Accepted Employers</h4>
 
-    <select id="statusFilter">
-        <option value="ALL">All Statuses</option>
-        <option value="PENDING">Pending</option>
-        <option value="ACCEPTED">Accepted</option>
-        <option value="ARCHIVED">Archived</option>
-    </select>
+  <!-- Table print zone -->
+  <div id="printZone" class="container mt-3">
+    <div class="table-responsive">
+      <table id="employerTable" class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Profile Picture</th>
+            <th>Employer Name</th>
+            <th>Business Name</th>
+            <th>Business Address</th>
+            <th>Landline No</th>
+            <th>Mobile No</th>
+            <th>Company Email</th>
+            <th>Website</th>
+            <th>User ID</th>
+            <th>Status</th>
+            <th>Submitted At</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
-    <select id="pageSelect"></select>
-    
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const tbody       = document.querySelector('#employerTable tbody');
-  const pageSelect  = document.getElementById('pageSelect');
-  const statusFilter = document.getElementById('statusFilter');
+  <!-- Info modal (custom lightweight) -->
+  <div id="infoModal" aria-hidden="true">
+    <div class="modal-panel">
+      <button class="close-btn" aria-label="Close">&times;</button>
+      <h5 id="modalTitle"></h5>
+      <div id="modalContent" class="mt-2"></div>
+    </div>
+  </div>
 
-  const ROWS_PER_PAGE = 100;
-  let currentPage = 1;
-  let totalPages  = 1;
-  let allEmployers = [];
+  <!-- Popup warning -->
+  <div id="popup" class="popup-warning">⚠️ No picture available</div>
 
-  if (sessionStorage.getItem('userRole') !== 'admin') {
-    window.location.href = 'homepage.html';
-    return;
-  }
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  // ✅ Modal references
-  const modalOverlay = document.getElementById("modalOverlay");
-  const infoModal    = document.getElementById("infoModal");
-  const modalTitle   = document.getElementById("modalTitle");
-  const modalContent = document.getElementById("modalContent");
-  const modalClose   = document.querySelector("#infoModal .close-btn");
+  <!-- Inline JS (keeps your endpoints and logic) -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Elements
+    const tbody = document.querySelector('#employerTable tbody');
+    const pageSelect = document.getElementById('pageSelect');
+    const statusFilter = document.getElementById('statusFilter');
+    const searchInput = document.getElementById('searchInput');
+    const printAcceptedBtn = document.getElementById('printAcceptedBtn');
+    const loaderBar = document.getElementById('loader-bar');
+    const loaderPct = document.getElementById('loader-pct');
+    const loaderWrap = document.getElementById('loader-wrapper');
+    const infoModal = document.getElementById('infoModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const modalClose = infoModal.querySelector('.close-btn');
+    const popup = document.getElementById('popup');
+    const printTitle = document.getElementById('printTitle');
 
-  // ✅ Helper: open/close modal
-  function openInfoModal(label, value) {
-    modalTitle.textContent = label;
-    modalContent.textContent = value || "N/A";
-    modalOverlay.style.display = "block";
-    infoModal.style.display = "block";
-  }
-  function closeInfoModal() {
-    modalOverlay.style.display = "none";
-    infoModal.style.display = "none";
-  }
-  modalClose.addEventListener("click", closeInfoModal);
-  modalOverlay.addEventListener("click", closeInfoModal);
+    const ROWS_PER_PAGE = 100;
+    let currentPage = 1, totalPages = 1, allEmployers = [], showOnlyAccepted = false;
 
-  // ✅ Helper: Create a "View" button cell
-  function makeViewButtonCell(label, value) {
-    const td = document.createElement("td");
-    const btn = document.createElement("button");
-    btn.textContent = "View";
-    btn.addEventListener("click", () => openInfoModal(label, value));
-    td.appendChild(btn);
-    return td;
-  }
-
-  // Filter change
-  statusFilter.addEventListener('change', () => loadPage(1));
-  pageSelect.addEventListener('change', () => loadPage(+pageSelect.value));
-
-  // Format date
-  function formatDateForDisplay(dateValue) {
-    if (!dateValue) return '';
-    try {
-      const date = new Date(dateValue);
-      if (isNaN(date.getTime())) return dateValue;
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch {
-      return dateValue;
+    // Admin guard
+    if (sessionStorage.getItem('userRole') !== 'admin') {
+      window.location.href = 'homepage.html';
+      return;
     }
-  }
 
-  async function loadPage(page = 1) {
-    currentPage = page;
-    tbody.innerHTML = `<tr><td colspan="12">⏳ Loading...</td></tr>`;
+    // Modal helpers
+    function openInfoModal(title, content) {
+      modalTitle.textContent = title;
+      modalContent.textContent = content || 'N/A';
+      infoModal.style.display = 'flex';
+    }
+    function closeInfoModal() {
+      infoModal.style.display = 'none';
+    }
+    modalClose.addEventListener('click', closeInfoModal);
+    infoModal.addEventListener('click', (e) => { if (e.target === infoModal) closeInfoModal(); });
 
-    try {
-      const res = await fetch('/api/employer/list');
-      if (!res.ok) throw new Error(await res.text());
-      const { employers } = await res.json();
-      allEmployers = employers || [];
+    // Format date
+    function formatDateForDisplay(dateValue) {
+      if (!dateValue) return '';
+      try {
+        const date = new Date(dateValue);
+        if (isNaN(date.getTime())) return dateValue;
+        return date.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+      } catch { return dateValue; }
+    }
 
-      // ✅ Filter + Sort
-      const statusPriority = { 'PENDING': 1, 'ACCEPTED': 2, 'ARCHIVED': 3 };
-      const filterVal = statusFilter.value || 'ALL';
+    // Status badge
+    function statusBadge(s) {
+      const st = (s || 'PENDING').toUpperCase();
+      if (st === 'ACCEPTED') return `<span class="badge-PENDING badge-ACCEPTED">ACCEPTED</span>`.replace('badge-PENDING','');
+      if (st === 'ARCHIVED') return `<span class="badge-ARCHIVED">ARCHIVED</span>`;
+      return `<span class="badge-PENDING">PENDING</span>`;
+    }
 
-      const sortedEmployers = allEmployers
-        .filter(emp => {
-          const st = emp.status?.toUpperCase() || 'PENDING';
-          return filterVal === 'ALL' || st === filterVal;
-        })
-        .sort((a, b) => {
-          const sa = statusPriority[a.status?.toUpperCase() || 'PENDING'] || 99;
-          const sb = statusPriority[b.status?.toUpperCase() || 'PENDING'] || 99;
-          return sa !== sb
-            ? sa - sb
-            : new Date(b.submittedAt) - new Date(a.submittedAt);
+    // Build pagination select
+    function buildPagination() {
+      pageSelect.innerHTML = '';
+      for (let i=1; i<=Math.max(1, totalPages); i++){
+        const opt = new Option(`Page ${i}`, i, i===currentPage, i===currentPage);
+        pageSelect.appendChild(opt);
+      }
+    }
+
+    // Fetch and render page
+    async function loadPage(page = 1) {
+      currentPage = page;
+      tbody.innerHTML = `<tr><td colspan="12">⏳ Loading...</td></tr>`;
+      try {
+        const res = await fetch('/api/employer/list');
+        if (!res.ok) throw new Error(await res.text());
+        const { employers } = await res.json();
+        allEmployers = employers || [];
+
+        // Filter & sort
+        const statusPriority = { 'PENDING':1, 'ACCEPTED':2, 'ARCHIVED':3 };
+        const filterVal = statusFilter.value || 'ALL';
+
+        const sortedEmployers = allEmployers
+          .filter(emp => {
+            const st = (emp.status || 'PENDING').toUpperCase();
+            return filterVal === 'ALL' || st === filterVal;
+          })
+          .sort((a,b) => {
+            const sa = statusPriority[(a.status||'PENDING').toUpperCase()] || 99;
+            const sb = statusPriority[(b.status||'PENDING').toUpperCase()] || 99;
+            if (sa !== sb) return sa - sb;
+            return new Date(b.submittedAt) - new Date(a.submittedAt);
+          });
+
+        totalPages = Math.ceil(sortedEmployers.length / ROWS_PER_PAGE) || 1;
+        buildPagination();
+
+        const start = (currentPage - 1) * ROWS_PER_PAGE;
+        const paginated = sortedEmployers.slice(start, start + ROWS_PER_PAGE);
+
+        tbody.innerHTML = '';
+        paginated.forEach(emp => {
+          const tr = document.createElement('tr');
+          const currentStatus = (emp.status || 'PENDING').toUpperCase();
+
+          // Profile picture
+          const tdPic = document.createElement('td');
+          if (emp.companyLogo) {
+            const img = document.createElement('img');
+            if (emp.companyLogo.startsWith('/')) img.src = emp.companyLogo;
+            else img.src = (emp.companyLogo.startsWith('http') ? emp.companyLogo : '/uploads/companyLogos/' + emp.companyLogo);
+            img.alt = 'Company Logo';
+            img.className = 'company-logo';
+            img.addEventListener('click', () => window.open(img.src, '_blank'));
+            tdPic.appendChild(img);
+          } else {
+            tdPic.textContent = 'No Picture';
+          }
+          tr.appendChild(tdPic);
+
+          // Employer name
+          const tdName = document.createElement('td'); tdName.textContent = emp.employerName || ''; tr.appendChild(tdName);
+
+          // Long fields -> view buttons
+          function makeViewCell(label, value) {
+            const td = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-secondary';
+            btn.textContent = 'View';
+            btn.addEventListener('click', () => openInfoModal(label, value));
+            td.appendChild(btn);
+            return td;
+          }
+          tr.appendChild(makeViewCell('Business Name', emp.businessName));
+          tr.appendChild(makeViewCell('Business Address', emp.businessAddress));
+          tr.appendChild(makeViewCell('Landline', emp.landlineNo));
+          tr.appendChild(makeViewCell('Mobile', emp.mobileNo));
+          tr.appendChild(makeViewCell('Company Email', emp.companyEmail));
+          tr.appendChild(makeViewCell('Website', emp.companyWebsite));
+
+          // User ID
+          const tdUser = document.createElement('td'); tdUser.textContent = emp.preferredUserId || ''; tr.appendChild(tdUser);
+
+          // Status
+          const tdStatus = document.createElement('td'); tdStatus.innerHTML = statusBadge(currentStatus); tr.appendChild(tdStatus);
+
+          // Submitted At
+          const tdDate = document.createElement('td'); tdDate.textContent = formatDateForDisplay(emp.submittedAt); tr.appendChild(tdDate);
+
+          // Actions
+          const tdAction = document.createElement('td');
+          tdAction.className = 'text-center';
+          tdAction.innerHTML = `
+            <button class="btn btn-success btn-sm action-btn accept-btn me-1" data-id="${emp.id}">Accept</button>
+            <button class="btn btn-danger btn-sm action-btn archive-btn" data-id="${emp.id}">Archive</button>
+          `;
+          tr.appendChild(tdAction);
+
+          tbody.appendChild(tr);
         });
 
-      totalPages = Math.ceil(sortedEmployers.length / ROWS_PER_PAGE);
-      buildPagination();
-
-      const start = (currentPage - 1) * ROWS_PER_PAGE;
-      const paginated = sortedEmployers.slice(start, start + ROWS_PER_PAGE);
-
-      tbody.innerHTML = '';
-      paginated.forEach(emp => {
-        const tr = document.createElement('tr');
-        const currentStatus = emp.status?.toUpperCase() || 'PENDING';
-
-        // ✅ Profile Picture
-        const tdPic = document.createElement('td');
-        if (emp.companyLogo) {
-          const img = document.createElement("img");
-          img.src = emp.companyLogo.startsWith('/')
-            ? emp.companyLogo
-            : '/uploads/companyLogos/' + emp.companyLogo;
-          img.alt = "Company Logo";
-          img.style.width = "40px";
-          img.style.height = "40px";
-          img.style.objectFit = "cover";
-          img.style.borderRadius = "50%";
-          img.style.cursor = "pointer";
-          img.addEventListener("click", () => {
-            window.open(img.src, "_blank");
-          });
-          tdPic.appendChild(img);
-        } else {
-          tdPic.textContent = "No Picture";
-        }
-        tr.appendChild(tdPic);
-
-        // ✅ Employer Name (show text directly)
-        const tdName = document.createElement('td');
-        tdName.textContent = emp.employerName || '';
-        tr.appendChild(tdName);
-
-        // ✅ Replace long fields with View button
-        tr.appendChild(makeViewButtonCell("Business Name", emp.businessName));
-        tr.appendChild(makeViewButtonCell("Business Address", emp.businessAddress));
-        tr.appendChild(makeViewButtonCell("Landline", emp.landlineNo));
-        tr.appendChild(makeViewButtonCell("Mobile", emp.mobileNo));
-        tr.appendChild(makeViewButtonCell("Company Email", emp.companyEmail));
-        tr.appendChild(makeViewButtonCell("Website", emp.companyWebsite));
-
-        // ✅ User ID
-        const tdUser = document.createElement('td');
-        tdUser.textContent = emp.preferredUserId || '';
-        tr.appendChild(tdUser);
-
-        // ✅ Status
-        const tdStatus = document.createElement('td');
-        tdStatus.textContent = currentStatus;
-        tdStatus.className = `status ${currentStatus}`;
-        tr.appendChild(tdStatus);
-
-        // ✅ Submitted Date
-        const tdDate = document.createElement('td');
-        tdDate.textContent = formatDateForDisplay(emp.submittedAt);
-        tr.appendChild(tdDate);
-
-        // ✅ Actions
-        const tdAction = document.createElement('td');
-        tdAction.innerHTML = `
-          <button class="accept-btn" data-id="${emp.id}">Accept</button>
-          <button class="decline-btn" data-id="${emp.id}">Archived</button>
-        `;
-        tr.appendChild(tdAction);
-
-        tbody.appendChild(tr);
-      });
-
-      attachStatusEvents();
-    } catch (err) {
-      console.error('❌ Error loading employers:', err);
-      tbody.innerHTML = `<tr><td colspan="12">Error loading employers</td></tr>`;
-    }
-  }
-
-  function buildPagination() {
-    pageSelect.innerHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-      const opt = new Option(`Page ${i}`, i, i === currentPage, i === currentPage);
-      pageSelect.appendChild(opt);
-    }
-  }
-
-  function attachStatusEvents() {
-    document.querySelectorAll('.accept-btn').forEach(btn => {
-      btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ACCEPTED'));
-    });
-    document.querySelectorAll('.decline-btn').forEach(btn => {
-      btn.addEventListener('click', () => updateStatus(btn.dataset.id, 'ARCHIVED'));
-    });
-  }
-
-  async function updateStatus(id, status) {
-    const buttons = document.querySelectorAll(`[data-id="${id}"]`);
-    buttons.forEach(b => b.disabled = true);
-    try {
-      const res = await fetch(`/api/employer/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      await loadPage(currentPage);
-    } catch (err) {
-      console.error('❌ Update error:', err);
-    } finally {
-      buttons.forEach(b => b.disabled = false);
-    }
-  }
-
-  // Initial load
-  loadPage();
-
-  // Loader animation
-  let pct = 80;
-  const loader = document.getElementById("loader-wrapper"),
-        bar = document.getElementById("progress-bar"),
-        pctEl = document.getElementById("percentage");
-
-  if (loader && bar && pctEl) {
-    const iv = setInterval(() => {
-      if (pct < 100) {
-        pct++;
-        bar.style.width = pct + "%";
-        pctEl.textContent = pct + "%";
-      } else {
-        clearInterval(iv);
-        loader.style.display = "none";
+        attachActionEvents();
+      } catch (err) {
+        console.error('❌ Error loading employers:', err);
+        tbody.innerHTML = `<tr><td colspan="12">❌ Failed to load employers</td></tr>`;
       }
-    }, 30);
-  }
-});
-</script>
+    }
 
+    function attachActionEvents() {
+      document.querySelectorAll('.accept-btn').forEach(btn => {
+        btn.onclick = () => updateStatus(btn.dataset.id, 'ACCEPTED');
+      });
+      document.querySelectorAll('.archive-btn').forEach(btn => {
+        btn.onclick = () => updateStatus(btn.dataset.id, 'ARCHIVED');
+      });
+    }
+
+    async function updateStatus(id, status) {
+      const buttons = document.querySelectorAll(`[data-id="${id}"]`);
+      buttons.forEach(b => b.disabled = true);
+      try {
+        const res = await fetch(`/api/employer/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        await loadPage(currentPage);
+      } catch (err) {
+        console.error('❌ Update error:', err);
+        alert('❌ ' + (err.message || 'Update failed'));
+      } finally {
+        buttons.forEach(b => b.disabled = false);
+      }
+    }
+
+    // Print accepted only
+    printAcceptedBtn.addEventListener('click', () => {
+      showOnlyAccepted = true;
+      printTitle.classList.remove('d-none');
+      // render will honor showOnlyAccepted by filtering table rows before print
+      // easiest approach: temporarily hide non-accepted rows, call print, then restore via afterprint
+      document.querySelectorAll('#employerTable tbody tr').forEach(row => {
+        const badge = row.querySelector('td:nth-child(10) span');
+        const status = badge ? badge.textContent.trim().toUpperCase() : row.querySelector('td:nth-child(10)')?.textContent?.trim().toUpperCase();
+        row.style.display = (status === 'ACCEPTED') ? '' : 'none';
+      });
+      setTimeout(() => window.print(), 100);
+    });
+
+    // after print restore
+    window.addEventListener('afterprint', () => {
+      document.querySelectorAll('#employerTable tbody tr').forEach(row => row.style.display = '');
+      showOnlyAccepted = false;
+      printTitle.classList.add('d-none');
+    });
+
+    // Controls
+    searchInput.addEventListener('input', () => { currentPage = 1; loadPage(1); });
+    statusFilter.addEventListener('change', () => { currentPage = 1; loadPage(1); });
+    pageSelect.addEventListener('change', () => { loadPage(+pageSelect.value); });
+
+
+    // Loader simulation (basketball style)
+    (function loaderSim(){
+      let pct = 0;
+      const iv = setInterval(() => {
+        pct = Math.min(100, pct + Math.floor(Math.random()*6) + 2);
+        loaderBar.style.width = pct + '%';
+        loaderPct.textContent = pct + '%';
+        if (pct >= 100) { clearInterval(iv); loaderWrap.style.display = 'none'; }
+      }, 40);
+    })();
+
+    // Initial load
+    loadPage();
+
+  });
+  </script>
 </body>
 </html>

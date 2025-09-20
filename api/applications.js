@@ -81,7 +81,7 @@ router.post("/add", upload.single("resume"), async (req, res) => {
     // ✅ Step 2: Copy into archive (explicit mapping)
     // Step 2: Copy into archive (mirror)
     await conn.execute(
-      `INSERT INTO applications_archive
+      `INSERT INTO applicant
         (originalAppId, userName, careerId, employerId, careerTitle, companyName,
          firstName, lastName, phoneNo, email, resumePath, dateSubmitted)
        SELECT 
@@ -142,7 +142,7 @@ router.get("/career/:careerId", async (req, res) => {
           resumePath,
           dateSubmitted,
           archivedAt
-       FROM applications_archive
+       FROM applicant
        WHERE careerId = ? AND employerId = ?
        ORDER BY dateSubmitted DESC`,
       [careerId, employerId]
@@ -168,7 +168,7 @@ router.get("/user/:userName", async (req, res) => {
          aa.dateSubmitted,
          aa.careerTitle      AS careerTitle,
          aa.companyName      AS company
-       FROM applications_archive aa
+       FROM applicant aa
        WHERE aa.userName = ?
        ORDER BY aa.dateSubmitted DESC`,
       [userName]

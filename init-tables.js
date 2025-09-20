@@ -13,18 +13,13 @@ async function initTables() {
     const sql = {
     alumni: `CREATE TABLE IF NOT EXISTS alumni (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      firstName VARCHAR(100),
-      lastName VARCHAR(100),
+      firstName VARCHAR(100) NOT NULL,
+      lastName VARCHAR(100) NOT NULL,
       initial VARCHAR(10),
       suffix VARCHAR(10),
-      civilStatus VARCHAR(50),
-      dateBirth DATE,
-      gender VARCHAR(20),
-      phoneNo VARCHAR(50),
-      major VARCHAR(100),
-      yearStarted YEAR,
-      graduated YEAR,
-      studentNo VARCHAR(50)
+      dateBirth DATE NOT NULL,
+      major VARCHAR(100) NOT NULL,
+      graduated YEAR NOT NULL
     )`,
     responses: `CREATE TABLE IF NOT EXISTS responses (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -71,7 +66,8 @@ async function initTables() {
       location VARCHAR(255),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
       eventDateTime DATETIME,
-      image LONGBLOB  -- ✅ store actual image as binary
+      image LONGBLOB,  -- ✅ store actual image as binary
+      status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
 
     careers: `CREATE TABLE IF NOT EXISTS careers (
@@ -81,7 +77,8 @@ async function initTables() {
       link VARCHAR(255),
       userId VARCHAR(100),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
-      image LONGBLOB  -- ✅ store actual image as binary
+      image LONGBLOB,  -- ✅ store actual image as binary
+      status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
     homeregs: `CREATE TABLE IF NOT EXISTS homeregs (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -169,17 +166,36 @@ async function initTables() {
       message TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
-    applications: `CREATE TABLE applications (
+    applications: `CREATE TABLE IF NOT EXISTS applications (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      userName VARCHAR(50) NOT NULL,     -- who applied
-      careerId INT NOT NULL,             -- which career/job they applied for
+      userName VARCHAR(50) NOT NULL,
+      careerId INT NOT NULL,
+      careerTitle VARCHAR(200) NOT NULL,
+      companyName VARCHAR(200) NOT NULL,
       firstName VARCHAR(100) NOT NULL,
       lastName VARCHAR(100) NOT NULL,
       phoneNo VARCHAR(20) NOT NULL,
       email VARCHAR(100) NOT NULL,
-      resumePath VARCHAR(255) NOT NULL,  -- file path of uploaded PDF
-      dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`
+      resumePath VARCHAR(255) NOT NULL,
+      dateSubmitted DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (careerId) REFERENCES careers(id) ON DELETE CASCADE
+    )`,
+    applicant: `CREATE TABLE applicant (
+      id INT AUTO_INCREMENT PRIMARY KEY,       -- archive’s own ID
+      originalAppId INT NOT NULL,              -- reference to applications.id
+      userName VARCHAR(50) NOT NULL,
+      careerId INT NOT NULL,
+      employerId VARCHAR(100) NOT NULL,        -- ✅ match careers.userId (VARCHAR)
+      careerTitle VARCHAR(200) NOT NULL,
+      companyName VARCHAR(200) NOT NULL,
+      firstName VARCHAR(100) NOT NULL,
+      lastName VARCHAR(100) NOT NULL,
+      phoneNo VARCHAR(20) NOT NULL,
+      email VARCHAR(100) NOT NULL,
+      resumePath VARCHAR(255) NOT NULL,
+      dateSubmitted DATETIME,
+      archivedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
     };
 
     for (const [name, ddl] of Object.entries(sql)) {

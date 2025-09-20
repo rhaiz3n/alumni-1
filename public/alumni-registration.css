@@ -327,7 +327,7 @@ html, body {
   color: #990000;
   text-align: left;
   font-family: "Sanchez", serif;
-  font-size: 40px;
+  font-size: 25px;
   font-weight: 700;
   position: relative;
   left: 100px;
@@ -337,7 +337,7 @@ html, body {
   color: #990000;
   text-align: left;
   font-family: "Sanchez", serif;
-  font-size: 40px;
+  font-size: 25px;
   font-weight: 700;
   position: absolute;
   left: 100px;
@@ -347,7 +347,7 @@ html, body {
   color: #990000;
   text-align: left;
   font-family: "Sanchez", serif;
-  font-size: 40px;
+  font-size: 25px;
   font-weight: 700;
   position: absolute;
   left: 100px;
@@ -373,266 +373,7 @@ html, body {
   left: 100px;
   top: 1765px;
 }
-.first-name {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: relative;
-  top: 660px;
-  left: 125px;
-}
-.first-name-typebox {
-  position: relative;
-  width: 300px; 
-  margin: 10px 0;
-  left: 125px;
-  top: 785px; 
-}
-.firstname-typebox {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-.last-name {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: relative;
-  top: 562px;
-  left: 580px;
-}
-.last-name-typebox {
-  position: relative;
-  width: 300px; 
-  margin: 10px 0;
-  left: 430px;
-  top: 735px; 
-}
-.lastname-typebox {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-.initial-name {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: relative;
-  top: 465px;
-  left: 970px;
-}
-.initial-name-typebox {
-  position: relative;
-  width: 100px; 
-  margin: 10px 0;
-  left: 735px;
-  top: 685px; 
-}
-.initialname-typebox {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-/* Label Styling (Gender & Civil Status share this) */
-.gender {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1200px; 
-  left: 130px;
-}
-.civil-status {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1400px;
-  left: 450px;
-}
 
-/* Dropdown (Select) Styling */
-/* GENDER DROPDOWN ONLY */
-#gender {
-  width: 200px;
-  padding: 10px;
-  font-size: 15px;
-  border: 2px solid #000000;
-  border-radius: 4px;
-  background-color: #ffffff;
-  cursor: pointer;
-  position: absolute;
-  top: 1150px;  
-  left: 125px;
-  margin-bottom: 40px;
-  font-family: "Sanchez", serif;
-}
-
-/* CIVIL STATUS DROPDOWN ONLY */
-#civilStatus {
-  width: 200px;
-  padding: 10px;
-  font-size: 15px;
-  border: 2px solid #000000;
-  border-radius: 4px;
-  background-color: #ffffff;
-  cursor: pointer;
-  position: absolute;
-  top: 1150px;  
-  left: 330px;    
-  font-family: "Sanchez", serif;
-}
-option {
-  font-size: 15px;
-  padding: 10px;
-  color: #000;
-}
-
-/* Date of Birth Section */
-.dob-container {
-  position: absolute;     
-  top: 1150px;             
-  left: 535px;         
-  font-family: 'Sanchez', serif;
-  z-index: 2;
-}
-
-.dob-label {
-  font-size: 30px;
-  font-weight: 400;
-  color: #000;
-}
-.dob-selects {
-  display: flex;
-  gap: 15px;
-}
-
-.dob-selects select {
-  width: 100px;           
-  padding: 10px;
-  font-size: 15px;
-  border: 2px solid #000;
-  border-radius: 4px;
-  background-color: #fff;
-  cursor: pointer;
-  font-family: 'Sanchez', serif;
-}
-.phone-number {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1505px;
-  left: 130px;
-}
-.phone-number-typebox {
-  position: absolute;
-  width: 200px; /* Adjust as needed */
-  left: 125px;
-  top: 1210px;
-}
-.phonenumber-typebox {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-.maiden-name {
-  position: absolute;
-  top: 1403px;  
-  left: 1130px;  
-  font-size: 30px;
-  font-family: 'Sanchez', serif;
-  font-weight: 400;
-  color: #000;
-}
-.maidenname-typebox {
-  width: 250px;
-  height: 45px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
-.maiden-name-typebox {
-  position: absolute;
-  top: 1150px;  
-  left: 870px; 
-  width: 1000px;
-}
-.user-name {
-  color: #000000;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1500px;
-  left: 550px;
-}
-.user-name-typebox {
-  position: absolute;
-  width: 260px; 
-  margin: 10px 0;
-  top: 1200px;
-  left: 330px;
-}
-.username-typebox {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-.passWords {
-  color: #000000;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1500px;
-  left: 830px;
-}
 .password-wrapper {
   top: 1210px;
   left: 595px;
@@ -640,164 +381,12 @@ option {
   align-items: center;
   position: absolute;
 }
-.password-input {
-  padding: 10px;
-  width: 260px;
-  height: 16px;
-  font-size: 15px;
-  border: 2px solid #000;
-  border-radius: 6px;
-}
 .toggle-password {
   cursor: pointer;
   font-size: 20px;
   margin-left: -40px;
   user-select: none;
 }
-.degree {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1320px;
-  left: 125px;
-}
-.degree-typebox {
-  position: absolute;
-  width: 250px; 
-  margin: 10px 0;
-  top: 1350px;
-  left: 125px; 
-}
-.degrees-typebox {
-  width: 150%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-.personalEmail {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1970px;
-  left: 125px;
-}
-.personale-typebox {
-  position: absolute;
-  width: 400px; 
-  margin: 10px 0;
-  top: 1560px;
-  left: 125px; 
-}
-.personales-typebox {
-  width: 400px;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-.retype {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1560px;
-  left: 750px;
-}
-.retypee-typebox {
-  position: absolute;
-  width: 400px; 
-  margin: 10px 0;
-  top: 1560px;
-  left: 530px; 
-}
-.retypees-typebox {
-  width: 400px;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-.year {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1680px;
-  left: 750px;
-}
-.year-typebox {
-  position: absolute;
-  width: 200px; 
-  margin: 10px 0;
-  top: 1350px;
-  left: 505px;
-}
-.years-typebox {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-
-.yearg {
-  color: #000000;
-  text-align: left;
-  font-family: "Sanchez", serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1680px;
-  left: 1025px;
-}
-.yearg-typebox {
-  position: absolute;
-  width: 200px; 
-  margin: 10px 0;
-  top: 1350px;
-  left: 710px;
-}
-.yearg-typebox1 {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  left: 100px;
-}
-/* Suffix Section */
-/* General Label Styling */
-/* Suffix Label Styling */
 .label-suffix {
   display: flex;
   align-items: center;
@@ -806,77 +395,9 @@ option {
   color: #860000;
   position: absolute;
   top: 1120px;
-  left: 840px;
+  left: 960px;
 }
 
-/* Student No. Label Styling */
-.label-student {
-  display: flex;
-  align-items: center;
-  font-family: 'Sanchez', serif;
-  font-size: 14px;
-  color: #333;
-  position: absolute;
-  top: 1460px;
-  left: 133px;
-}
-
-/* Suffix Section Styling */
-.suffix-name {
-  color: #000;
-  font-family: 'Sanchez', serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1307px;
-  left: 1100px;
-}
-
-.suffix-typebox {
-  position: absolute;
-  top: 1073px;
-  left: 840px;
-}
-
-.suffix {
-  width: 150px;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-  position: absolute;
-}
-
-/* Student Number Section Styling */
-.student-no {
-  color: #000;
-  font-family: 'Sanchez', serif;
-  font-size: 30px;
-  font-weight: 400;
-  position: absolute;
-  top: 1430px;
-  left: 125px;
-}
-
-.student-no-typebox {
-  position: absolute;
-  top: 1410px;
-  left: 125px;
-}
-
-.student {
-  width: 200px;
-  height: 40px;
-  padding: 10px;
-  font-size: 15px;
-  font-family: 'Albert Sans', serif;
-  border: 2px solid #000;
-  border-radius: 6px;
-  box-sizing: border-box;
-}
 #loader-wrapper {
   position: fixed;
   top: 0;
@@ -1428,3 +949,1064 @@ option {
 }
 
 
+
+
+
+
+
+
+.first-name {
+  position: relative;
+  width: 100%;
+}
+
+.first-name input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .first-name {
+    top: 793px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .first-name {
+    top: 796px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .first-name {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.first-name label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.first-name input:focus + label,
+.first-name input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.last-name{
+  position: relative;
+  width: 100%;
+}
+
+.last-name  input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .last-name {
+    top: 748px;
+    left: 29%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .last-name {
+    top: 750px;
+    left: 32%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .last-name {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.last-name  label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.last-name  input:focus + label,
+.last-name  input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 15px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+.initial{
+  position: relative;
+  width: 100%;
+}
+
+.initial  input {
+  width: 15%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .initial {
+    top: 701px;
+    left: 51%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .initial {
+    top: 704px;
+    left: 54%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .initial {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.initial  label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.initial  input:focus + label,
+.initial  input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 15px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.suffix{
+  position: relative;
+  width: 100%;
+}
+
+.suffix  input {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .suffix {
+    top: 152px;
+    left: 68%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .suffix {
+    top: 154px;
+    left: 71%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .suffix {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.suffix  label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.suffix  input:focus + label,
+.suffix  input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 15px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.gender {
+  position: relative;
+  width: 100%;
+}
+
+.gender select {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .gender{
+    top: 340px;
+    left: 7%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .gender {
+    top: 340px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .gender {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.gender label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.gender select:focus + label,
+.gender select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.status {
+  position: relative;
+  width: 100%;
+}
+
+.status select {
+  width: 15%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .status{
+    top: 294px;
+    left: 18%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .status {
+    top: 294px;
+    left: 20.5%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .status {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.status label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.status select:focus + label,
+.status select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper select {
+  width: 13%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .input-wrapper{
+    top: 108px;
+    left:34%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .input-wrapper {
+    top: 108px;
+    left:36%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .input-wrapper {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.input-wrapper label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+.icon {
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+  top: 5px;
+  position: relative;
+  background-color: white;
+}
+
+/* Float label when select has a value or is focused */
+.input-wrapper select:focus + label,
+.input-wrapper select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.phone {
+  position: relative;
+  width: 100%;
+}
+
+.phone input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .phone {
+    top: 480px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .phone {
+    top: 900px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .phone {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.phone label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.phone input:focus + label,
+.phone input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.maiden-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;         /* take most of the width */
+  max-width: 500px;   /* but don’t get too wide */
+  margin: 50px auto;  /* center it */
+  position: relative;
+}
+
+.maiden-name input {
+  width: 100%;        /* full width of container */
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Label styling */
+.maiden-name label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.maiden-name input:focus + label,
+.maiden-name input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/* Optional small tweaks for smaller screens */
+@media (max-width: 768px) {
+  .maiden-name {
+    width: 95%;
+    margin: 30px auto;
+  }
+}
+
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+.major {
+  position: relative;
+  width: 100%;
+}
+
+.major input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .major {
+    top: 820px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .major {
+    top: 900px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .major {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.major label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.major input:focus + label,
+.major input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+.username {
+  position: relative;
+  width: 100%;
+}
+
+.username input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .username {
+    top: 1200px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .username {
+    top: 1200px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .username {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.username label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.username input:focus + label,
+.username input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.pass {
+  position: relative;
+  width: 100%;
+}
+
+.pass input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .pass {
+    top: 820px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .pass {
+    top: 1000px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .pass {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.pass label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.pass input:focus + label,
+.pass input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+
+.start {
+  position: relative;
+  width: 100%;
+}
+
+.start select {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .start{
+    top: 700px;
+    left: 7%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .start {
+    top: 700px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .start {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.start label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.start select:focus + label,
+.start select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.end {
+  position: relative;
+  width: 100%;
+}
+
+.end select {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .end{
+    top: 700px;
+    left: 7%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .end {
+    top: 700px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .end {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.end label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.end select:focus + label,
+.end select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.per {
+  position: relative;
+  width: 100%;
+}
+
+.per input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .per {
+    top: 1000px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .per {
+    top: 600px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .per {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.per label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.per input:focus + label,
+.per input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+
+.re {
+  position: relative;
+  width: 100%;
+}
+
+.re input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .re {
+    top: 1000px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .re {
+    top: 600px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .re {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.re label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.re input:focus + label,
+.re input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.student {
+  position: relative;
+  width: 100%;
+}
+
+.student input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .student {
+    top: 820px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .student {
+    top: 600px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .student {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.student label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.student input:focus + label,
+.student input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/

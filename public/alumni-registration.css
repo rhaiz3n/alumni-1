@@ -1,0 +1,2012 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Alegreya', 'Albert Sans', 'Sanchez', sans-serif;
+}
+.registrationpage {
+  background: #ffffff00;
+  border: 0px solid #000000;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  display: block;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .registrationpage {
+    height: 175vh;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .registrationpage {
+    height: 240vh;
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .registrationpage {
+    top: 270px;
+    left: 36%;
+  }
+}
+.Navbar {
+  width: 100%;                 
+  height: 195px;
+  object-fit: cover;
+  display: block;
+}
+.line1 {
+  margin-top: -10px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 100%;
+  height: 0px; 
+  position: absolute;
+  left: 0;
+  top: 200px;
+  transform-origin: left top;
+  transform: rotate(0deg) scale(1, 1);
+}
+
+.line2 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 86%;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 470px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .line3 {
+    top: 77%;
+    left: 5.1%;
+    max-width: 86%;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .line3 {
+    top: 870px;
+    left: 7%;
+    max-width: 86%;
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .line3 {
+    top: 270px;
+    left: 36%;
+  }
+}
+.line4 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 86%;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 1000px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.line5 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 86%;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 1290px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.line6 {
+  margin-top: -5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 10px 0 0 0;
+  width: 86%;
+  height: 0px;
+  position: absolute;
+  left: 97px;
+  top: 1500px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.label1 {
+  color: white; 
+  text-align: center; 
+  font-family: "Alegreya-Medium", serif;
+  font-size: 30px;
+  font-weight: 200;
+  position: absolute;
+  left: 50%;
+  top: 37px;
+  transform: translateX(-50%); 
+  width: max-content;
+  -webkit-text-stroke: 1px #ffffff; 
+}
+.Logo {
+  width: 220px;
+  height: 220px;
+  position: absolute;
+  object-fit: cover;
+  align-self: center;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .Logo {
+    top: 9%;
+    left: 45%;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .Logo {
+    top: 10%;
+    left: 40%;
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .Logo {
+    top: 270px;
+    left: 36%;
+  }
+}
+.frame {
+  background: #83838300;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 5px;
+  width: 100%;
+  height: 1480px;
+  position: absolute;
+  left: 63px;
+  top: 255px;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .frame {
+    max-width: 93%;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .frame {
+    max-width: 90%;
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .frame {
+    top: 270px;
+    left: 36%;
+  }
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.8s ease-out forwards;
+}
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.zoom-in {
+  animation: zoomIn 0.8s ease-out forwards;
+}
+.alumni {
+  color: #990000;
+  text-align: left;
+  position: absolute;
+  -webkit-text-stroke: 1px #000000;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .alumni {
+    top: 30%;
+    left: 35%;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .alumni {
+    top: 38%;
+    left: 25%;
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .alumni {
+    top: 270px;
+    left: 36%;
+  }
+}
+.alumni-span {
+  font-family: "Alegreya", serif;
+  font-size: 80px;
+  font-weight: 700;
+}
+.alumni-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.reminders {
+  color: #990000;
+  text-align: left;
+  font-size: 40px;
+  font-weight: 700;
+  position: absolute;
+  font-family: "Sanchez", serif;
+  left: 100px;
+  top: 400px;
+}
+.required-star {
+  color: red;
+}
+.required {
+  color: red;
+}
+.reminder {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 25px;
+  font-weight: 200;
+  position: relative;
+  top: 290px;
+  left: 120px;
+}
+.notify {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 25px;
+  font-weight: 400;
+  position: absolute;
+  top: 1620px;
+  left: 125px;
+  width: 85%;
+}
+.consents {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 25px;
+  font-weight: 400;
+  position: absolute;
+  left: 120px;
+  top: 530px;
+  width: 85%;
+}
+.about-yourself {
+  color: #990000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 25px;
+  font-weight: 700;
+  position: relative;
+  left: 100px;
+  top: 780px;
+}
+.certificate {
+  color: #990000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 25px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 1300px;
+}
+.personal {
+  color: #990000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 25px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 1510px;
+}
+.alumnir1 {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 15px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 1750px;
+}
+.alumnir2 {
+  color: #000000;
+  text-align: left;
+  font-family: "Sanchez", serif;
+  font-size: 15px;
+  font-weight: 700;
+  position: absolute;
+  left: 100px;
+  top: 1765px;
+}
+
+.password-wrapper {
+  top: 1210px;
+  left: 595px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+}
+.toggle-password {
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: -40px;
+  user-select: none;
+}
+.label-suffix {
+  display: flex;
+  align-items: center;
+  font-family: 'Sanchez', serif;
+  font-size: 14px;
+  color: #860000;
+  position: absolute;
+  top: 1120px;
+  left: 960px;
+}
+
+#loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.loader-content {
+  text-align: center;
+  font-family: 'Alegraya', serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #882323;
+  -webkit-text-stroke: 1px #000000;
+}
+.loading-span {
+  font-family: "Alegreya", serif;
+  font-size: 60px;
+  font-weight: 700;
+}
+.loading-span2 {
+  font-family: "Alegreya", serif;
+  font-size: 40px;
+  font-weight: 700;
+}
+.progress-container {
+  width: 300px;
+  height: 20px;
+  background: #ddd;
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #990000;
+  transition: width 0.2s ease;
+}
+.percentage {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #000;
+}
+.footer-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
+}
+.label-privary{
+  display: flex;
+  align-items: center;
+  font-family: 'Sanchez', serif;
+  font-size: 20px;
+  color: #000000;
+  position: absolute;
+  top: 2150px;
+  left: 125px;
+}
+.modal {
+  display: none;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.alumniTable {
+  position: absolute;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.submitform-button {
+  font-family: "Albert Sans", sans-serif;
+  position: absolute;
+  padding: 10px 20px;
+  font-size: 30px;
+  cursor: pointer;
+  background: #990000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .submitform-button {
+    top: 1770px;
+    left: 90%;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .submitform-button {
+    max-width: 80%;
+    top: 1770px;
+    left: 85%;
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .submitform-button {
+    top: 270px;
+    left: 36%;
+  }
+}
+.submitform-button:hover {
+  background: #b32a2a;
+}
+@keyframes fadeInZoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.toast-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #28a745;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 6px;
+  font-size: 15px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.toast-notification.show {
+  opacity: 5;
+  pointer-events: auto;
+}
+.toast-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.toast-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-warning {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.toast-warning.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-header.warn {
+  display: flex;
+  align-items: center;
+  background-color: #882323;
+  padding: 10px;
+}
+.toast-logo {
+  height: 30px;
+  margin-right: 10px;
+}
+.toast-title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+}
+.toast-content {
+  padding: 15px;
+  font-size: 25px;
+  color: #333;
+  white-space: pre-line;
+}
+.back-button {
+  position: absolute;
+  top: 100px;
+  left: 1200px;
+  background-color: #00000000;
+  color: #ffffff;
+  border: none;
+  font-size: 70px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 1000;
+}
+/* ✅ For 1920x1080 screens (large PC monitors) */
+@media (min-width: 1600px) {
+  .back-button {
+    top: 9%;
+    left: 80%;
+  }
+}
+
+/* ✅ For 1366x768 screens (common laptops) */
+@media (max-width: 1400px) {
+  .back-button {
+    top: 11%;
+    left: 80%;
+  }
+}
+
+/* ✅ For tablets/phones */
+@media (max-width: 768px) {
+  .back-button {
+    top: 270px;
+    left: 36%;
+  }
+}
+.back-button:hover {
+  background-color: #00000000;
+}
+  .notify-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border-left: 5px solid #d9534f;
+    color: #333;
+    padding: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    z-index: 9999;
+    max-width: 300px;
+    font-family: sans-serif;
+  }
+
+  .notify-popup.success {
+    border-left-color: #28a745;
+  }
+
+  .notify-popup strong {
+    display: block;
+    margin-bottom: 8px;
+  }
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-message {
+  font-size: 14px;
+}
+.toast {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 16px 40px 16px 16px;
+  position: fixed;
+  z-index: 9999;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.5s, bottom 0.5s;
+}
+
+.toast.show {
+  visibility: visible;
+  opacity: 1;
+  bottom: 50px;
+}
+
+#toastCloseBtn {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+  .consent-wrapper {
+    position: absolute;
+    top: 1690px;
+    left: 90px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: "Alegreya-Bold", serif;
+    margin: 2px 0;
+  }
+
+  .check-button {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0);
+    font-family: "Alegreya-Bold", serif;
+    border: 0px solid #333;
+    padding: 5px 15px;
+    border-radius: 0px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 700px;
+    margin-left: 10px;
+    font-size: 13px;
+    transition: background-color 0.3s;
+    width: 1500px;
+  }
+  .hover-underline1 {
+    text-decoration: none;
+  }
+  .highlight-text {
+    color: rgb(0, 129, 172);
+    font-weight: bold;
+  }
+
+.hover-underline1::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #990000;
+  transition: width 0.3s ease-in-out;
+}
+.hover-underline1 {
+  font-family: 'Albert Sans', serif;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  color: #000000; 
+}
+.check-button:hover .hover-underline1::after {
+  width: 13.5%;
+}
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modal-navbar {
+  background: #004080;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  justify-content: space-between;
+}
+
+.modal-logo {
+  height: 30px;
+}
+
+.modal-title {
+  font-size: 1.2em;
+  flex-grow: 1;
+  margin-left: 15px;
+}
+
+.close-btn {
+  background: none;
+  color: white;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+  font-size: 1em;
+  color: #333;
+}
+
+/* Modal Base */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  width: 95%;
+  max-width: 1000px;
+  height: 90%;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.modal-header {
+  background: linear-gradient(165deg, #3a3a3a 50%, #882323 50%);
+  color: white;
+  padding: 10px 20px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.modal-logo5 {
+  position: absolute;
+  height: 150px;
+  top: 10px;
+  left: 20px;
+}
+
+.modal-title-wrapper {
+  flex-grow: 1;
+}
+
+.modal-title-wrapper h2 {
+  position: absolute;
+  font-size: 25px;
+  font-weight: bold;
+  bottom: 20px;
+  left: 170px;
+}
+
+.modal-subtitle {
+  position: absolute;
+  font-family: 'Alegreya', serif;
+  font-size: 40px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  top: -5px;
+  left: 170px;
+  color: black;
+  -webkit-text-stroke: 1px white;
+}
+
+.highlight-red {
+  color: #000000;
+}
+
+.modal-close {
+  background: none;
+  color: white;
+  font-size: 28px;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 20px;
+  top: 10px;
+}
+
+/* Body */
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.modal-body h4 {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  padding: 10px 0;
+}
+
+.modal-body h5 {
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.modal-body ol {
+  padding-left: 20px;
+}
+
+.modal-body li {
+  margin-bottom: 10px;
+}
+.password-error {
+  position: relative;
+  font-family: 'Albert Sans', serif;
+  top: 35px;
+  right: 255px;
+  color: red;
+  display: none;
+  text-align: left;
+  display: block;
+  font-size: 0.9em;
+}
+
+
+
+
+
+
+
+
+.first-name {
+  position: relative;
+  width: 100%;
+}
+
+.first-name input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .first-name {
+    top: 793px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .first-name {
+    top: 796px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .first-name {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.first-name label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.first-name input:focus + label,
+.first-name input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.last-name{
+  position: relative;
+  width: 100%;
+}
+
+.last-name  input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .last-name {
+    top: 748px;
+    left: 29%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .last-name {
+    top: 750px;
+    left: 32%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .last-name {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.last-name  label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.last-name  input:focus + label,
+.last-name  input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 15px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+.initial{
+  position: relative;
+  width: 100%;
+}
+
+.initial  input {
+  width: 15%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .initial {
+    top: 701px;
+    left: 51%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .initial {
+    top: 704px;
+    left: 54%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .initial {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.initial  label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.initial  input:focus + label,
+.initial  input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 15px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.suffix{
+  position: relative;
+  width: 100%;
+}
+
+.suffix  input {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .suffix {
+    top: 152px;
+    left: 68%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .suffix {
+    top: 154px;
+    left: 71%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .suffix {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.suffix  label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.suffix  input:focus + label,
+.suffix  input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 15px;
+  color: #007bff;
+}
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.gender {
+  position: relative;
+  width: 100%;
+}
+
+.gender select {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .gender{
+    top: 340px;
+    left: 7%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .gender {
+    top: 340px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .gender {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.gender label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.gender select:focus + label,
+.gender select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.status {
+  position: relative;
+  width: 100%;
+}
+
+.status select {
+  width: 15%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .status{
+    top: 294px;
+    left: 18%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .status {
+    top: 294px;
+    left: 20.5%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .status {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.status label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.status select:focus + label,
+.status select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper select {
+  width: 13%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .input-wrapper{
+    top: 108px;
+    left:34%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .input-wrapper {
+    top: 108px;
+    left:36%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .input-wrapper {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.input-wrapper label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+.icon {
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+  top: 5px;
+  position: relative;
+  background-color: white;
+}
+
+/* Float label when select has a value or is focused */
+.input-wrapper select:focus + label,
+.input-wrapper select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.phone {
+  position: relative;
+  width: 100%;
+}
+
+.phone input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .phone {
+    top: 480px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .phone {
+    top: 900px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .phone {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.phone label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.phone input:focus + label,
+.phone input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.maiden-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;         /* take most of the width */
+  max-width: 500px;   /* but don’t get too wide */
+  margin: 50px auto;  /* center it */
+  position: relative;
+}
+
+.maiden-name input {
+  width: 100%;        /* full width of container */
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Label styling */
+.maiden-name label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.maiden-name input:focus + label,
+.maiden-name input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/* Optional small tweaks for smaller screens */
+@media (max-width: 768px) {
+  .maiden-name {
+    width: 95%;
+    margin: 30px auto;
+  }
+}
+
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+.major {
+  position: relative;
+  width: 100%;
+}
+
+.major input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .major {
+    top: 820px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .major {
+    top: 900px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .major {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.major label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.major input:focus + label,
+.major input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+.username {
+  position: relative;
+  width: 100%;
+}
+
+.username input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .username {
+    top: 1200px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .username {
+    top: 1200px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .username {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.username label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.username input:focus + label,
+.username input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.pass {
+  position: relative;
+  width: 100%;
+}
+
+.pass input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .pass {
+    top: 820px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .pass {
+    top: 1000px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .pass {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.pass label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.pass input:focus + label,
+.pass input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+
+.start {
+  position: relative;
+  width: 100%;
+}
+
+.start select {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .start{
+    top: 700px;
+    left: 7%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .start {
+    top: 700px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .start {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.start label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.start select:focus + label,
+.start select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.end {
+  position: relative;
+  width: 100%;
+}
+
+.end select {
+  width: 10%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .end{
+    top: 700px;
+    left: 7%;
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .end {
+    top: 700px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .end {
+    height: 90vh;
+    width: 100%;
+  }
+}
+.end label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Float label when select has a value or is focused */
+.end select:focus + label,
+.end select:not([value=""]) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.per {
+  position: relative;
+  width: 100%;
+}
+
+.per input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .per {
+    top: 1000px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .per {
+    top: 600px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .per {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.per label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.per input:focus + label,
+.per input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+
+.re {
+  position: relative;
+  width: 100%;
+}
+
+.re input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .re {
+    top: 1000px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .re {
+    top: 600px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .re {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.re label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.re input:focus + label,
+.re input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+.student {
+  position: relative;
+  width: 100%;
+}
+
+.student input {
+  width: 20%;
+  padding: 12px 10px;
+  font-size: 16px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  outline: none;
+}
+/* Large monitors (>=1600px) */
+@media (min-width: 1600px) {
+  .student {
+    top: 820px;
+    left: 7%
+  }
+}
+
+/* Laptops (<=1400px) */
+@media (max-width: 1400px) {
+  .student {
+    top: 600px;
+    left: 10%;
+  }
+}
+
+/* Phones (<=768px) */
+@media (max-width: 768px) {
+  .student {
+    height: 90vh;
+    width: 100%;
+  }
+}
+
+.student label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  padding: 0 5px;
+  color: #999;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  font-size: 20px;
+  font-family: 'Albert Sans', serif;
+}
+
+/* Floating label effect */
+.student input:focus + label,
+.student input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/

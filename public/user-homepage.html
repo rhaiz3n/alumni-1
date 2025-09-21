@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TUPC Alumni — Modern Feed</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="/Logo2.png">
+
+  <style>
+    :root{
+      --fb-blue:#1877f2;
+      --muted:#6c757d;
+      --card-bg:#ffffff;
+      --card-radius:14px;
+      --shadow:0 6px 18px rgba(15,23,42,0.08);
+    }
+    body{
+      font-family:'Inter',system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      background:#f0f2f5;color:#111827;
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    }
+    .topbar{ background:linear-gradient(90deg,var(--fb-blue) 0%,#135bd8 100%); color:white; box-shadow:0 1px 0 rgba(0,0,0,.06); position:sticky; top:0; z-index:1050; }
+    .topbar .navbar-brand{ display:flex; align-items:center; gap:.6rem; }
+    .topbar .search-input{ max-width:640px; width:100%; border-radius:999px; }
+    .topbar .btn-outline-light{ border-color: rgba(255,255,255,0.2); color:white; }
+    .app-container{ max-width:1200px; margin:22px auto; padding:0 16px; }
+    .left-card,.right-card,.feed-card{ background:var(--card-bg); border-radius:var(--card-radius); box-shadow:var(--shadow); }
+    .left-card{ padding:18px; margin-bottom:18px; }
+    .shortcut-btn{ border-radius:10px; background:linear-gradient(180deg,#fff,#f7f9fb); border:1px solid #e6e9ee; padding:12px; text-align:left; display:flex; gap:12px; align-items:center; transition:transform .12s ease, box-shadow .12s ease; cursor:pointer; }
+    .shortcut-btn:hover{ transform:translateY(-4px); box-shadow:0 10px 30px rgba(15,23,42,0.06); }
+    .feed-card{ padding:14px; margin-bottom:16px; border-radius:12px; }
+    .feed-header{ display:flex; gap:12px; align-items:center; }
+    .avatar{ width:44px;height:44px;border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 8px rgba(15,23,42,0.06); }
+    .feed-title{ font-weight:600; font-size:15px; }
+    .feed-date{ color:var(--muted); font-size:12px; }
+    .feed-image{ width:100%; border-radius:10px; margin-top:12px; max-height:420px; object-fit:cover; }
+    .feed-meta{ display:flex; gap:12px; margin-top:10px; color:var(--muted); font-size:13px; align-items:center; }
+    .badge-status{ font-size:12px; padding:6px 8px; border-radius:999px; }
+    .badge-open{ background:#e7f7ec; color:#1a7f32; }
+    .badge-closed{ background:#f8e9e9; color:#a11a1a; }
+    .right-card{ padding:14px; margin-bottom:18px; border-radius:12px; }
+    .announce-item{ border-radius:10px; padding:10px; background:#fff; margin-bottom:10px; box-shadow:0 3px 10px rgba(15,23,42,0.04); }
+    #loader-wrapper{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230,230,230); z-index:1400; }
+    .progress-bar-custom{ left:100px; width:0%; height:10px; background-color:maroon; border-radius:6px; transition: width .2s linear; margin:auto; }
+    .profile-avatar-sm { width:36px; height:36px; border-radius:50%; object-fit:cover; }
+    @media (max-width:991px) { .app-container{ padding:0 12px; } .left-column{ display:none; } .right-column{ display:none; } .topbar .search-input{ max-width:380px; } }
+    /* toast stack */
+    #toastWrapper { position: fixed; top: 16px; right: 16px; z-index: 13000; }
+  </style>
+</head>
+<body>
+
+  <!-- Loader -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div style="text-align:center;">
+      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+      <div style="width:360px; margin:auto; background:#f0f2f5; border-radius:8px; padding:6px;">
+        <div id="progress-bar" class="progress-bar-custom"></div>
+      </div>
+      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
+    </div>
+  </div>
+
+  <!-- Topbar -->
+  <nav class="navbar topbar">
+    <div class="container">
+      <a class="navbar-brand text-white" href="homepage.html">
+        <img src="Logo2.png" alt="Logo" style="height:34px; border-radius:6px;">
+        <span style="font-weight:600;">TUPC — Cavite Alumni</span>
+      </a>
+
+      <div class="d-flex align-items-center mx-auto" style="flex:1; max-width:760px;">
+        <div class="input-group search-input w-100">
+          <input id="feedSearchInput" class="form-control rounded-pill" placeholder="Search alumni, events, careers..." aria-label="search">
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center ms-3 gap-2">
+        <div id="topProfileWrap" class="d-none align-items-center gap-2">
+          <img id="topProfilePic" src="/public/images/default-profile.png" class="profile-avatar-sm" alt="profile">
+          <span id="topProfileName" class="text-white small"></span>
+        </div>
+        <button class="btn btn-outline-light btn-sm" id="open-login-modal">Log In</button>
+        <button class="btn btn-light btn-sm text-primary" id="open-registration-modal">Register</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- App Container -->
+  <div class="app-container">
+    <div class="row gx-4">
+
+      <!-- Left Sidebar -->
+      <div class="col-lg-3 left-column">
+        <div class="left-card">
+          <div class="d-flex align-items-center mb-3">
+            <img src="Logo2.png" alt="avatar" class="avatar" />
+            <div>
+              <div style="font-weight:700;">TUPC Alumni</div>
+              <div style="color:var(--muted); font-size:13px;">Connect — Find jobs — Stay updated</div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <div class="shortcut-btn" id="careerBtn" role="button"><i class="fa-solid fa-briefcase fa-lg" style="color:#0b5ed7;"></i><div><strong>Career</strong><div class="small" style="color:var(--muted)">Jobs & opportunities</div></div></div>
+            <div class="shortcut-btn" id="galleryBtn" role="button"><i class="fa-solid fa-images fa-lg" style="color:#d63384;"></i><div><strong>Gallery</strong><div class="small" style="color:var(--muted)">Event photos</div></div></div>
+            <div class="shortcut-btn" id="idBtn" role="button"><i class="fa-solid fa-id-card fa-lg" style="color:#198754;"></i><div><strong>ID Request</strong><div class="small" style="color:var(--muted)">Request your alumni ID</div></div></div>
+            <div class="shortcut-btn" id="open-registration-button" role="button" data-bs-toggle="modal" data-bs-target="#registrationModal"><i class="fa-solid fa-user-plus fa-lg" style="color:#0d6efd;"></i><div><strong>Registration</strong><div class="small" style="color:var(--muted)">Alumni & employer</div></div></div>
+          </div>
+
+          <hr style="margin:14px 0;border-color:#eef2f6;">
+          <div class="small" style="color:var(--muted);">Quick Links</div>
+          <ul class="list-unstyled mt-2">
+            <li><a href="alumni-registration.html" class="text-decoration-none">Alumni Registration</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Center feed -->
+      <div class="col-lg-6">
+        <div id="feed">
+          <!-- populated by JS -->
+          <div class="text-center text-muted py-4">Loading feed...</div>
+        </div>
+      </div>
+
+      <!-- Right announcements -->
+      <div class="col-lg-3 right-column">
+        <div class="right-card mb-3 text-center">
+          <img src="Logo2.png" alt="logo" style="max-height:80px; margin-bottom:10px;">
+          <div style="font-weight:700;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+          <div class="small" style="color:var(--muted); margin-top:6px;">To access Events, Career, and ID Request, please log in or register.</div>
+          <div class="d-grid gap-2 mt-3">
+            <button class="btn btn-outline-primary btn-sm" id="open-login-modal-2">Log In</button>
+            <button class="btn btn-primary btn-sm" id="open-registration-modal-2">Register</button>
+          </div>
+        </div>
+
+        <div class="right-card mb-3">
+          <div style="font-weight:700; margin-bottom:8px;">ID Announcements</div>
+          <div id="idAnnouncementList" class="small-muted">Loading...</div>
+        </div>
+
+        <div class="right-card mb-3">
+          <div style="font-weight:700; margin-bottom:8px;">Events Announcements</div>
+          <div id="eventList" class="small-muted">Loading...</div>
+        </div>
+
+        <div class="right-card">
+          <div style="font-weight:700; margin-bottom:8px;">Career Opportunities</div>
+          <div id="careerList" class="small-muted">Loading...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LOGIN Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Log In</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="login-form">
+            <div class="mb-3">
+              <input type="text" id="login-username" class="form-control" placeholder="Enter Username" maxlength="25" required>
+            </div>
+            <div class="mb-3 position-relative">
+              <input type="password" id="login-password" class="form-control" placeholder="Enter Password" required>
+              <span id="toggleLoginPassword" class="position-absolute top-50 end-0 translate-middle-y me-3 toggle-icon">⌣</span>
+            </div>
+            <div id="loginError" class="text-danger small mb-2"></div>
+            <div class="d-grid">
+              <button class="btn btn-primary" type="submit">Login</button>
+            </div>
+          </form>
+
+          <div class="text-center mt-3">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#forgotModal" data-bs-dismiss="modal">Forgot Password?</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot modal -->
+  <div class="modal fade" id="forgotModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Forgot Password</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="forgot-step1">
+            <label class="form-label small">Enter Username or User ID</label>
+            <input id="forgot-username" class="form-control mb-2" placeholder="Enter Username">
+            <div class="d-grid">
+              <button id="findEmailBtn" class="btn btn-outline-primary">Find Email</button>
+            </div>
+          </div>
+
+          <div id="emailDisplay" style="display:none; margin-top:10px;">
+            <p id="emailFound" class="small"></p>
+            <div class="d-grid">
+              <button id="sendOtpBtn" class="btn btn-primary">Send OTP</button>
+            </div>
+          </div>
+
+          <div id="otpSection" style="display:none; margin-top:10px;">
+            <input id="otpInput" class="form-control mb-2" placeholder="Enter OTP">
+            <div class="d-grid">
+              <button id="verifyOtpBtn" class="btn btn-primary">Verify OTP</button>
+            </div>
+          </div>
+
+          <div id="resetPasswordSection" style="display:none; margin-top:10px;">
+            <div class="position-relative mb-2">
+              <input id="newPassword" class="form-control" maxlength="15" placeholder="Enter New Password" oninput="filterResetPassword(this)" style="padding-right:54px;">
+              <span id="toggleResetPassword" class="position-absolute top-50 end-0 translate-middle-y me-3 toggle-icon">⌣</span>
+            </div>
+            <div class="d-grid">
+              <button id="resetPasswordBtn" class="btn btn-success">Reset Password</button>
+            </div>
+          </div>
+
+          <div id="forgot-error" class="text-danger small mt-2"></div>
+          <div id="forgot-success" class="text-success small mt-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registration selection modal -->
+  <div class="modal fade" id="registrationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Registration</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <a href="alumni-registration.html" class="btn btn-outline-primary w-100 mb-2">Alumni Registration</a>
+          <button class="btn btn-outline-primary w-100" id="openEmployerModalBtn" data-bs-toggle="modal" data-bs-target="#employerModal" data-bs-dismiss="modal">Employer Registration</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employer Modal -->
+  <div class="modal fade" id="employerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Employer Registration</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="employerRegForm">
+            <div class="row g-2">
+              <div class="col-md-6"><input type="text" id="employerName" name="employerName" class="form-control" placeholder="Employer Name" maxlength="30"></div>
+              <div class="col-md-6"><input type="text" id="businessName" name="businessName" class="form-control" placeholder="Business Name" maxlength="40"></div>
+              <div class="col-12"><input type="text" id="businessAddress" name="businessAddress" class="form-control" placeholder="Business Address" maxlength="100"></div>
+              <div class="col-md-6"><input type="text" id="landlineNo" name="landlineNo" class="form-control" placeholder="Landline Number" maxlength="15"></div>
+              <div class="col-md-6"><input type="text" id="mobileNo" name="mobileNo" class="form-control" placeholder="Mobile Number" maxlength="12"></div>
+              <div class="col-md-6"><input type="email" id="companyEmail" name="companyEmail" class="form-control" placeholder="Company Email Address" maxlength="40"></div>
+              <div class="col-md-6"><input type="url" id="companyWebsite" name="companyWebsite" class="form-control" placeholder="Company Website" maxlength="100"></div>
+              <div class="col-md-6"><input type="text" id="preferredUserId" name="preferredUserId" class="form-control" placeholder="Preferred User ID" maxlength="25"></div>
+              <div class="col-md-6 position-relative">
+                <input type="password" id="preferredPassword" name="preferredPassword" class="form-control" placeholder="Preferred Password" maxlength="15">
+                <span id="toggleEmployerPassword" class="position-absolute top-50 end-0 translate-middle-y me-3 toggle-icon">⌣</span>
+                <small id="passwordHelp" class="text-danger" style="display:none;">Password must be at least 10 characters</small>
+              </div>
+            </div>
+
+            <div class="d-grid mt-3">
+              <button type="button" id="employerSubmitBtn" class="btn btn-success">Submit Registration</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal (Bootstrap) -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-4 text-center">
+              <img id="modalProfilePic" src="/public/images/default-profile.png" alt="Profile" class="img-fluid rounded-circle mb-2" style="width:140px;height:140px;object-fit:cover;">
+              <div><button id="changePicBtn" class="btn btn-outline-secondary btn-sm">Change</button></div>
+              <input type="file" id="uploadProfilePic" accept="image/*" style="display:none;">
+            </div>
+            <div class="col-md-8">
+              <h4 id="name">NAME</h4>
+              <p><strong>Username:</strong> <span id="userName">-</span></p>
+              <p><strong>Email:</strong> <span id="personalEmail">-</span></p>
+              <p><strong>Phone:</strong> <span id="phoneNo">-</span></p>
+              <div class="mt-3">
+                <button id="editBtn" class="btn btn-outline-primary btn-sm">Edit</button>
+                <button id="saveBtn" class="btn btn-primary btn-sm d-none">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <hr>
+          <div id="profile-details" class="mt-2">
+            <p><strong>Gender:</strong> <span id="gender">-</span></p>
+            <p><strong>Date of Birth:</strong> <span id="dateBirth">-</span></p>
+            <p><strong>Major:</strong> <span id="major">-</span></p>
+            <p><strong>Graduated:</strong> <span id="graduated">-</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast wrapper -->
+  <div id="toastWrapper"></div>
+
+  <!-- Bootstrap-ready feed + logic script -->
+  <script>
+  // --- Loader progress simulation (keeps your original pattern) ---
+  (function loaderSim(){
+    let pct = 80;
+    const bar = document.getElementById('progress-bar');
+    const pctEl = document.getElementById('percentage');
+    const iv = setInterval(() => {
+      if (pct < 100) {
+        pct++;
+        bar.style.width = pct + '%';
+        pctEl.textContent = pct + '%';
+      } else {
+        clearInterval(iv);
+        const wrap = document.getElementById('loader-wrapper');
+        if (wrap) wrap.style.display = 'none';
+      }
+    }, 30);
+  })();
+
+  /* ---------------------------
+     Utility: showBootstrapToast
+     Creates a transient Bootstrap toast in #toastWrapper
+  ----------------------------*/
+  function showBootstrapToast(message, opts = {}) {
+    const wrapper = document.getElementById('toastWrapper');
+    if (!wrapper) return;
+    const id = 'toast-' + Date.now();
+    const typeClass = opts.type === 'error' ? 'bg-danger text-white' : (opts.type === 'success' ? 'bg-success text-white' : 'bg-light');
+    const html =
+      '<div id="' + id + '" class="toast ' + typeClass + '" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3500" style="min-width:220px;">' +
+        '<div class="d-flex">' +
+          '<div class="toast-body">' + message + '</div>' +
+          '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+        '</div>' +
+      '</div>';
+    wrapper.insertAdjacentHTML('beforeend', html);
+    const el = document.getElementById(id);
+    const bs = new bootstrap.Toast(el);
+    bs.show();
+    el.addEventListener('hidden.bs.toast', () => el.remove());
+  }
+
+  /* ---------------------------
+     Fetch & render ID announcements (Bootstrap cards)
+  ----------------------------*/
+  async function loadIdAnnouncements() {
+    const container = document.getElementById('idAnnouncementList');
+    if (!container) return;
+    container.innerHTML = 'Loading...';
+    try {
+      const res = await fetch('/api/admin/id-announcements');
+      if (!res.ok) throw new Error('Failed to load ID announcements');
+      const { announcements } = await res.json();
+      if (!announcements || !announcements.length) {
+        container.innerHTML = '<div class="small text-muted">No announcements found.</div>';
+        return;
+      }
+      container.innerHTML = announcements.map(a => {
+        const posted = new Date(a.datePosted).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+        return `
+          <div class="announce-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div><strong>ID ANNOUNCEMENT</strong></div>
+              <small class="text-muted">Posted: ${posted}</small>
+            </div>
+            <div class="mt-2"><strong>${a.title}</strong></div>
+            <div class="mt-1 small text-muted">${a.description || ''}</div>
+          </div>`;
+      }).join('');
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = '<div class="text-danger small">❌ Failed to load announcements</div>';
+    }
+  }
+
+  /* ---------------------------
+     Fetch & render Events announcements
+  ----------------------------*/
+  async function loadEvents() {
+    const container = document.getElementById('eventList');
+    if (!container) return;
+    container.innerHTML = 'Loading...';
+    try {
+      const res = await fetch('/api/events');
+      if (!res.ok) throw new Error('Failed to load events');
+      const { events } = await res.json();
+      if (!events || !events.length) {
+        container.innerHTML = '<div class="small text-muted">No events found.</div>';
+        return;
+      }
+      container.innerHTML = events.map(e => {
+        const posted = new Date(e.datePosted).toLocaleDateString();
+        return (
+          '<div class="announce-item">' +
+            '<div class="d-flex justify-content-between">' +
+              '<div><strong>EVENT</strong></div>' +
+              '<small class="text-muted">Posted: ' + posted + '</small>' +
+            '</div>' +
+            '<div class="mt-2">' + e.title + '</div>' +
+          '</div>'
+        );
+      }).join('');
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = '<div class="text-danger small">❌ Failed to load events</div>';
+    }
+  }
+
+  /* ---------------------------
+     Fetch & render Careers (right column)
+  ----------------------------*/
+  async function loadCareers() {
+    const container = document.getElementById('careerList');
+    if (!container) return;
+    container.innerHTML = 'Loading...';
+    try {
+      const role = sessionStorage.getItem('userRole');
+      let careersUrl = (role === 'employer') ? '/api/careers' : '/api/careers/public';
+      if (role === 'admin') careersUrl = '/api/careers/all';
+      const res = await fetch(careersUrl);
+      if (!res.ok) throw new Error('Failed to load careers');
+      const { careers } = await res.json();
+      if (!careers || !careers.length) {
+        container.innerHTML = '<div class="small text-muted">No careers found.</div>';
+        return;
+      }
+      container.innerHTML = careers.slice(0,6).map(function(c) {
+        const posted = new Date(c.datePosted).toLocaleDateString();
+        return '<div class="announce-item"><div class="d-flex justify-content-between"><div><strong>CAREER</strong></div><small class="text-muted">' + posted + '</small></div><div class="mt-2">' + c.title + '</div></div>';
+      }).join('');
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = '<div class="text-danger small">❌ Failed to load careers</div>';
+    }
+  }
+
+  /* ---------------------------
+     Feed loader (events + careers) -> center feed
+  ----------------------------*/
+  async function loadFeed() {
+    const container = document.getElementById('feed');
+    if (!container) return;
+    container.innerHTML = '<div class="text-center text-muted py-4">Loading feed...</div>';
+    try {
+      const role = sessionStorage.getItem('userRole') || 'user';
+      const careersUrl = (role === 'employer') ? '/api/careers' : '/api/careers/public';
+      const [eventsRes, careersRes] = await Promise.all([ fetch('/api/events'), fetch(careersUrl) ]);
+      if (!eventsRes.ok || !careersRes.ok) throw new Error('Failed to fetch feed');
+      const { events } = await eventsRes.json();
+      const { careers } = await careersRes.json();
+
+      const feed = [ ...(events||[]).map(e=>({...e,type:'Event'})), ...(careers||[]).map(c=>({...c,type:'Career'})) ]
+        .sort((a,b)=> new Date(b.datePosted) - new Date(a.datePosted));
+
+      if (!feed.length) {
+        container.innerHTML = '<div class="text-center text-muted py-4">No posts yet.</div>';
+        return;
+      }
+
+      container.innerHTML = feed.map((post, idx) => {
+        const imgSrc = post.type === 'Career' ? \`/api/careers/image/\${post.id}\` : \`/api/events/image/\${post.id}\`;
+        const posted = new Date(post.datePosted).toLocaleString();
+        // deadlines
+        let deadlineMs = '';
+        if (post.type === 'Career') {
+          const postedDate = post.datePosted ? new Date(post.datePosted) : new Date();
+          deadlineMs = (postedDate.getTime() + 5*24*60*60*1000);
+        } else {
+          deadlineMs = post.eventDateTime ? new Date(post.eventDateTime).getTime() : new Date(post.datePosted).getTime();
+        }
+        const extraInfo = (post.type === 'Event') ? (\`🎉 Event Type: \${post.location||'N/A'}\`) : (\`🏢 Company: \${post.link||'N/A'}\`);
+        const cardId = 'feed-card-' + (post.id || idx);
+
+        return \`
+          <div class="feed-card card mb-3" id="\${cardId}" data-deadline="\${deadlineMs}">
+            <div class="card-body">
+              <div class="feed-header">
+                <img src="/public/images/default-profile.png" class="avatar" alt="avatar">
+                <div class="ms-2 w-100">
+                  <div class="d-flex justify-content-between">
+                    <div>
+                      <div class="feed-title">\${(post.title||'').toUpperCase()} <small class="text-muted">[\${post.type}]</small></div>
+                      <div class="feed-date">\${posted}</div>
+                    </div>
+                    <div>
+                      <span class="badge badge-status \${(post.type==='Career')?'badge-open':''}">\${post.type}</span>
+                    </div>
+                  </div>
+                  <div class="mt-2">\${(post.description||'')}</div>
+                  \${imgSrc ? ('<img src="'+imgSrc+'" class="feed-image" alt="post image">') : ''}
+                  <div class="feed-meta">
+                    <div>\${extraInfo}</div>
+                    <div>⏳ <span class="countdown" id="countdown-\${idx}" data-time="\${deadlineMs}"></span></div>
+                    <div class="ms-auto">
+                      <button class="btn btn-sm btn-primary register-btn" data-id="\${post.id}" data-type="\${post.type}">\${post.type==='Career'?'Apply':'Register'}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>\`;
+      }).join('');
+
+      // attach register handler delegated
+      container.querySelectorAll('.register-btn').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const id = btn.dataset.id;
+          const type = btn.dataset.type;
+          const post = feed.find(p=>String(p.id) === String(id) && p.type === type);
+          if (type === 'Career') {
+            openCareerSurvey(post);
+          } else {
+            openRegistrationModal(post);
+          }
+        });
+      });
+
+      // start countdown updater
+      const updateCountdowns = () => {
+        const now = Date.now();
+        container.querySelectorAll('.countdown').forEach(el=>{
+          const ms = Number(el.dataset.time);
+          if (!ms || isNaN(ms)) return el.textContent = '—';
+          const diff = ms - now;
+          const card = el.closest('.feed-card');
+          const btn = card?.querySelector('.register-btn');
+          if (diff <= 0) {
+            el.textContent = '❌ Closed';
+            card.style.filter = 'grayscale(100%)';
+            if (btn) { btn.disabled = true; btn.textContent = '❌ Closed'; }
+            return;
+          }
+          const d = Math.floor(diff / (1000*60*60*24));
+          const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+          const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+          const s = Math.floor((diff % (1000*60)) / 1000);
+          el.textContent = d>0 ? \`\${d}d \${h}h \${m}m \${s}s left\` : \`\${h}h \${m}m \${s}s left\`;
+        });
+      };
+      updateCountdowns();
+      setInterval(updateCountdowns, 1000);
+
+    } catch (err) {
+      console.error('Failed to load feed', err);
+      container.innerHTML = '<div class="text-danger text-center py-4">⚠️ Failed to load feed.</div>';
+    }
+  }
+
+  /* ---------------------------
+     Modal helpers that preserve your function names
+     We'll create Bootstrap modal instances and expose the old-style functions.
+  ----------------------------*/
+
+  // Mens basketball: map your old IDs to a bootstrap modal (#mensBasketballModal)
+  // Create lightweight hidden modals for the custom ones you use.
+  (function ensureModals() {
+    // if mensBasketballModal does not exist in DOM, create a bootstrap modal skeleton that your functions can use.
+    const ensure = (id, title, innerHTML) => {
+      if (document.getElementById(id)) return;
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = \`
+        <div class="modal fade" id="\${id}" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">\${title}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">\${innerHTML || ''}</div>
+            </div>
+          </div>
+        </div>\`;
+      document.body.appendChild(wrapper.firstElementChild);
+    };
+
+    // mensBasketballModal skeleton (we keep your form ids inside so original bindings will find them)
+    ensure('mensBasketballModal','Men\\'s Basketball Registration', \`
+      <form id="mensBasketballForm">
+        <div class="mb-2"><label class="form-label">Team Name</label><input class="form-control" id="teamName" maxlength="20" required></div>
+        <div class="mb-2"><label class="form-label">Age Range</label><input class="form-control" id="ageRange" maxlength="5" required></div>
+        <div id="membersContainer" class="mb-2">
+          <div class="member d-flex gap-2 mb-2">
+            <input class="form-control" name="firstName[]" placeholder="First Name" required>
+            <input class="form-control" name="middleInitial[]" placeholder="M.I.">
+            <input class="form-control" name="lastName[]" placeholder="Last Name" required>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-secondary" onclick="addMember()">+ Add Member</button>
+          <button type="submit" class="btn btn-primary ms-auto">Register</button>
+        </div>
+      </form>\`
+    );
+
+    // homecoming modal skeleton
+    ensure('modal-home','Homecoming Event Registration', \`
+      <form id="homecomingForm" enctype="multipart/form-data">
+        <div class="row g-2">
+          <div class="col"><input class="form-control" id="firstName" name="firstName" placeholder="First Name" required></div>
+          <div class="col"><input class="form-control" id="middleInitial" name="middleInitial" placeholder="M.I."></div>
+          <div class="col"><input class="form-control" id="lastName" name="lastName" placeholder="Last Name" required></div>
+        </div>
+        <div class="mt-2"><select class="form-select" name="sex" required><option value=\"\" disabled selected>Select Sex</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+        <div class="mt-2"><input class="form-control" id="yearGraduated" name="yearGraduated" placeholder="Year Graduated" maxlength="4" required></div>
+        <div class="mt-2">
+          <label>Add-on Options</label>
+          <div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="addon" value="100" id="addon100"><label class="form-check-label" for="addon100">₱100 – Additional four (4) drinks</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="addon" value="500" id="addon500"><label class="form-check-label" for="addon500">₱500 – Additional unlimited drinks</label></div>
+            <div class="form-check"><input class="form-check-input" type="radio" name="addon" value="no addon" id="addonNo"><label class="form-check-label" for="addonNo">I do not want an add-on</label></div>
+          </div>
+        </div>
+        <div class="mt-2"><label>Upload Receipt</label><input type="file" class="form-control" id="receiptInput" name="receipt" accept="image/png,image/jpeg"></div>
+        <div class="mt-3 d-flex gap-2"><button type="submit" class="btn btn-primary">Register</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+      </form>\`
+    );
+
+    // sportfest modal skeleton (keeps sportType field id)
+    ensure('sportfestModal','Sport Fest Registration', \`
+      <form id="sportfestForm">
+        <div class="mb-2"><input class="form-control" name="firstName" placeholder="First Name" required></div>
+        <div class="mb-2"><input class="form-control" name="middleInitial" placeholder="M"></div>
+        <div class="mb-2"><input class="form-control" name="lastName" placeholder="Last Name" required></div>
+        <div class="mb-2"><select class="form-select" name="sex" required><option value=\"\" disabled selected>Select Gender</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+        <div class="mb-2"><input class="form-control" name="extension" placeholder="Extension (Jr)"></div>
+        <div class="mb-2"><input class="form-control" name="batch" placeholder="Batch / Year Graduated" maxlength="4" required></div>
+        <input type="hidden" id="sportTypeField" name="sportType" value="">
+        <div class="mt-3 d-flex gap-2"><button class="btn btn-primary" type="submit">Register</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+      </form>\`
+    );
+
+    // career survey modal
+    ensure('careerSurveyModal','Career Survey', \`
+      <form id="careerSurveyForm">
+        <div id="surveyQuestions"></div>
+        <div class="mt-3 d-flex gap-2"><button type="submit" class="btn btn-primary">Submit Survey</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+      </form>\`
+    );
+
+    // employment form modal
+    ensure('employmentFormModal','Employment Application', \`
+      <form id="employmentForm" enctype="multipart/form-data">
+        <input type="hidden" name="careerId" value="">
+        <div class="mb-2"><input class="form-control" name="firstName" placeholder="First Name" required></div>
+        <div class="mb-2"><input class="form-control" name="lastName" placeholder="Last Name" required></div>
+        <div class="mb-2"><input class="form-control" id="employmentPhoneNo" name="phoneNo" placeholder="Phone No" required></div>
+        <div class="mb-2"><input class="form-control" name="email" placeholder="Personal Email" required></div>
+        <div class="mb-2"><input class="form-control" type="file" name="resume" accept="application/pdf" required></div>
+        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary">Apply</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+      </form>\`
+    );
+  })();
+
+  /* ---------------------------
+     Map original open/close functions to Bootstrap modals
+  ----------------------------*/
+  function openMensBasketballModal(post) {
+    const el = document.getElementById('mensBasketballModal');
+    if (!el) return;
+    const bs = new bootstrap.Modal(el);
+    // fill form defaults if post provided (optional)
+    if (post && post.title) {
+      document.querySelector('#mensBasketballModal .modal-title').textContent = post.title;
+    }
+    bs.show();
+  }
+  function closeMensBasketballModal() { const el=document.getElementById('mensBasketballModal'); if(el) bootstrap.Modal.getInstance(el)?.hide(); }
+
+  function openHomecomingModal(post) {
+    const el = document.getElementById('modal-home');
+    if (!el) return;
+    const bs = new bootstrap.Modal(el);
+    bs.show();
+  }
+  function closeHomecomingModal() { const el=document.getElementById('modal-home'); if(el) bootstrap.Modal.getInstance(el)?.hide(); }
+
+  function openSportfestModal(post) {
+    const el = document.getElementById('sportfestModal');
+    if (!el) return;
+    // set sport type if provided
+    if (post?.location) {
+      const field = document.getElementById('sportTypeField');
+      if (field) field.value = post.location;
+      const locationDisplay = document.getElementById('sportfestLocation');
+      if (locationDisplay) locationDisplay.textContent = '🎉 Type of Event: ' + post.location;
+    }
+    const bs = new bootstrap.Modal(el);
+    bs.show();
+  }
+  function closeSportfestModal() { const el=document.getElementById('sportfestModal'); if(el) bootstrap.Modal.getInstance(el)?.hide(); }
+
+  function openCareerSurvey(post) {
+    const el = document.getElementById('careerSurveyModal');
+    if (!el) return;
+    // populate questions area
+    const container = document.getElementById('surveyQuestions');
+    if (container) {
+      container.innerHTML = \`
+        <label>First Name</label><input class="form-control mb-2" name="firstName" required>
+        <label>Last Name</label><input class="form-control mb-2" name="lastName" required>
+        <label>Are you interested?</label><select class="form-select mb-2" name="interested" required><option value="">-- Select --</option><option value="YES">YES</option><option value="NO">NO</option></select>
+        <label>Current employment status</label><select class="form-select mb-2" name="employmentStatus" required><option value="">-- Select --</option><option>EMPLOYED</option><option>UNEMPLOYED</option><option>UNDEREMPLOYED</option></select>
+        <label>If employed, is work inline with career?</label><select class="form-select" name="inlineWork"><option value=\"\">-- Select --</option><option>YES</option><option>NO</option><option>MAYBE</option></select>\`;
+    }
+    const bs = new bootstrap.Modal(el);
+    bs.show();
+    window.currentCareer = post;
+  }
+  function closeCareerSurvey() { const el=document.getElementById('careerSurveyModal'); if(el) bootstrap.Modal.getInstance(el)?.hide(); }
+
+  function openRegistrationModal(post) {
+    // try to open the modal matching post.title
+    if (!post || !post.title) return;
+    const title = (post.title||'').toUpperCase();
+    if (title.includes('MENSBASKETBALL')) openMensBasketballModal(post);
+    else if (title.includes('HOMECOMING')) openHomecomingModal(post);
+    else if (title.includes('SPORT FEST')) openSportfestModal(post);
+    else showBootstrapToast('No form configured for this event', {type:'error'});
+  }
+
+  /* ---------------------------
+     Bind forms & submissions (preserve your APIs)
+  ----------------------------*/
+
+  // Mens basketball submit binding (the form exists inside modal created above)
+  document.addEventListener('submit', async (ev) => {
+    // Mens basketball form
+    if (ev.target && ev.target.id === 'mensBasketballForm') {
+      ev.preventDefault();
+      const teamName = document.getElementById('teamName')?.value?.trim() || '';
+      const ageRange = document.getElementById('ageRange')?.value?.trim() || '';
+      const firstNames = document.querySelectorAll("input[name='firstName[]']");
+      const middleInitials = document.querySelectorAll("input[name='middleInitial[]']");
+      const lastNames = document.querySelectorAll("input[name='lastName[]']");
+      const players = [];
+      firstNames.forEach((input,i)=> {
+        if ((input.value||'').trim() || (lastNames[i]||{}).value) {
+          players.push({ firstName: input.value.trim(), middleInitial: (middleInitials[i]||{}).value.trim(), lastName: (lastNames[i]||{}).value.trim() });
+        }
+      });
+      if (players.length < 10) { showBootstrapToast('You need at least 10 members to register.', {type:'error'}); return; }
+      if (players.length > 20) { showBootstrapToast('Maximum 20 members allowed.', {type:'error'}); return; }
+      try {
+        const res = await fetch('/api/sportfest/mensBasketball', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({teamName, ageRange, players}) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to register');
+        showBootstrapToast('Team registered successfully!', {type:'success'});
+        bootstrap.Modal.getInstance(document.getElementById('mensBasketballModal'))?.hide();
+      } catch (err) {
+        console.error(err);
+        showBootstrapToast('Error: ' + (err.message||err), {type:'error'});
+      }
+    }
+
+    // Homecoming submission
+    if (ev.target && ev.target.id === 'homecomingForm') {
+      ev.preventDefault();
+      const fd = new FormData(ev.target);
+      const addon = fd.get('addon');
+      const gcashEnabled = localStorage.getItem('gcashEnabled') === 'true';
+      if ((addon === '100' || addon === '500') && !gcashEnabled) {
+        showBootstrapToast('Registration blocked: GCash disabled by admin', {type:'error'});
+        return;
+      }
+      if ((addon === '100' || addon === '500') && !fd.get('receipt')?.name) {
+        showBootstrapToast('Receipt is required for selected add-on', {type:'error'});
+        return;
+      }
+      try {
+        const res = await fetch('/api/homeregs', { method:'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server error');
+        showBootstrapToast('Registration successful!', {type:'success'});
+        bootstrap.Modal.getInstance(document.getElementById('modal-home'))?.hide();
+        ev.target.reset();
+      } catch (err) {
+        console.error(err);
+        showBootstrapToast('Error: ' + (err.message||err), {type:'error'});
+      }
+    }
+
+    // Sportfest submission
+    if (ev.target && ev.target.id === 'sportfestForm') {
+      ev.preventDefault();
+      const form = ev.target;
+      const data = new FormData(form);
+      const payload = {
+        firstName: (data.get('firstName')||'').trim(),
+        middleName: (data.get('middleInitial')||'').trim(),
+        lastName: (data.get('lastName')||'').trim(),
+        gender: (data.get('sex')||'').trim(),
+        extension: (data.get('extension')||'').trim(),
+        yearGraduated: (data.get('batch')||'').trim(),
+        sportType: (data.get('sportType')||'').trim()
+      };
+      if (!payload.firstName || !payload.lastName || !payload.gender || !payload.sportType) {
+        showBootstrapToast('Please complete required fields', {type:'error'}); return;
+      }
+      try {
+        const res = await fetch('/api/allsport/add', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Failed');
+        showBootstrapToast('Sportfest registration successful!', {type:'success'});
+        bootstrap.Modal.getInstance(document.getElementById('sportfestModal'))?.hide();
+        form.reset();
+      } catch (err) {
+        console.error(err); showBootstrapToast('Error: ' + (err.message||err), {type:'error'});
+      }
+    }
+
+    // Career survey submission
+    if (ev.target && ev.target.id === 'careerSurveyForm') {
+      ev.preventDefault();
+      const fd = new FormData(ev.target);
+      const payload = {
+        careerId: window.currentCareer?.id || '',
+        firstName: fd.get('firstName'),
+        lastName: fd.get('lastName'),
+        interested: fd.get('interested'),
+        employmentStatus: fd.get('employmentStatus'),
+        inlineWork: fd.get('inlineWork') || null
+      };
+      try {
+        const res = await fetch('/api/responses/add', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save survey');
+        bootstrap.Modal.getInstance(document.getElementById('careerSurveyModal'))?.hide();
+        if (payload.interested === 'NO') {
+          showBootstrapToast('You are not interested. Career description will not be shown.', {type:'error'});
+        } else {
+          // open employment modal
+          const empEl = document.getElementById('employmentFormModal');
+          const bs = new bootstrap.Modal(empEl);
+          bs.show();
+          // set careerId in the employment form
+          const employmentForm = empEl.querySelector('form');
+          if (employmentForm) {
+            const fd2 = new FormData(employmentForm);
+            fd2.set('careerId', window.currentCareer?.id || '');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        showBootstrapToast('Failed to save survey', {type:'error'});
+      }
+    }
+
+    // Employment form submission
+    if (ev.target && ev.target.id === 'employmentForm') {
+      ev.preventDefault();
+      const form = ev.target;
+      const formData = new FormData(form);
+      formData.set('careerId', window.currentCareer?.id || '');
+      try {
+        const res = await fetch('/api/applications/add', { method:'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to submit application');
+        showBootstrapToast('Employment Application Submitted!', {type:'success'});
+        bootstrap.Modal.getInstance(document.getElementById('employmentFormModal'))?.hide();
+        form.reset();
+      } catch (err) {
+        console.error(err);
+        showBootstrapToast('Failed to submit application', {type:'error'});
+      }
+    }
+  });
+
+  /* ---------------------------
+     Small utility bindings & initial loaders
+  ----------------------------*/
+
+  // search/filter feed
+  document.getElementById('feedSearchInput')?.addEventListener('input', (e)=>{
+    const q = (e.target.value||'').toLowerCase();
+    document.querySelectorAll('.feed-card').forEach(card=>{
+      const text = card.innerText.toLowerCase();
+      card.style.display = text.includes(q) ? '' : 'none';
+    });
+  });
+
+  // profile top-right integration
+  async function loadProfileData(updateTop=false) {
+    try {
+      const res = await fetch('/api/fullInformation/me', { credentials:'include', cache:'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const topWrap = document.getElementById('topProfileWrap');
+      const topPic = document.getElementById('topProfilePic');
+      const topName = document.getElementById('topProfileName');
+      if (data && topWrap && topPic && topName) {
+        topWrap.classList.remove('d-none');
+        topPic.src = data.profilePic || '/public/images/default-profile.png';
+        topName.textContent = ((data.firstName||'') + ' ' + (data.lastName||'')).trim();
+        document.getElementById('modalProfilePic') && (document.getElementById('modalProfilePic').src = data.profilePic || '/public/images/default-profile.png');
+      }
+    } catch (err) {
+      console.error('profile load error', err);
+    }
+  }
+
+  // Bind login modal triggers
+  document.getElementById('open-login-modal')?.addEventListener('click', ()=> new bootstrap.Modal(document.getElementById('loginModal')).show());
+  document.getElementById('open-login-modal-2')?.addEventListener('click', ()=> new bootstrap.Modal(document.getElementById('loginModal')).show());
+  document.getElementById('open-registration-modal')?.addEventListener('click', ()=> new bootstrap.Modal(document.getElementById('registrationModal')).show());
+  document.getElementById('open-registration-modal-2')?.addEventListener('click', ()=> new bootstrap.Modal(document.getElementById('registrationModal')).show());
+
+  // left shortcuts
+  document.getElementById('galleryBtn')?.addEventListener('click', ()=> window.location.href = 'gallery-user.html?from=user-homepage.html');
+  document.getElementById('careerBtn')?.addEventListener('click', ()=> window.location.href = 'career-post.html');
+
+  // employer submit inside modal (API kept)
+  document.getElementById('employerSubmitBtn')?.addEventListener('click', async ()=>{
+    const form = document.getElementById('employerRegForm');
+    const fd = new FormData(form);
+    try {
+      const res = await fetch('/api/employer/register', { method:'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      showBootstrapToast('Employer registered!', {type:'success'});
+      bootstrap.Modal.getInstance(document.getElementById('employerModal'))?.hide();
+      form.reset();
+    } catch (err) {
+      console.error(err); showBootstrapToast('Failed to register employer', {type:'error'});
+    }
+  });
+
+  // profile change picture trigger
+  document.getElementById('changePicBtn')?.addEventListener('click', ()=> document.getElementById('uploadProfilePic')?.click());
+
+  document.getElementById('uploadProfilePic')?.addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    const fd = new FormData(); fd.append('profilePic', file);
+    try {
+      const res = await fetch('/api/fullInformation/upload-picture', { method:'POST', body: fd, credentials:'include' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      if (data.imageUrl) {
+        document.getElementById('modalProfilePic').src = data.imageUrl;
+        document.getElementById('topProfilePic').src = data.imageUrl;
+        showBootstrapToast('Profile picture updated', {type:'success'});
+        // after upload, enable confirm if needed
+      }
+    } catch (err) {
+      console.error(err); showBootstrapToast('Upload failed', {type:'error'});
+    }
+  });
+
+  // load initial data
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    await Promise.allSettled([ loadIdAnnouncements(), loadEvents(), loadCareers(), loadFeed() ]);
+    await loadProfileData(true);
+  });
+
+  </script>
+</body>
+</html>

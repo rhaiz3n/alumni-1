@@ -11,6 +11,7 @@ const careersRoutes = require("./careers.js");
 const profileRoutes = require("./profileRoutes.js");
 const employerRoutes = require("./employerRoutes");
 const adminApplicationsRoutes = require("./adminApplications");
+const requireAdmin = require("./requireAdmin");
 const { sendOtpEmail } = require('../GmailMailer');
 const XLSX = require('xlsx');
 
@@ -47,6 +48,8 @@ app.use("/api/careers", careersRoutes);
 app.use("/api/fullInformation", profileRoutes);
 app.use("/api/employers", employerRoutes);
 app.use("/api/admin-applications", adminApplicationsRoutes);
+
+app.use("/api/admin-applications", requireAdmin, adminApplicationsRoutes);
 
 
 // Public homepage
@@ -99,13 +102,13 @@ async function initTables() {
   const sql = {
     alumni: `CREATE TABLE IF NOT EXISTS alumni (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      firstName VARCHAR(100) NOT NULL,
-      lastName VARCHAR(100) NOT NULL,
-      initial VARCHAR(10),
+      firstName VARCHAR(100),
+      lastName VARCHAR(100),
+      initial VARCHAR(100),
       suffix VARCHAR(10),
-      dateBirth DATE NOT NULL,
-      major VARCHAR(100) NOT NULL,
-      graduated YEAR NOT NULL
+      dateBirth DATE NULL,
+      major VARCHAR(100),
+      graduated YEAR
     )`,
     responses: `CREATE TABLE IF NOT EXISTS responses (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -403,96 +406,6 @@ app.get('/api/alumni', async (req, res) => {
 
 
 
-
-// ✅ Excel Upload with proper date handling
-app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-    let wb, sheet, rows;
-    try {
-      wb = XLSX.read(req.file.buffer, { type: 'buffer', raw: false });
-      sheet = wb.Sheets[wb.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(sheet, { raw: false });
-    } catch (xlsxError) {
-      console.error('XLSX parsing error:', xlsxError);
-      return res.status(400).json({ error: 'Invalid Excel file format' });
-    }
-
-    if (!rows || rows.length === 0) {
-      return res.status(400).json({ error: 'Excel file is empty' });
-    }
-
-    console.log(`Processing ${rows.length} rows from Excel file`);
-
-    const connection = await pool.getConnection();
-    await connection.beginTransaction();
-
-    const stmt = `
-      INSERT INTO alumni (
-        firstName, lastName, initial, suffix, dateBirth, major, graduated
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    function formatDates(value) {
-      if (!value) return null;
-      const d = new Date(value);
-      if (isNaN(d)) return null;  // skip invalid dates
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    let insertedCount = 0;
-    let errors = [];
-
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-
-      // Skip row if it looks like a header
-      const rowValues = Object.values(row).map(v => (v || '').toString().toLowerCase());
-      if (rowValues.includes('full name') && rowValues.includes('last name')) {
-        console.log(`Skipping header row ${i + 1}`);
-        continue;
-      }
-
-      // Extract data
-      const firstName = row['First Name'] || row['firstName'] || '';
-      const lastName  = row['Last Name']  || row['lastName'] || '';
-      const initial   = row['Middle Initial'] || '';
-      const suffix    = row['Suffix'] || '';
-      const program   = row['Program'] || row['Course'] || '';
-      const course    = row['Course'] || row['Program'] || '';
-      const yearGraduated = row['Year Graduated'] || row['Graduated'] || '';
-
-      // Skip row if required fields are missing
-      if (!firstName || !lastName || !program || !yearGraduated) {
-        console.warn(`Skipping row ${i + 1}: missing required fields`);
-        continue;
-      }
-
-      // Insert into DB
-      try {
-        await connection.execute(stmt, [firstName, lastName, initial, suffix, program, course, yearGraduated]);
-      } catch (err) {
-        console.error(`❌ Error inserting row ${i + 1}:`, err.message);
-      }
-    }
-
-
-    await connection.commit();
-    connection.release();
-
-    res.json({ success: true, totalRows: rows.length, inserted: insertedCount, errors });
-
-  } catch (err) {
-    console.error('Excel upload error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
 app.delete('/api/alumni/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -504,128 +417,214 @@ app.delete('/api/alumni/:id', async (req, res) => {
   }
 });
 
-// 📅 Improved date parsing for Excel uploads
-function parseDate(dateValue) {
-  if (!dateValue) return null;
 
-  // If it's already a JS Date object
-  if (dateValue instanceof Date && !isNaN(dateValue)) {
-    return dateValue.toISOString().split("T")[0]; // YYYY-MM-DD
+
+
+
+// --- Helper: normalize Excel headers ---
+function normalizeKeys(row) {
+  const normalized = {};
+  for (const key in row) {
+    const newKey = key
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_'); // spaces -> underscores
+    normalized[newKey] = row[key];
+  }
+  return normalized;
+}
+
+// --- 📅 Universal Date Parser ---
+function parseDate(value) {
+  if (!value) return null;
+
+  // ✅ If it's already a Date object
+  if (value instanceof Date && !isNaN(value)) {
+    return value.toISOString().split("T")[0];
   }
 
-  // If it's an Excel serial number (e.g., 37358)
-  if (typeof dateValue === "number") {
+  // ✅ If it's a number (Excel serial date like 37358)
+  if (typeof value === "number") {
     const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Excel base date
-    const parsedDate = new Date(excelEpoch.getTime() + dateValue * 86400000);
-    return parsedDate.toISOString().split("T")[0];
+    const parsedDate = new Date(excelEpoch.getTime() + value * 86400000);
+    if (!isNaN(parsedDate)) {
+      return parsedDate.toISOString().split("T")[0];
+    }
   }
 
-  // If it's a string
-  if (typeof dateValue === "string") {
-    // Normalize (remove commas, trim spaces)
-    dateValue = dateValue.replace(/,/g, "").trim();
+  // ✅ If it's a string
+  if (typeof value === "string") {
+    const cleaned = value.replace(/,/g, "").trim();
 
-    // Try parsing with Date()
-    const tryDate = new Date(dateValue);
-    if (!isNaN(tryDate)) {
-      return tryDate.toISOString().split("T")[0];
+    // Direct parse (handles: 2001-06-23, 06/23/2001, 23 June 2001)
+    const parsed = Date.parse(cleaned);
+    if (!isNaN(parsed)) {
+      return new Date(parsed).toISOString().split("T")[0];
     }
 
-    // Handle formats like "March 20 2002"
-    const monthNames = {
-      January: "01", February: "02", March: "03", April: "04",
-      May: "05", June: "06", July: "07", August: "08",
-      September: "09", October: "10", November: "11", December: "12"
-    };
-
-    const match = dateValue.match(/^(\w+)\s+(\d{1,2})\s+(\d{4})$/);
+    // Handle "June 23 2001"
+    const match = cleaned.match(/^([A-Za-z]+)\s+(\d{1,2})\s+(\d{4})$/);
     if (match) {
       const [ , monthName, day, year ] = match;
+      const monthNames = {
+        January: "01", February: "02", March: "03", April: "04",
+        May: "05", June: "06", July: "07", August: "08",
+        September: "09", October: "10", November: "11", December: "12"
+      };
       const month = monthNames[monthName];
       if (month) {
         return `${year}-${month}-${day.padStart(2, "0")}`;
       }
     }
   }
-  
-  // Fallback to regular date parsing
-  const date = new Date(dateValue);
-  if (!isNaN(date.getTime())) {
-    const result = date.getFullYear() + '-' + 
-      String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-      String(date.getDate()).padStart(2, '0');
-    return result;
-  }
-  
-  return null; // Return null instead of undefined
+
+  return null; // fallback
 }
 
+// --- Program map ---
+const programMap = {
+  // --- Engineering ---
+  "bachelor of science in civil engineering": "BSCE",
+  "bachelor of science in electrical engineering": "BSEE",
+  "bachelor of science in mechanical engineering": "BSME",
 
+  // --- Education ---
+  "bachelor of science in industrial education": "BSIE",
+  "bsie major in home economics": "BSIE-HE",
+  "bsie major in industrial arts": "BSIE-IA",
+  "bsie major in information and communication technology": "BSIE-ICT",
 
-// 📦 Upload Excel for alumni (6 fields only)
+  "bachelor of technical vocational teacher education": "BTVTEd",
+  "btvted major in computer programming": "BTVTEd-CP",
+  "btvted major in electrical technology": "BTVTEd-ET",
+
+  // --- BET Programs ---
+  "bachelor of engineering technology program": "BET",
+  "bet major in computer engineering technology": "BET-CoET",
+  "bet major in electrical technology": "BET-ET",
+  "bet major in electronics technology": "BET-ElecT",
+  "bet major in mechanical technology": "BET-MT",
+  "bet mechanical engineering technology track: automotive technology": "BET-MT-Auto",
+  "bet mechanical engineering technology track: power plant technology": "BET-MT-PP"
+};
+
+// --- Abbreviation logic ---
+function abbreviateMajor(raw) {
+  if (!raw) return null;
+  const str = String(raw).trim();
+  const key = str.toLowerCase();
+
+  // If already abbreviation
+  if (/^(bet(-ct|-et|-mt)?|bsce|bsee|bsme|bsie(-he|-ia|-ict)?|btvted(-cp|-et)?)$/i.test(str)) {
+    return str.toUpperCase();
+  }
+
+  // Exact match from map
+  if (programMap[key]) return programMap[key];
+
+  // Partial match for BET
+  if (key.includes('bachelor of engineering technology')) {
+    if (key.includes('construction')) return 'BET-CT';
+    if (key.includes('electrical')) return 'BET-ET';
+    if (key.includes('mechanical')) return 'BET-MT';
+    return 'BET';
+  }
+
+  return str;
+}
+
+// --- Upload Excel route ---
 app.post('/api/alumni/upload-excel', excelUpload.single('file'), async (req, res) => {
+  let connection;
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    let wb, sheet, rows;
-    try {
-      wb = XLSX.read(req.file.buffer, { type: 'buffer', raw: false });
-      sheet = wb.Sheets[wb.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(sheet, { raw: false });
-    } catch (xlsxError) {
-      console.error('❌ XLSX parsing error:', xlsxError);
-      return res.status(400).json({ error: 'Invalid Excel file format' });
-    }
+    // Parse Excel
+    const wb = XLSX.read(req.file.buffer, { type: 'buffer', raw: false });
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-    if (!rows || rows.length === 0) {
+    if (!rawRows || rawRows.length === 0) {
       return res.status(400).json({ error: 'Excel file is empty' });
     }
 
-    console.log(`📊 Processing ${rows.length} rows from Excel file`);
-
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     await connection.beginTransaction();
 
-    const stmt = `
+    const insertStmt = `
       INSERT INTO alumni (
         firstName, lastName, initial, suffix, dateBirth, major, graduated
       ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    let insertedCount = 0;
-    let errors = [];
+    const insertedRows = [];
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      try {
-        const values = [
-          row['FirstName'] || row['FIRSTNAME'] || row['firstName'] || row['First Name'] || row['FIRST NAME'] || row['first Name'] || null,
-          row['LastName']  || row['LASTNAME']  || row['lastName']  || row['Last Name']  || row['LAST NAME']  || row['last Name'] || null,
-          row['Initial']   || row['INITIAL']   || row['initial']   || row['Middle Initial'] || row['MIDDLE INITIAL'] || row['middle initial'] || null,
-          row['Suffix']    || row['SUFFIX']    || row['suffix']    || null,
-          row['DateBirth'] || row['DATEBIRTH'] || row['dateBirth'] || row['Date of Birth'] || row['DATE OF BIRTH'] || row['dob'] || null,
-          row['Major']     || row['MAJOR / COURSE'] || row['Course'] || row['major'] || null,
-          row['Graduated'] || row['Year Graduated'] || row['YEAR GRADUATED'] || row['year graduated'] || null
-        ];
+    for (let i = 0; i < rawRows.length; i++) {
+      const row = normalizeKeys(rawRows[i]);
 
-        await connection.execute(stmt, values);
-        insertedCount++;
-      } catch (rowError) {
-        console.error(`❌ Error inserting row ${i + 1}:`, rowError.message);
-        errors.push(`Row ${i + 1}: ${rowError.message}`);
+      const firstName = row.first_name || row.firstname || null;
+      const lastName  = row.last_name || row.lastname || null;
+      let initial     = row.initial || row.middle_initial || null;
+      const suffix    = row.suffix || null;
+      const dateBirth = parseDate(row.date_of_birth || row.dob || null); // ✅ unified parser
+
+      if (initial) {
+        initial = initial.toString().trim().substring(0, 10); // DB safety
       }
+
+      const majorRaw  = row.course || row.major || row.program || null;
+      const major     = abbreviateMajor(majorRaw);
+
+      let graduated = row.graduated || row.year_graduated || row.year || null;
+      if (graduated) {
+        graduated = parseInt(graduated.toString().trim(), 10);
+        if (isNaN(graduated)) graduated = null;
+      }
+
+      const [result] = await connection.execute(insertStmt, [
+        firstName, lastName, initial, suffix, dateBirth, major, graduated
+      ]);
+
+      insertedRows.push({
+        id: result.insertId,
+        firstName, lastName, initial, suffix, dateBirth, major, graduated
+      });
     }
 
     await connection.commit();
+
+    // Fetch refreshed page 1 (newest first)
+    const [page1Rows] = await connection.execute(
+      `SELECT id, firstName, lastName, initial, suffix, dateBirth, major, graduated
+       FROM alumni
+       ORDER BY id DESC
+       LIMIT 20`
+    );
+
     connection.release();
+    connection = null;
 
-    res.json({ success: true, totalRows: rows.length, inserted: insertedCount, errors });
-
+    return res.json({
+      success: true,
+      inserted: insertedRows.length,
+      insertedRows,
+      page1Rows
+    });
   } catch (err) {
     console.error('❌ Excel upload error:', err);
-    res.status(500).json({ error: err.message });
+    if (connection) {
+      try { await connection.rollback(); connection.release(); } catch {}
+    }
+    res.status(500).json({ error: err.message || 'Server error' });
   }
 });
+
+
+
+
+
+
 
 
 

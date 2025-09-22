@@ -191,6 +191,14 @@
         }
       },20);
     });
+
+    // --- Initialize everything on DOM load ---
+document.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('userRole') !== 'admin') {
+    alert("⛔ Access denied. Admins only!");
+    window.location.href = 'homepage.html';
+  }
+});
   </script>
 </body>
 </html>

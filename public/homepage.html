@@ -28,7 +28,7 @@
     }
     body{
       font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: #f0f2f5;
+      background: #bebebe;
       color: #111827;
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
@@ -52,7 +52,7 @@
     .left-card, .right-card, .feed-card { background: var(--card-bg); border-radius: var(--card-radius); box-shadow: var(--shadow); }
 
     /* Left sidebar */
-    .left-card { padding: 18px; margin-bottom: 18px; }
+    .left-card { padding: 18px; margin-bottom: 18px; position: sticky;  top: 70px; z-index: 1020;}
     .shortcut-btn { border-radius: 10px; background: linear-gradient(180deg,#fff,#f7f9fb); border:1px solid #e6e9ee; padding:12px; text-align:left; display:flex; gap:12px; align-items:center; transition: transform .12s ease, box-shadow .12s ease; }
     .shortcut-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
 
@@ -110,8 +110,12 @@
         <span style="font-weight:600;">TUPC — Cavite Alumni</span>
       </a>
 
-      <form class="d-flex ms-auto me-3" role="search">
-        <input id="feedSearch" class="form-control form-control-sm" type="search" placeholder="🔍 Search events or careers..." oninput="filterFeed()">
+      <form class="d-flex ms-auto me-3 flex-grow-1" role="search" style="max-width: 600px;">
+        <input id="feedSearch" 
+              class="form-control" 
+              type="search" 
+              placeholder="🔍 Search events or careers..." 
+              oninput="filterFeed()">
       </form>
 
       <div class="d-flex align-items-center ms-3 gap-2">
@@ -196,7 +200,7 @@
   </div>
 
   <!-- LOGIN Modal -->
-  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="loginModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content p-3">
         <div class="modal-header border-0">
@@ -227,7 +231,7 @@
   </div>
 
   <!-- Forgot modal -->
-  <div class="modal fade" id="forgotModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="forgotModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content p-3">
         <div class="modal-header border-0">
@@ -275,7 +279,7 @@
   </div>
 
   <!-- Registration selection modal -->
-  <div class="modal fade" id="registrationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="registrationModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content p-3">
         <div class="modal-header border-0">
@@ -291,7 +295,7 @@
   </div>
 
   <!-- Employer Modal -->
-  <div class="modal fade" id="employerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="employerModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content p-3">
         <div class="modal-header border-0">

@@ -12,20 +12,62 @@
   <link rel="icon" type="image/png" href="/Logo2.png">
 
   <style>
-    body { background:#f5f7fa; color:#111827; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
-    .topbar { background:#fff; border-bottom:1px solid #e6e9ee; }
-    .card-surface { background:#fff; border:1px solid #eef2f6; border-radius:10px; box-shadow:0 6px 18px rgba(16,24,40,0.04);}
+    body { background:#bebebe; color:#111827; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
+    .topbar { background: linear-gradient(175deg, #882323 55%, #000000 60%); }
+    .card-surface,
+    .card-control {
+      background: #fff;
+      border: 1px solid #eef2f6;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(16, 24, 40, 0.04);
+      width: 100%; /* ✅ always fill column width */
+      max-width: 100%; /* ✅ don’t overflow */
+    }
+    .header-title {
+      color: #fff !important;
+    }
+    .header-subtitle {
+      color: #f8f9fa !important; /* softer white (Bootstrap's gray-100) */
+    }
+
+    /* Optional: add padding inside */
+    .card-surface { padding: 1rem; }
+    .card-control { padding: 1rem; }
     .small-muted { color:#64748b; font-size:.88rem; }
     .form-control, .form-select { border-radius:8px; }
-    .table thead th { border-bottom:3px solid #000000; font-size: 15px;}
+    .table thead th {
+      border-bottom: 3px solid #000000; /* strong black underline */
+      font-size: 15px;
+      font-weight: 600;                /* slightly bolder text */
+      text-transform: uppercase;       /* optional: makes headers ALL CAPS */
+      text-align: center;              /* keeps headers aligned */
+      background-color: #f8f9fa;       /* light gray background for contrast */
+    }
     #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
     .progress-bar-custom { width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
-    @media print {
-      body * { visibility: hidden; }
-      #printTitle, #reqTable, #reqTable * { visibility: visible; }
-      #reqTable th:last-child, #reqTable td:last-child { display: none; } /* hide Action */
-      #reqTable { position: absolute; top: 40px; left:0; width:100%; }
-    }
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printTitle, #reqTable, #reqTable * {
+    visibility: visible;
+  }
+
+  /* Hide VALID ID (7th column) and ACTION (9th column) */
+  #reqTable th:nth-child(7),
+  #reqTable td:nth-child(7),
+  #reqTable th:nth-child(9),
+  #reqTable td:nth-child(9) {
+    display: none;
+  }
+
+  #reqTable {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
@@ -33,10 +75,16 @@
   <!-- Topbar -->
   <nav class="topbar py-2">
     <div class="container d-flex align-items-center gap-3">
-      <a class="btn btn-outline-secondary btn-sm" href="admin-homepage.html"><i class="fa-solid fa-arrow-left"></i></a>
+      <a class="btn btn-outline-light btn-sm" href="admin-homepage.html">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
       <div>
-        <div class="fw-bold">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
-        <div class="small-muted">ID Request Database — Admin</div>
+        <div class="fw-bold text-white">
+          TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
+        </div>
+        <div class="small-muted text-white">
+          ID Request Database — Admin
+        </div>
       </div>
       <div class="ms-auto">
         <button class="btn btn-primary btn-sm" id="printBtn"><i class="fa-solid fa-print me-1"></i> Print Accepted Only</button>
@@ -44,54 +92,73 @@
     </div>
   </nav>
 
-  <!-- Main -->
-  <main class="container my-4">
-    <div class="row g-4">
-      <!-- Left: controls -->
-      <div class="col-lg-4">
-        <div class="card-surface p-3">
-          <label class="form-label small-muted mb-1">Search</label>
-          <input id="searchInput" class="form-control mb-3" placeholder="Search by name…">
+<!-- Main -->
+<main class="container-fluid my-4">
+  <div class="row g-4 justify-content-start">
+    
+    <!-- Left: controls -->
+    <div class="col-12 col-lg-4">
+      <div class="card-control p-3">
+        <label class="form-label small-muted mb-1">Search</label>
+        <input id="searchInput" class="form-control mb-3" placeholder="Search by name…">
 
-          <label class="form-label small-muted mb-1">Filter by Status</label>
-          <select id="statusFilter" class="form-select mb-3">
-            <option value="ALL">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="ACCEPTED">Accepted</option>
-            <option value="DECLINED">Declined</option>
-          </select>
+        <label class="form-label small-muted mb-1">Filter by Status</label>
+        <select id="statusFilter" class="form-select mb-3">
+          <option value="ALL">All Statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="ACCEPTED">Accepted</option>
+          <option value="DECLINED">Declined</option>
+        </select>
 
-          <label class="form-label small-muted mb-1">Page</label>
-          <select id="pageSelect" class="form-select mb-3"></select>
-        </div>
+        <label class="form-label small-muted mb-1">Page</label>
+        <select id="pageSelect" class="form-select mb-3"></select>
       </div>
+    </div>
 
-      <!-- Right: table -->
-      <div class="col-lg-8">
-        <div class="card-surface p-3">
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" id="reqTable">
-              <thead>
-                <tr>
-                  <th>NAME</th>
-                  <th>DEGREE</th>
-                  <th>YEAR</th>
-                  <th>STUDENT NO</th>
-                  <th>PHONE</th>
-                  <th>EMAIL</th>
-                  <th>VALID ID</th>
-                  <th>STATUS</th>
-                  <th>ACTION</th>
-                  <th>SUBMITTED</th>
-                </tr>
-              </thead>
-              <tbody id="reqBody"><tr><td colspan="10">Loading…</td></tr></tbody>
-            </table>
-          </div>
+    <!-- Right: table -->
+    <div class="col-12 col-lg-8">
+      <div class="card-surface p-3">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" id="reqTable">
+            <thead>
+              <tr>
+                <th>NAME</th>
+                <th>DEGREE</th>
+                <th>YEAR</th>
+                <th>STUDENT NO</th>
+                <th>PHONE</th>
+                <th>EMAIL</th>
+                <th>VALID ID</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+                <th>SUBMITTED</th>
+              </tr>
+            </thead>
+            <tbody id="reqBody">
+              <tr><td colspan="10">Loading…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-  </main>
+
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="idModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Submitted ID</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="idPreview" src="" class="img-fluid rounded" alt="User Submitted ID">
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Loader -->
   <div id="loader-wrapper" role="status" aria-live="polite">
@@ -158,38 +225,91 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function renderTable(){
-    const filter = statusFilter.value || 'ALL';
-    tbody.innerHTML = '';
-    const statusOrder = { PENDING:0, ACCEPTED:1, DECLINED:2 };
+function renderTable() {
+  const filter = statusFilter.value || 'ALL';
+  tbody.innerHTML = '';
+  const statusOrder = { PENDING:0, ACCEPTED:1, DECLINED:2 };
 
-    requests.filter(r => filter==='ALL'||(r.status||'PENDING').toUpperCase()===filter)
-      .sort((a,b)=>{
-        const sa = statusOrder[(a.status||'PENDING').toUpperCase()];
-        const sb = statusOrder[(b.status||'PENDING').toUpperCase()];
-        return sa!==sb?sa-sb:b.id-a.id;
-      })
-      .forEach(r=>{
-        const status = (r.status||'PENDING').toUpperCase();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.fullName}</td>
-          <td>${r.degree}</td>
-          <td>${r.yearGraduated}</td>
-          <td>${r.studentNo}</td>
-          <td>${r.phoneNo}</td>
-          <td>${r.email}</td>
-          <td><button class="btn btn-sm btn-outline-secondary">View</button></td>
-          <td class="status ${status}">${status}</td>
-          <td>
-            <button class="btn btn-sm btn-success">Accept</button>
-            <button class="btn btn-sm btn-danger">Decline</button>
-          </td>
-          <td>${r.submittedAt ? new Date(r.submittedAt).toLocaleDateString('en-US',{month:'long',day:'2-digit',year:'numeric'}).toUpperCase():'N/A'}</td>
-        `;
-        tbody.appendChild(tr);
+  requests
+    .filter(r => filter==='ALL' || (r.status||'PENDING').toUpperCase()===filter)
+    .sort((a,b)=>{
+      const sa = statusOrder[(a.status||'PENDING').toUpperCase()];
+      const sb = statusOrder[(b.status||'PENDING').toUpperCase()];
+      return sa!==sb ? sa-sb : b.id-a.id;
+    })
+    .forEach(r => {
+      const status = (r.status||'PENDING').toUpperCase();
+      const tr = document.createElement('tr');
+
+      // ✅ Row background based on status
+      if (status === "PENDING") tr.classList.add("table-warning"); // yellow
+      if (status === "ACCEPTED") tr.classList.add("table-success"); // green
+      if (status === "DECLINED") tr.classList.add("table-danger"); // red
+
+      tr.innerHTML = `
+        <td>${r.fullName}</td>
+        <td>${r.degree}</td>
+        <td>${r.yearGraduated}</td>
+        <td>${r.studentNo}</td>
+        <td>${r.phoneNo}</td>
+        <td>${r.email}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary btn-view" 
+                  data-url="${r.validIdUrl || ''}">View</button>
+        </td>
+        <td class="status ${status}">${status}</td>
+        <td>
+          <button class="btn btn-sm btn-success btn-accept">Accept</button>
+          <button class="btn btn-sm btn-danger btn-decline">Decline</button>
+        </td>
+        <td>${r.submittedAt ? new Date(r.submittedAt).toLocaleDateString('en-US',{month:'long',day:'2-digit',year:'numeric'}).toUpperCase() : 'N/A'}</td>
+      `;
+
+      // ✅ Accept / Decline actions
+      tr.querySelector(".btn-accept").addEventListener("click", async () => {
+        await updateStatus(r.id, "ACCEPTED");
       });
+      tr.querySelector(".btn-decline").addEventListener("click", async () => {
+        await updateStatus(r.id, "DECLINED");
+      });
+
+      // ✅ View button
+      const viewBtn = tr.querySelector(".btn-view");
+      if (viewBtn) {
+        viewBtn.addEventListener("click", () => {
+          const url = viewBtn.getAttribute("data-url");
+          if (url) {
+            document.getElementById("idPreview").src = url;
+            new bootstrap.Modal(document.getElementById("idModal")).show();
+          } else {
+            alert("No ID uploaded by this user.");
+          }
+        });
+      }
+
+      tbody.appendChild(tr);
+    });
+}
+
+
+// ✅ Helper function to update status
+async function updateStatus(id, newStatus) {
+  try {
+    const res = await fetch(`/api/requests/${id}/status`, {
+      method: "PATCH", // ✅ use PATCH, not PUT
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus })
+    });
+
+    if (!res.ok) throw new Error("Failed to update request");
+
+    // Refresh list
+    await loadPage();
+  } catch (err) {
+    console.error("❌ Error updating status:", err);
+    alert("Failed to update request");
   }
+}
 
   // Print accepted only
   printBtn.addEventListener('click', ()=>{
@@ -206,6 +326,14 @@ document.addEventListener('DOMContentLoaded', () => {
   statusFilter.addEventListener('change', renderTable);
 
   loadPage();
+});
+
+// --- Initialize everything on DOM load ---
+document.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('userRole') !== 'admin') {
+    alert("⛔ Access denied. Admins only!");
+    window.location.href = 'homepage.html';
+  }
 });
   </script>
 

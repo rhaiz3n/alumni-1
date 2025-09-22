@@ -13,13 +13,13 @@ async function initTables() {
     const sql = {
     alumni: `CREATE TABLE IF NOT EXISTS alumni (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      firstName VARCHAR(100) NOT NULL,
-      lastName VARCHAR(100) NOT NULL,
-      initial VARCHAR(10),
+      firstName VARCHAR(100),
+      lastName VARCHAR(100),
+      initial VARCHAR(100),
       suffix VARCHAR(10),
-      dateBirth DATE NOT NULL,
-      major VARCHAR(100) NOT NULL,
-      graduated YEAR NOT NULL
+      dateBirth DATE NULL,
+      major VARCHAR(100),
+      graduated YEAR
     )`,
     responses: `CREATE TABLE IF NOT EXISTS responses (
       id INT AUTO_INCREMENT PRIMARY KEY,

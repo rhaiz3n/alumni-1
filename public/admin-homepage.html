@@ -15,15 +15,15 @@
 
   <style>
     /* --- Custom styles (kept compact) --- */
-    body { background: #f5f7fb; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-    .feed-card { background: #fff; border-radius: .8rem; box-shadow: 0 6px 18px rgba(24,39,75,0.06); overflow: hidden; margin-bottom: 1rem; }
-    .feed-img { width: 100%; object-fit: cover; max-height: 360px; display:block; }
+    body { background: #bebebe; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    .feed-card {background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 5px rgba(0,0,0,.05); }
+    .feed-img { width:100%; height: 600px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
     .feed-content { padding: 14px; }
     .badge-mini { font-size: .7rem; padding: .25rem .5rem; border-radius: .35rem; }
     .toast-custom { position: fixed; right: 20px; bottom: 20px; z-index: 9999; }
     .gallery-thumb { border-radius: .5rem; overflow: hidden; }
     .grayscale { filter: grayscale(100%); opacity: .6; }
-    .inbox-panel { position: fixed; right: 20px; top: 70px; width: 300px; z-index: 1050; display:none; }
+    .inbox-panel { position: fixed; right: 20px; top: 70px; width: 300px; z-index: 1050; display:none; background-color: beige;}
     .inbox-panel.show { display:block; }
     .cursor-pointer { cursor: pointer; }
     .small-muted { font-size: .85rem; color:#6c757d; }
@@ -36,18 +36,37 @@
     /* Loader overlay */
     #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
     .progress-bar-custom { left: 100px; width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
+    .navbar {
+      position: sticky;
+      top: 0;        /* sticks to the top */
+      z-index: 1050; /* ensures it's above other content */
+    }
 
-
+    .sticky-sidebar {
+      position: sticky;
+      top: var(--bs-navbar-height, 50px); /* Bootstrap default navbar height */
+    }
   </style>
 </head>
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary"
+    style="background: linear-gradient(175deg, #882323 55%, #000000 60%);">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center" href="admin-homepage.html">
         <img src="Logo.png" alt="logo" style="height:36px; margin-right:10px;">
         <span><strong>TUP Cavite — Admin</strong></span>
       </a>
+
+
+      <form class="d-flex ms-auto me-3 flex-grow-1" role="search" style="max-width: 600px;">
+        <input id="feedSearch" 
+              class="form-control" 
+              type="search" 
+              placeholder="🔍 Search events or careers..." 
+              oninput="filterFeed()">
+      </form>
+
       <div class="d-flex align-items-center ms-auto">
         <button id="notificationToggle" class="btn btn-outline-light me-2 position-relative">
           <i class="fas fa-bell"></i>
@@ -59,34 +78,35 @@
   </nav>
 
   <!-- MAIN LAYOUT -->
-  <div class="container-fluid my-3">
-    <div class="row gx-3">
-      <!-- LEFT SIDEBAR -->
-      <div class="col-lg-3 mb-3">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <div class="d-grid gap-2">
-              <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEvent">📅 Post Event</button>
-              <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalCareer">💼 Post Career</button>
-              <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalGallery">🖼️ Gallery</button>
-              <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalID">🪪 ID Announcement</button>
-              <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalApps">📋 Applications</button>
-              <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modalGcash">💳 Manage GCash</button>
-            </div>
+<div class="container-fluid my-3">
+  <div class="row gx-3">
+    <!-- LEFT SIDEBAR -->
+    <div class="col-lg-3 mb-3">
+      <div class="card shadow-sm sticky-sidebar">
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEvent">📅 Post Event</button>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalCareer">💼 Post Career</button>
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalGallery">🖼️ Gallery</button>
+            <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalID">🪪 ID Announcement</button>
+            <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalApps">📋 Applications</button>
+            <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modalGcash">💳 Manage GCash</button>
+          </div>
 
-            <hr class="my-3"/>
+          <hr class="my-3"/>
 
-            <div class="list-group">
-              <a class="list-group-item list-group-item-action" href="alumni-Database.html">Alumni Database</a>
-              <a class="list-group-item list-group-item-action" href="jobs-response.html">Jobs Response</a>
-              <a class="list-group-item list-group-item-action" href="data-registration.html">Registration</a>
-              <a class="list-group-item list-group-item-action" href="admin-id.html">ID Request</a>
-              <a class="list-group-item list-group-item-action" href="event-registration.html">Event Registration</a>
-              <a class="list-group-item list-group-item-action" href="admin-employer.html">Employer Registration</a>
-            </div>
+          <div class="list-group">
+            <a class="list-group-item list-group-item-action" href="alumni-Database.html">Alumni Database</a>
+            <a class="list-group-item list-group-item-action" href="jobs-response.html">Jobs Response</a>
+            <a class="list-group-item list-group-item-action" href="data-registration.html">Registration</a>
+            <a class="list-group-item list-group-item-action" href="admin-id.html">ID Request</a>
+            <a class="list-group-item list-group-item-action" href="event-registration.html">Event Registration</a>
+            <a class="list-group-item list-group-item-action" href="admin-employer.html">Employer Registration</a>
           </div>
         </div>
       </div>
+    </div>
+
 
       <!-- FEED COLUMN -->
       <div class="col-lg-6 mb-3">
@@ -118,7 +138,7 @@
   <!-- INBOX PANEL -->
   <div id="inboxPanel" class="card inbox-panel shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <span>Admin Inbox</span>
+      <span>ADMIN INBOX</span>
     </div>
     <div class="card-body" style="max-height: 400px; overflow:auto;">
       <div id="inboxContentList"></div>
@@ -171,7 +191,7 @@
   </div>
 
   <!-- Career Modal -->
-  <div class="modal fade" id="modalCareer" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="modalCareer" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <form id="careerForm" enctype="multipart/form-data">
@@ -886,13 +906,11 @@ document.getElementById("careerForm").addEventListener("submit", async function 
 
   // --- Initialize everything on DOM load ---
   document.addEventListener('DOMContentLoaded', () => {
-    // enforce admin role (if you use sessionStorage/userRole)
     if (sessionStorage.getItem('userRole') !== 'admin') {
-      // redirect non-admins back to homepage
-      // NOTE: remove or change if your auth differs
-      // window.location.href = 'homepage.html';
-      // (we won't force redirect to avoid blocking testing; comment above line if you prefer)
+      alert("⛔ Access denied. Admins only!");
+      window.location.href = 'homepage.html';
     }
+
 
     loadFeed();
     loadGallery();
@@ -978,6 +996,15 @@ document.getElementById("careerForm").addEventListener("submit", function (e) {
   }
 });
 
+
+  function filterFeed() {
+    const query = document.getElementById('feedSearch').value.toLowerCase();
+    document.querySelectorAll('.feed-card').forEach(card => {
+      const text = card.innerText.toLowerCase();
+      card.style.display = text.includes(query) ? 'block' : 'none';
+    });
+  }
+  window.filterFeed = filterFeed;
   </script>
 </body>
 </html>

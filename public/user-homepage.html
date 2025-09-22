@@ -22,11 +22,11 @@
 
   <style>
     /* Minimal custom styles to get a FB-like feel */
-    body { font-family: "Albert Sans", Arial, sans-serif; background:#f0f2f5; }
-    .left-col { min-width: 220px; max-width: 270px; }
-    .right-col { min-width: 260px; max-width: 320px; }
-    .feed-card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
-    .feed-img { width:100%; height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
+    body { font-family: "Albert Sans", Arial, sans-serif; background:#e0e0e0; }
+    .left-col { min-width: 220px; max-width: 270px; position: sticky; top: 80px; height: calc(100vh - 100px); overflow-y: auto;}
+    .right-col { min-width: 260px; max-width: 320px; position: sticky; top: 80px; height: calc(100vh - 100px); overflow-y: auto;}
+    .feed-card {background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 5px rgba(0,0,0,.05); }
+    .feed-img { width:100%; height: 600px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;}
     .profile-pic-sm { width:40px; height:40px; object-fit:cover; border-radius:50%; }
     .sidebar-link { display:flex; align-items:center; gap:.75rem; padding:.5rem .25rem; border-radius:8px; color:#111; text-decoration:none; }
     .sidebar-link:hover { background:#e9ecef; text-decoration:none; }
@@ -46,6 +46,24 @@
     /* Responsive */
     @media (max-width: 991px) {
       .left-col, .right-col { display:none; }
+    }
+    main.col-lg-6 {
+      margin: 0 auto;
+    }
+    .navbar {
+      position: sticky;
+      top: 0;        /* sticks to the top */
+      z-index: 1050; /* ensures it's above other content */
+    }
+    nav.flex-column {
+      position: sticky;
+      top: 80px; /* distance from top (below navbar) */
+      max-height: calc(100vh - 100px); 
+      overflow-y: auto; /* add scrolling if items overflow */
+      background: #fff; 
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
   </style>
 </head>
@@ -464,64 +482,6 @@
               <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="inlineWork" id="inlineWorkMaybe" value="Maybe">
                 <label class="form-check-label" for="inlineWorkMaybe">Maybe</label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Submit Survey</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- MINI CAREER SURVEY Modal -->
-<div class="modal fade" id="miniSurveyModalBS" tabindex="-1">
-  <div class="modal-dialog modal-md modal-dialog-scrollable">
-    <div class="modal-content">
-      <form id="miniSurveyForm" class="modal-body p-4">
-        <div class="modal-header">
-          <h5 class="modal-title">Quick Career Survey</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div id="miniSurveyQuestions">
-          <!-- Field of Interest -->
-          <div class="mb-3">
-            <label class="form-label">Field of Interest</label>
-            <div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="interested" id="miniInterestedYes" value="Yes" required>
-                <label class="form-check-label" for="miniInterestedYes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="interested" id="miniInterestedNo" value="No">
-                <label class="form-check-label" for="miniInterestedNo">No</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="interested" id="miniInterestedMaybe" value="Maybe">
-                <label class="form-check-label" for="miniInterestedMaybe">Maybe</label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Inline Work -->
-          <div class="mb-3">
-            <label class="form-label">Inline Work</label>
-            <div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineWork" id="miniInlineYes" value="Yes" required>
-                <label class="form-check-label" for="miniInlineYes">Yes</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineWork" id="miniInlineNo" value="No">
-                <label class="form-check-label" for="miniInlineNo">No</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineWork" id="miniInlineMaybe" value="Maybe">
-                <label class="form-check-label" for="miniInlineMaybe">Maybe</label>
               </div>
             </div>
           </div>
@@ -1248,131 +1208,55 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // -----------------------------
-  // Safe localStorage parse
-  // -----------------------------
-  function safeParse(key) {
-    try {
-      return JSON.parse(localStorage.getItem(key));
-    } catch {
-      return null;
-    }
-  }
-
-  // -----------------------------
-  // Show Mini Survey
-  // -----------------------------
-function showMiniSurvey() {
-  const careerId = window.currentCareer?.id;
-  if (!careerId) return;
-
-  const saved = safeParse(`miniSurvey_${careerId}`);
-  const now = new Date();
-  const cooldownMs = 30 * 1000; // 30s mini cooldown
-  const cooldownKey = `miniSurveyCooldown_${careerId}`; // separate key for countdown
-
-  // Check if cooldown is active
-  const lastCooldownStr = localStorage.getItem(cooldownKey);
-  const lastCooldown = lastCooldownStr ? new Date(lastCooldownStr) : null;
-
-  if (lastCooldown && now < lastCooldown) {
-    showNotification('ℹ️ Mini survey cooldown active. Retry later.', 'info');
-    startSeparateCountdown('miniSurveyCountdownBox', 'miniSurveyCountdown', cooldownKey, cooldownMs);
-    return;
-  }
-
-  // Show mini survey modal
-  const miniSurveyEl = document.getElementById('miniSurveyModalBS');
-  const miniModal = new bootstrap.Modal(miniSurveyEl, { backdrop: 'static', keyboard: false });
-  miniModal.show();
-
-  // Reset form
-  miniSurveyEl.querySelector('form').replaceWith(miniSurveyEl.querySelector('form').cloneNode(true));
-  const form = miniSurveyEl.querySelector('form');
-
-  form.addEventListener('submit', function(ev) {
-    ev.preventDefault();
-    const timestamp = new Date().toISOString();
-
-    // Save mini survey data
-    localStorage.setItem(`miniSurvey_${careerId}`, JSON.stringify({
-      interested: form.interested.value,
-      inlineWork: form.inlineWork.value,
-      timestamp
-    }));
-
-    // Hide modal
-    bootstrap.Modal.getInstance(miniSurveyEl)?.hide();
-
-    // Show employment form if user chose "Yes"
-    if (form.interested.value === 'Yes') {
-      new bootstrap.Modal(document.getElementById('employmentFormModalBS'), { backdrop: 'static', keyboard: false }).show();
-    }
-
-    // Set mini survey cooldown separately
-    const cooldownEnd = new Date(Date.now() + cooldownMs);
-    localStorage.setItem(cooldownKey, cooldownEnd.toISOString());
-    startSeparateCountdown('miniSurveyCountdownBox', 'miniSurveyCountdown', cooldownKey, cooldownMs);
-
-    showNotification('✅ Mini survey saved locally', 'success');
-  });
-}
-
-
-  // -----------------------------
   // Open Career Survey
   // -----------------------------
-  window.openCareerSurvey = async function(career) {
-    window.currentCareer = career;
-    const careerId = career?.id;
-    const userId = sessionStorage.getItem('userId');
-    if (!careerId || !userId) return;
+window.openCareerSurvey = async function(career) {
+  window.currentCareer = career;
+  const careerId = career?.id;
+  const userId = sessionStorage.getItem('userId');
+  if (!careerId || !userId) return;
 
-    try {
-      const resCareer = await fetch(`/api/responses/check?userId=${userId}&careerId=${careerId}`);
-      const careerData = await resCareer.json();
+  try {
+    // Check if user has ever submitted survey
+    const resFull = await fetch(`/api/responses/checkFullSurvey?userId=${userId}`);
+    const fullData = await resFull.json();
 
-      const resFull = await fetch(`/api/responses/checkFullSurvey?userId=${userId}`);
-      const fullData = await resFull.json();
+    const now = new Date();
+    const lastFullStr = localStorage.getItem('fullSurveyCooldown');
+    const lastFullTime = lastFullStr ? new Date(lastFullStr) : null;
 
-      const now = new Date();
-      const lastFullStr = localStorage.getItem('fullSurveyCooldown');
-      const lastFullTime = lastFullStr ? new Date(lastFullStr) : null;
+    const fullCooldownMs = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-      // Case 1: User never submitted full survey or cooldown expired
-      if (!fullData.submittedAny || (lastFullTime && now >= lastFullTime)) {
-        const fullModal = new bootstrap.Modal(document.getElementById('careerSurveyModalBS'), {backdrop:'static', keyboard:false});
-        fullModal.show();
-        return;
-      }
-
-      // Case 2: Cooldown active → show mini survey
-      const diffMs = now - lastFullTime;
-      const fullCooldownMs = 30 * 24 * 60 * 60 * 1000; // 30 days ~ 1 month
-
-      if (diffMs < fullCooldownMs) {
-        showMiniSurvey();
-
-        // Always reset the stored endTime to now + cooldown
-        const cooldownEnd = new Date(Date.now() + fullCooldownMs);
-        localStorage.setItem('fullSurveyCooldown', cooldownEnd.toISOString());
-
-        startSeparateCountdown(
-          'fullSurveyCountdownBox',
-          'fullSurveyCountdown',
-          'fullSurveyCooldown',
-          fullCooldownMs
-        );
-        return;
-      }
-
-      // Case 3: Cooldown expired → full survey available again
-      const fullModal = new bootstrap.Modal(document.getElementById('careerSurveyModalBS'), {backdrop:'static', keyboard:false});
-      fullModal.show();
-
-    } catch(err) {
-      console.error("❌ Failed to load survey status:", err);
+    // Case 1: Never submitted OR cooldown expired → show full survey
+    if (!fullData.submittedAny || (lastFullTime && now >= lastFullTime)) {
+      new bootstrap.Modal(
+        document.getElementById('careerSurveyModalBS'),
+        { backdrop: 'static', keyboard: false }
+      ).show();
+      return;
     }
-  };
+
+    // Case 2: Cooldown active → show employment form directly
+    const diffMs = now - lastFullTime;
+    if (diffMs < fullCooldownMs) {
+      new bootstrap.Modal(
+        document.getElementById('employmentFormModalBS'),
+        { backdrop: 'static', keyboard: false }
+      ).show();
+      return;
+    }
+
+    // Case 3: Safety net → full survey again
+    new bootstrap.Modal(
+      document.getElementById('careerSurveyModalBS'),
+      { backdrop: 'static', keyboard: false }
+    ).show();
+
+  } catch (err) {
+    console.error("❌ Failed to load survey status:", err);
+  }
+};
+
 
   // -----------------------------
   // Full Career Survey Submit
@@ -1394,26 +1278,36 @@ function showMiniSurvey() {
 
     try {
       const res = await fetch('/api/responses/add', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit survey');
 
+      // Hide modal & show success
       bootstrap.Modal.getInstance(document.getElementById('careerSurveyModalBS'))?.hide();
       showNotification('✅ Career survey submitted!', 'success');
 
-      // Persist full survey cooldown
-      const fullCooldownMs = 30 * 24 * 60 * 60 * 1000; // 30 days
+      // Set full survey cooldown = 30 seconds
+      const fullCooldownMs =  30 * 24 * 60 * 60 * 1000;
       const cooldownEnd = new Date(Date.now() + fullCooldownMs);
-      startSeparateCountdown('fullSurveyCountdownBox', 'fullSurveyCountdown', 'fullSurveyCooldown', fullCooldownMs);
+      localStorage.setItem('fullSurveyCooldown', cooldownEnd.toISOString());
 
-      if (form.interested.value === 'Yes') {
-        new bootstrap.Modal(document.getElementById('employmentFormModalBS'), {backdrop:'static', keyboard:false}).show();
-      }
+      startSeparateCountdown(
+        'fullSurveyCountdownBox',
+        'fullSurveyCountdown',
+        'fullSurveyCooldown',
+        fullCooldownMs
+      );
 
-    } catch(err) {
+      // Always show employment form after survey
+      new bootstrap.Modal(document.getElementById('employmentFormModalBS'), {
+        backdrop: 'static',
+        keyboard: false
+      }).show();
+
+    } catch (err) {
       console.error(err);
       showNotification('❌ Failed to submit survey', 'error');
     }
@@ -1430,19 +1324,19 @@ function showMiniSurvey() {
     fd.set('careerId', window.currentCareer?.id || '');
 
     try {
-      const res = await fetch('/api/applications/add', {method:'POST', body:fd});
+      const res = await fetch('/api/applications/add', { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit application');
 
       bootstrap.Modal.getInstance(document.getElementById('employmentFormModalBS'))?.hide();
       showNotification('✅ Employment application submitted!', 'success');
-    } catch(err) {
+    } catch (err) {
       console.error(err);
       showNotification('❌ Failed to submit application', 'error');
     }
   });
-
 });
+
 
 
   // ------------------------------

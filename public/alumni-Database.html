@@ -12,7 +12,7 @@
   <style>
     /* Minimal inline styles for clean matte-white look */
     body { background:#8d8d8d; color:#111827; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
-    .topbar { background:#fff; border-bottom:1px solid #e6e9ee; }
+    .topbar { background: linear-gradient(175deg, #882323 55%, #000000 60%); }
     .card-surface { background:#fff; border:1px solid #eef2f6; border-radius:10px; box-shadow:0 6px 18px rgba(16,24,40,0.04);}
     .excel-drop { border:1px dashed #d9e2ec; border-radius:8px; padding:14px; text-align:center; cursor:pointer; background:#fbfdff; }
     .excel-drop.dragover { background:#eef6ff; border-color:#93c5fd; }
@@ -49,17 +49,28 @@
     display: none;
   }
 }
-
+    .header-title {
+      color: #fff !important;
+    }
+    .header-subtitle {
+      color: #f8f9fa !important; /* softer white (Bootstrap's gray-100) */
+    }
   </style>
 </head>
 <body>
   <!-- Topbar -->
   <nav class="topbar py-2">
     <div class="container d-flex align-items-center gap-3">
-      <a class="btn btn-outline-secondary btn-sm" href="admin-homepage.html" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
+      <a class="btn btn-outline-light btn-sm" href="admin-homepage.html">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
       <div>
-        <div class="fw-bold">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
-        <div class="small-muted">Alumni Database — Admin</div>
+        <div class="fw-bold text-white">
+          TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
+        </div>
+        <div class="small-muted text-white">
+          ID Request Database — Admin
+        </div>
       </div>
       <div class="ms-auto d-flex gap-2">
         <button id="printBtn" class="btn btn-light btn-sm" title="Print"><i class="fa-solid fa-print"></i></button>
@@ -107,7 +118,7 @@
                   <th>INITIAL</th>
                   <th>SUFFIX</th>
                   <th>DATE OF BIRTH</th>
-                  <th>COURSE</th>
+                  <th>PROGRAM</th>
                   <th>GRADUATED</th>
                   <th>ACTIONS</th>
                 </tr>
@@ -137,7 +148,7 @@
   </div>
 
   <!-- Add Alumni Modal -->
-  <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <form id="formAdd" class="needs-validation" novalidate>
@@ -188,14 +199,6 @@
                   <option value="">Select Major</option>
                   <option value="BET">BET</option>
                   <option value="BTVTED">BTVTED</option>
-                  <option value="Electrician">Electrician</option>
-                  <option value="Mechanic">Mechanic</option>
-                  <option value="Education">Education</option>
-                  <option value="Software Developer">Software Developer</option>
-                  <option value="Network Engineer">Network Engineer</option>
-                  <option value="Telecommunications Engineer">Telecommunications Engineer</option>
-                  <option value="Electrical Engineer">Electrical Engineer</option>
-                  <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
                   <option value="Other">Other</option>
                 </select>
                 <div class="invalid-feedback">Required</div>
@@ -224,7 +227,7 @@
   </div>
 
   <!-- Confirm Delete Modal -->
-  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="confirmModal" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">
       <div class="modal-content text-center">
         <div class="modal-body">
@@ -293,83 +296,103 @@ document.addEventListener('DOMContentLoaded', () => {
   // Print table
   printBtn.addEventListener('click', ()=>window.print());
 
-  // Excel Drop & Input
-  excelDrop.addEventListener('click', () => excelInput.click());
-  excelInput.addEventListener('change', async (e) => handleExcel(e.target.files[0]));
+// ✅ Excel Drop & Input
+excelDrop.addEventListener('click', () => excelInput.click());
+excelInput.addEventListener('change', async (e) => handleExcel(e.target.files[0]));
 
-  excelDrop.addEventListener('dragover', (e)=>{e.preventDefault(); excelDrop.classList.add('dragover');});
-  excelDrop.addEventListener('dragleave', ()=>{excelDrop.classList.remove('dragover');});
-  excelDrop.addEventListener('drop', (e)=>{e.preventDefault(); excelDrop.classList.remove('dragover'); handleExcel(e.dataTransfer.files[0]);});
+excelDrop.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  excelDrop.classList.add('dragover');
+});
+excelDrop.addEventListener('dragleave', () => {
+  excelDrop.classList.remove('dragover');
+});
+excelDrop.addEventListener('drop', (e) => {
+  e.preventDefault();
+  excelDrop.classList.remove('dragover');
+  handleExcel(e.dataTransfer.files[0]);
+});
 
-  async function handleExcel(file){
-    if(!file) return;
-    if(!file.name.match(/\.(xlsx|xls)$/i)){ showToast('Not an Excel file', 'danger'); return; }
-    const formData = new FormData();
-    formData.append('file', file);
-    try{
-      const res = await fetch('/api/alumni/upload-excel',{method:'POST', body:formData});
-      const data = await res.json();
-      if(!res.ok) throw new Error(data.error || 'Upload failed');
-      showToast(`✅ Inserted ${data.inserted} rows!`, 'success');
-      loadTable();
-    }catch(err){ showToast('❌ ' + err.message,'danger'); }
+// ✅ Handle Excel Upload
+async function handleExcel(file) {
+  if (!file) return;
+  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+    showToast('Not an Excel file', 'danger');
+    return;
   }
 
-  // Form submission
-  const formAdd = document.getElementById('formAdd');
-  formAdd.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    if(!formAdd.checkValidity()) { formAdd.classList.add('was-validated'); return; }
+  const formData = new FormData();
+  formData.append('file', file);
 
-    const payload = {
-      firstName: document.getElementById('firstName').value.trim(),
-      lastName: document.getElementById('lastName').value.trim(),
-      initial: document.getElementById('initial').value.trim(),
-      suffix: document.getElementById('suffix').value,
-      dateBirth: document.getElementById('dateBirth').value,
-      major: majorSelect.value === 'Other' ? majorOther.value.trim() : majorSelect.value,
-      graduated: graduatedSelect.value
-    };
+  try {
+    const res = await fetch('/api/alumni/upload-excel', {
+      method: 'POST',
+      body: formData
+    });
 
-    try{
-      const res = await fetch('/api/alumni',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
-      const data = await res.json();
-      if(!res.ok) throw new Error(data.error || 'Failed to save');
-      showToast('✅ Saved successfully', 'success');
-      formAdd.reset(); formAdd.classList.remove('was-validated');
-      addModal.hide();
-      loadTable();
-    }catch(err){ showToast('❌ '+err.message,'danger'); }
-  });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
 
-  // Load table
-  async function loadTable(){
-    try{
-      const search = encodeURIComponent(searchInput.value.trim());
-      const res = await fetch(`/api/alumni?page=${currentPage}&limit=${ROWS_PER_PAGE}&search=${search}`);
-      const data = await res.json();
-      const rows = data.rows || data;
-      const totalPages = data.totalPages || 1;
-      tbody.innerHTML = '';
+    showToast(`✅ Inserted ${data.inserted} rows!`, 'success');
 
-      rows.forEach(r=>{
+    // Reset filters so new data shows
+    currentPage = 1;
+    searchInput.value = '';
+
+    // Show inserted rows immediately (if backend returns them)
+    if (data.insertedRows && data.insertedRows.length > 0) {
+      data.insertedRows.forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${r.firstName||''}</td>
-          <td>${r.lastName||''}</td>
-          <td>${r.initial||''}</td>
-          <td>${r.suffix||''}</td>
-          <td>${r.dateBirth||''}</td>
-          <td>${r.major||''}</td>
-          <td>${r.graduated||''}</td>
-          <td>
-            <button class="btn btn-sm btn-danger">Delete</button>
-          </td>
+          <td>${r.firstName || ''}</td>
+          <td>${r.lastName || ''}</td>
+          <td>${r.initial || ''}</td>
+          <td>${r.suffix || ''}</td>
+          <td>${r.dateBirth || ''}</td>
+          <td>${r.major || ''}</td>
+          <td>${r.graduated || ''}</td>
+          <td><button class="btn btn-sm btn-danger">Delete</button></td>
         `;
         const delBtn = tr.querySelector('button');
-        delBtn.addEventListener('click', ()=>confirmDelete(r.id));
-        tbody.appendChild(tr);
+        delBtn.addEventListener('click', () => confirmDelete(r.id));
+        tbody.prepend(tr); // show at top
       });
+    }
+
+    // ✅ Reload full table from DB to stay consistent
+    await loadTable();
+
+  } catch (err) {
+    showToast('❌ ' + err.message, 'danger');
+  }
+}
+
+// ✅ Load Alumni Table
+async function loadTable() {
+  try {
+    const search = encodeURIComponent(searchInput.value.trim());
+    const res = await fetch(`/api/alumni?page=${currentPage}&limit=${ROWS_PER_PAGE}&search=${search}`);
+    const data = await res.json();
+    const rows = data.rows || data;
+    const totalPages = data.totalPages || 1;
+    tbody.innerHTML = '';
+
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.firstName || ''}</td>
+        <td>${r.lastName || ''}</td>
+        <td>${r.initial || ''}</td>
+        <td>${r.suffix || ''}</td>
+        <td>${r.dateBirth || ''}</td>
+        <td>${r.major || ''}</td>
+        <td>${r.graduated || ''}</td>
+        <td><button class="btn btn-sm btn-danger">Delete</button></td>
+      `;
+      const delBtn = tr.querySelector('button');
+      delBtn.addEventListener('click', () => confirmDelete(r.id));
+      tbody.appendChild(tr);
+    });
 
       // Pagination
       pageSelect.innerHTML = '';
@@ -436,6 +459,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, 70);
   });
+
+  // --- Initialize everything on DOM load ---
+document.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('userRole') !== 'admin') {
+    alert("⛔ Access denied. Admins only!");
+    window.location.href = 'homepage.html';
+  }
+});
 </script>
 
 </body>

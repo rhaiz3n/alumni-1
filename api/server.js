@@ -669,14 +669,12 @@ app.get('/api/alumni', async (req, res) => {
 // 🧾 Submit career form (from user-homepage)
  // ✅ Import your broadcast function
 
-// ✅ Add new job response + emit + notify
-// Helper function for MySQL datetime format (add this at the top of server.js if not already there)
-
+// Add new job response + notify
 app.post('/api/responses/add', async (req, res) => {
-  const { careerId, firstName, lastName, interested, employmentStatus, inlineWork } = req.body;
+  const { userId, careerId, firstName, lastName, interested, employmentStatus, inlineWork } = req.body;
   
   // Validate required fields
-  if (!careerId || !firstName || !lastName || !interested || !employmentStatus) {
+  if (!userId || !careerId || !firstName || !lastName || !interested || !employmentStatus) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
   
@@ -686,25 +684,25 @@ app.post('/api/responses/add', async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // Insert into responses table
+    // ✅ Insert into responses table with userId
     const [insertResult] = await connection.execute(`
-      INSERT INTO responses (careerId, firstName, lastName, interested, employmentStatus, inlineWork, dateSubmitted)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [careerId, firstName, lastName, interested, employmentStatus, inlineWork || null, dateSubmitted]);
-
-    // Insert into notifications table
-    const message = `${firstName} ${lastName} submitted a job response.`;
-    const notifLink = 'jobs-response.html';
-
-    await connection.execute(`
       INSERT INTO responses (userId, careerId, firstName, lastName, interested, employmentStatus, inlineWork, dateSubmitted)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `, [userId, careerId, firstName, lastName, interested, employmentStatus, inlineWork || null, dateSubmitted]);
 
+    // ✅ Insert into notifications table
+    const message = `${firstName} ${lastName} submitted a job response.`;
+    const notifLink = 'jobs-response.html';
+
+    await connection.execute(`
+      INSERT INTO notifications (name, message, link, createdAt)
+      VALUES (?, ?, ?, ?)
+    `, ['Jobs Responses', message, notifLink, dateSubmitted]);
+
     await connection.commit();
     connection.release();
 
-    // Emit real-time notification
+    // ✅ Emit real-time notification
     io.emit('newNotification', {
       name: 'Jobs Responses',
       message,
@@ -721,23 +719,60 @@ app.post('/api/responses/add', async (req, res) => {
   }
 });
 
+
 app.get('/api/responses/check', async (req, res) => {
   const { userId, careerId } = req.query;
+  if (!userId || !careerId) {
+    return res.status(400).json({ error: 'Missing userId or careerId' });
+  }
 
   try {
     const [rows] = await pool.query(
-      'SELECT * FROM responses WHERE userId = ? AND careerId = ? LIMIT 1',
+      `SELECT interested, dateSubmitted 
+       FROM responses 
+       WHERE userId = ? AND careerId = ? 
+       ORDER BY dateSubmitted DESC 
+       LIMIT 1`,
       [userId, careerId]
     );
 
     if (rows.length > 0) {
-      res.json({ submitted: true, dateSubmitted: rows[0].dateSubmitted });
+      res.json({
+        submitted: true,
+        dateSubmitted: rows[0].dateSubmitted,
+        interested: rows[0].interested // Yes / No / Maybe
+      });
     } else {
       res.json({ submitted: false });
     }
   } catch (err) {
-    console.error("❌ Error in /api/responses/check:", err);
-    res.status(500).json({ error: 'Database query failed' });
+    console.error("❌ /api/responses/check error:", err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.get('/api/responses/checkFullSurvey', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT dateSubmitted 
+       FROM responses 
+       WHERE userId = ? 
+       ORDER BY dateSubmitted DESC
+       LIMIT 1`,
+      [userId]
+    );
+
+    if (rows.length > 0) {
+      res.json({ submittedAny: true, lastSubmittedDate: rows[0].dateSubmitted });
+    } else {
+      res.json({ submittedAny: false });
+    }
+  } catch (err) {
+    console.error('❌ /checkFullSurvey error:', err);
+    res.status(500).json({ error: 'Database error' });
   }
 });
 

@@ -50,42 +50,48 @@ router.post("/add", upload.single("resume"), async (req, res) => {
   try {
     const { firstName, lastName, phoneNo, email, careerId } = req.body;
 
-    if (!req.session.user) {
-      return res.status(401).json({ error: "Not logged in" });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ error: "Resume (PDF) is required" });
-    }
+    if (!req.session.user) return res.status(401).json({ error: "Not logged in" });
+    if (!req.file) return res.status(400).json({ error: "Resume (PDF) is required" });
 
     await conn.beginTransaction();
 
-    // ✅ Step 1: Insert into applications
+    // ✅ Fetch career info
+    const [careerRows] = await conn.execute(
+      "SELECT title AS careerTitle, userId AS companyName FROM careers WHERE id = ?",
+      [careerId]
+    );
+
+    if (!careerRows.length) throw new Error("Invalid careerId");
+
+    const { careerTitle, companyName } = careerRows[0];
+
+    // ✅ Insert into applications
     const [result] = await conn.execute(
-      `INSERT INTO applications 
-        (userName, firstName, lastName, phoneNo, email, resumePath, careerId)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO applications
+        (userName, firstName, lastName, phoneNo, email, resumePath, careerId, careerTitle, companyName)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req.session.user.userName,
         firstName,
         lastName,
         phoneNo,
         email,
-        req.file.filename,
-        parseInt(careerId, 10)
+        req.file.filename,  // or path depending on storage
+        parseInt(careerId, 10),
+        careerTitle,
+        companyName
       ]
     );
 
     const newAppId = result.insertId;
 
-    // ✅ Step 2: Copy into archive (explicit mapping)
-    // Step 2: Copy into archive (mirror)
+    // ✅ Copy into archive
     await conn.execute(
       `INSERT INTO applicant
         (originalAppId, userName, careerId, employerId, careerTitle, companyName,
          firstName, lastName, phoneNo, email, resumePath, dateSubmitted)
        SELECT 
-         a.id, a.userName, a.careerId, c.userId AS employerId, c.title AS careerTitle, c.link AS companyName,
+         a.id, a.userName, a.careerId, c.userId, c.title, c.link,
          a.firstName, a.lastName, a.phoneNo, a.email, a.resumePath, a.dateSubmitted
        FROM applications a
        JOIN careers c ON a.careerId = c.id
@@ -93,17 +99,17 @@ router.post("/add", upload.single("resume"), async (req, res) => {
       [newAppId]
     );
 
-
     await conn.commit();
     res.json({ success: true, applicationId: newAppId });
   } catch (err) {
     await conn.rollback();
     console.error("❌ Application insert error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: err.message });
   } finally {
     conn.release();
   }
 });
+
 
 
 

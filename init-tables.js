@@ -23,7 +23,8 @@ async function initTables() {
     )`,
     responses: `CREATE TABLE IF NOT EXISTS responses (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      careerId INT, -- ✅ added
+      userId INT NOT NULL,          -- 👈 Added
+      careerId INT,                 -- 👈 Already there
       firstName VARCHAR(100),
       lastName VARCHAR(100),
       interested VARCHAR(100),

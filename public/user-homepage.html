@@ -100,11 +100,17 @@
               </div>
             </div>
             <hr>
-            <nav class="nav flex-column">
-              <a class="sidebar-link" href="user-homepage.html"><i class="bi bi-house"></i> Home</a>
-              <a class="sidebar-link" href="#" id="openApplicationsFromSidebar"><i class="bi bi-journal-text"></i> My Applications</a>
-              <a class="sidebar-link" href="#" id="openIdRequestFromSidebar"><i class="bi bi-credit-card"></i> ID Request</a>
-              <a class="sidebar-link" href="gallery-user.html?from=user-homepage.html"><i class="bi bi-image"></i> Gallery</a>
+              <nav class="nav flex-column">
+                <a class="sidebar-link" href="user-homepage.html"><i class="bi bi-house"></i> Home</a>
+                <a class="sidebar-link" href="#" id="openApplicationsFromSidebar"><i class="bi bi-journal-text"></i> My Applications</a>
+                <a class="sidebar-link" href="#" id="openIdRequestFromSidebar"><i class="bi bi-credit-card"></i> ID Request</a>
+                <a class="sidebar-link" href="gallery-user.html?from=user-homepage.html"><i class="bi bi-image"></i> Gallery</a>
+
+                <!-- Countdown goes here -->
+                <div id="surveyCountdownBox" class="mt-3 p-2 text-center small text-muted border rounded" style="display:none;">
+                  ⏳ Survey available in <span id="surveyCountdown"></span>
+                </div>
+              </nav>
             </nav>
           </div>
         </div>
@@ -149,12 +155,11 @@
   <!-- ===== Bootstrap Modals (converted) ===== -->
 
   <!-- PROFILE MODAL -->
-  <div class="modal fade" id="modalProfile" tabindex="-1" aria-labelledby="modalProfileLabel" aria-hidden="true">
+  <div class="modal fade" id="modalProfile" tabindex="-1" aria-labelledby="modalProfileLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Profile</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="d-flex gap-3">
@@ -202,7 +207,7 @@
   </div>
 
   <!-- APPLICATIONS MODAL -->
-  <div class="modal fade" id="applicationsModalBS" tabindex="-1" aria-labelledby="applicationsModalLabel" aria-hidden="true">
+  <div class="modal fade" id="applicationsModalBS" tabindex="-1" aria-labelledby="applicationsModalLabel">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
@@ -224,7 +229,7 @@
   </div>
 
   <!-- ID REQUEST MODAL -->
-  <div class="modal fade" id="idRequestModalBS" tabindex="-1" aria-labelledby="idRequestModalLabel" aria-hidden="true">
+  <div class="modal fade" id="idRequestModalBS" tabindex="-1" aria-labelledby="idRequestModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <form id="idRequestForm" enctype="multipart/form-data">
@@ -274,7 +279,7 @@
   </div>
 
   <!-- MENS BASKETBALL MODAL -->
-  <div class="modal fade" id="mensBasketballModalBS" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="mensBasketballModalBS" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
         <form id="mensBasketballForm" class="modal-body p-4">
@@ -312,7 +317,7 @@
   </div>
 
   <!-- HOMECOMING MODAL -->
-  <div class="modal fade" id="homecomingModalBS" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="homecomingModalBS" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
         <form id="homecomingForm" class="modal-body p-4" enctype="multipart/form-data">
@@ -379,7 +384,7 @@
   </div>
 
   <!-- GCASH Modal -->
-  <div class="modal fade" id="gcashModalBS" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="gcashModalBS" tabindex="-1">
     <div class="modal-dialog modal-md modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header"><h5 class="modal-title">GCash Payment</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
@@ -388,23 +393,61 @@
     </div>
   </div>
 
-  <!-- CAREER SURVEY Modal -->
-  <div class="modal fade" id="careerSurveyModalBS" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-scrollable">
-      <div class="modal-content">
-        <form id="careerSurveyForm" class="modal-body p-4">
-          <div class="modal-header"><h5 class="modal-title">Career Survey</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-          <div id="surveyQuestions"></div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Submit Survey</button>
+  
+<!-- CAREER SURVEY Modal -->
+<div class="modal fade" id="careerSurveyModalBS" tabindex="-1">
+  <div class="modal-dialog modal-md modal-dialog-scrollable">
+    <div class="modal-content">
+      <form id="careerSurveyForm" class="modal-body p-4">
+        <div class="modal-header">
+          <h5 class="modal-title">Career Survey</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div id="surveyQuestions">
+          <!-- ✅ Survey Fields -->
+          <div class="mb-3">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" id="firstName" name="firstName" class="form-control" required>
           </div>
-        </form>
-      </div>
+
+          <div class="mb-3">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" id="lastName" name="lastName" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="interested" class="form-label">Field of Interest</label>
+            <input type="text" id="interested" name="interested" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="employmentStatus" class="form-label">Employment Status</label>
+            <select id="employmentStatus" name="employmentStatus" class="form-select" required>
+              <option value="">-- Select Status --</option>
+              <option value="Employed">Employed</option>
+              <option value="Unemployed">Unemployed</option>
+              <option value="Student">Student</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="inlineWork" class="form-label">Inline Work</label>
+            <input type="text" id="inlineWork" name="inlineWork" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Submit Survey</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+
 
   <!-- EMPLOYMENT APPLICATION Modal -->
-  <div class="modal fade" id="employmentFormModalBS" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="employmentFormModalBS" tabindex="-1">
     <div class="modal-dialog modal-md modal-dialog-scrollable">
       <div class="modal-content">
         <form id="employmentForm" class="modal-body p-4" enctype="multipart/form-data">
@@ -442,7 +485,7 @@
   </div>
 
   <!-- SPORTFEST Modal -->
-  <div class="modal fade" id="sportfestModalBS" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="sportfestModalBS" tabindex="-1">
     <div class="modal-dialog modal-md modal-dialog-scrollable">
       <div class="modal-content">
         <form id="sportfestForm" class="modal-body p-4">
@@ -478,6 +521,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- Notification / survey box (top-right) -->
   <div id="surveyNotification" class="survey-notification" style="display:none;position:fixed;right:20px;bottom:20px;z-index:2000;">
@@ -536,52 +580,62 @@
   // ------------------------------
   // Unified Toast Helper
   // ------------------------------
-  function getToastContainer() {
-    let container = document.getElementById("toast-container");
+// Utility to show notifications
+function getNotificationContainer() {
+    let container = document.getElementById('notification-container');
     if (!container) {
-      container = document.createElement("div");
-      container.id = "toast-container";
-      container.style.position = "fixed";
-      container.style.top = "80px";
-      container.style.right = "20px";
-      container.style.zIndex = "2000";
-      container.style.display = "flex";
-      container.style.flexDirection = "column";
-      container.style.gap = "8px";
-      document.body.appendChild(container);
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.style.position = 'fixed';
+        container.style.top = '20px';
+        container.style.right = '20px';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.gap = '10px';
+        container.style.zIndex = '2000';
+        document.body.appendChild(container);
     }
     return container;
-  }
+}
 
-  function showToast(message, type = "info", duration = 4000) {
-    const container = getToastContainer();
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    
-    // Apply inline styles for fade effect
-    toast.style.transition = "opacity 0.5s, transform 0.5s";
-    toast.style.opacity = "1";
-    toast.style.transform = "translateX(0)";
-    toast.style.padding = "10px 15px";
-    toast.style.borderRadius = "8px";
-    toast.style.color = "#fff";
-    toast.style.backgroundColor = {
-      success: "#28a745",
-      error: "#dc3545",
-      warning: "#ffc107",
-      info: "#17a2b8"
-    }[type] || "#17a2b8";
-    toast.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
-    
-    container.appendChild(toast);
-    
+function showNotification(message, type = 'success', duration = 4000) {
+    const container = getNotificationContainer();
+
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.padding = '10px 20px';
+    notification.style.borderRadius = '6px';
+    notification.style.color = '#fff';
+    notification.style.minWidth = '200px';
+    notification.style.boxShadow = '0 4px 10px rgba(0,0,0,0.15)';
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(100%)';
+    notification.style.transition = 'all 0.5s ease';
+
+    // Set background color based on type
+    switch (type) {
+        case 'success': notification.style.backgroundColor = '#28a745'; break;
+        case 'error': notification.style.backgroundColor = '#dc3545'; break;
+        case 'warning': notification.style.backgroundColor = '#ffc107'; notification.style.color = '#000'; break;
+        case 'info': notification.style.backgroundColor = '#0dcaf0'; break;
+        default: notification.style.backgroundColor = '#333';
+    }
+
+    container.appendChild(notification);
+
+    // Animate in
+    requestAnimationFrame(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    });
+
+    // Remove after duration
     setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.transform = "translateX(20px)";
-      setTimeout(() => toast.remove(), 500);
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        notification.addEventListener('transitionend', () => notification.remove());
     }, duration);
-  }
+}
 
   // ------------------------------
   // DOM Ready consolidated
@@ -643,65 +697,117 @@
       window.location.href = '/homepage.html' // adjust per your backend
     });
 
-    // profile edit/save
-    document.getElementById('editBtn')?.addEventListener('click', enableEdit);
-    document.getElementById('saveBtn')?.addEventListener('click', saveProfile);
+// profile edit/save
+document.getElementById('editBtn')?.addEventListener('click', enableEdit);
+document.getElementById('saveBtn')?.addEventListener('click', saveProfile);
 
-    // profile confirm
-    document.getElementById('confirmProfileBtn')?.addEventListener('click', async () => {
-      try {
-        const res = await fetch("/api/fullInformation/confirm", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" } });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showToast('✅ Profile confirmed', 'success');
-          document.getElementById('profileNotice').style.display = 'none';
-          document.getElementById('confirmProfileBtn').style.display = 'none';
-          const modalEl = document.getElementById('modalProfile');
-          const modalObj = bootstrap.Modal.getInstance(modalEl);
-          modalObj?.hide();
-        } else {
-          alert(data.error || 'Please upload a profile picture first.');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Server error while confirming profile.');
-      }
+// profile confirm
+document.getElementById('confirmProfileBtn')?.addEventListener('click', async () => {
+  try {
+    const res = await fetch("/api/fullInformation/confirm", { 
+      method: "POST", 
+      credentials: "include", 
+      headers: { "Content-Type": "application/json" } 
     });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showNotification('✅ Profile confirmed', 'success');
+      document.getElementById('profileNotice').style.display = 'none';
+      document.getElementById('confirmProfileBtn').style.display = 'none';
 
-    // hook upload show confirm
-    hookUploadShowConfirm();
+      const modalEl = document.getElementById("modalProfile");
+      let modalObj = bootstrap.Modal.getInstance(modalEl);
 
-    // Attach file upload handler
-    document.getElementById('uploadProfilePic')?.addEventListener('change', async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const url = e.target.result;
-        document.getElementById('modalProfilePic').src = url;
-        document.getElementById('profilePic').src = url;
-        document.getElementById('profilePicSmall').src = url;
-      };
-      reader.readAsDataURL(file);
-
-      const formData = new FormData();
-      formData.append('profilePic', file);
-      try {
-        const res = await fetch('/api/fullInformation/upload-picture', { method: 'POST', body: formData, credentials: 'include' });
-        const data = await res.json();
-        if (data.success && data.imageUrl) {
-          document.getElementById('modalProfilePic').src = data.imageUrl;
-          document.getElementById('profilePic').src = data.imageUrl;
-          document.getElementById('profilePicSmall').src = data.imageUrl;
-          showToast('✅ Profile picture updated!', 'success');
-        } else {
-          showToast('❌ Upload failed', 'error');
-        }
-      } catch (err) {
-        console.error(err);
-        showToast('❌ Server error while uploading', 'error');
+      // If no instance exists, create one
+      if (!modalObj) {
+        modalObj = new bootstrap.Modal(modalEl);
       }
+
+      modalObj.hide();
+
+      // 🔥 Also remove any leftover backdrops (just in case)
+      document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
+    } else {
+      alert(data.error || 'Please upload a profile picture first.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Server error while confirming profile.');
+  }
+});
+
+// Attach file upload handler
+document.getElementById('uploadProfilePic')?.addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const url = e.target.result;
+    document.getElementById('modalProfilePic').src = url;
+    document.getElementById('profilePic').src = url;
+    document.getElementById('profilePicSmall').src = url;
+  };
+  reader.readAsDataURL(file);
+
+  const formData = new FormData();
+  formData.append('profilePic', file);
+
+  try {
+    const res = await fetch('/api/fullInformation/upload-picture', { 
+      method: 'POST', 
+      body: formData, 
+      credentials: 'include' 
     });
+    const data = await res.json();
+
+    if (data.success && data.imageUrl) {
+      // ✅ Update UI
+      document.getElementById('modalProfilePic').src = data.imageUrl;
+      document.getElementById('profilePic').src = data.imageUrl;
+      document.getElementById('profilePicSmall').src = data.imageUrl;
+
+      // ✅ Save new profile pic in localStorage
+      let user = JSON.parse(localStorage.getItem("user") || "{}");
+      user.profilePic = data.imageUrl;
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // ✅ Unlock modal closing
+      const profileModalEl = document.getElementById("modalProfile");
+      profileModalEl.removeAttribute("data-bs-backdrop");
+      profileModalEl.removeAttribute("data-bs-keyboard");
+      profileModalEl.querySelector(".btn-close")?.classList.remove("d-none");
+
+      const modalInstance = bootstrap.Modal.getInstance(profileModalEl);
+      if (modalInstance) {
+        modalInstance._config.backdrop = true;
+        modalInstance._config.keyboard = true;
+      }
+
+      // Hide warning
+      document.getElementById("profileNotice").style.display = "none";
+
+      showNotification('✅ Profile picture updated! You can now close this modal.', 'success');
+    } else {
+      showNotification('❌ Upload failed', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showNotification('❌ Server error while uploading', 'error');
+  }
+});
+
+// 🔒 Safeguard: Prevent closing if still default pic
+document.getElementById("modalProfile").addEventListener("hide.bs.modal", (event) => {
+  const pic = document.getElementById("modalProfilePic").src;
+  if (pic.includes("default-profile.png")) {
+    event.preventDefault();
+    const notice = document.getElementById("profileNotice");
+    notice.style.display = "block";
+    notice.textContent = "⚠️ Please upload a profile picture before closing.";
+  }
+});
+
 
     // Applications open handler
     document.getElementById('openApplicationsFromSidebar')?.addEventListener('click', e => { e.preventDefault(); openApplicationsModal(); });
@@ -906,7 +1012,7 @@ const membersContainer = document.getElementById('membersContainer');
 
 // Toast helper for warnings
 function showRegistrationWarning(message) {
-  showToast(`⚠️ ${message}`, 'warning');
+  showNotification(`⚠️ ${message}`, 'warning');
 }
 
 // Add member function (exposed globally)
@@ -931,7 +1037,7 @@ window.addMember = function() {
       toastContainer.style.gap = "8px";
       document.body.appendChild(toastContainer);
     }
-    showToast(`⚠️ Maximum 20 members allowed. Currently added: ${currentCount}`, 'warning');
+    showNotification(`⚠️ Maximum 20 members allowed. Currently added: ${currentCount}`, 'warning');
     return;
   }
 
@@ -945,7 +1051,7 @@ window.addMember = function() {
   container.appendChild(div);
 
   const newCount = container.querySelectorAll("input[name='firstName[]']").length;
-  showToast(`Members added: ${newCount}`, 'info');
+  showNotification(`Members added: ${newCount}`, 'info');
 };
 
 
@@ -994,7 +1100,7 @@ mbForm?.addEventListener('submit', async (e) => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to register');
 
-    showToast(`✅ Team registered successfully! Players: ${data.playerCount || players.length}`, 'success');
+    showNotification(`✅ Team registered successfully! Players: ${data.playerCount || players.length}`, 'success');
 
     // Close modal, reset form, clear members
     bootstrap.Modal.getInstance(document.getElementById('mensBasketballModalBS'))?.hide();
@@ -1008,80 +1114,143 @@ mbForm?.addEventListener('submit', async (e) => {
     `;
   } catch (err) {
     console.error(err);
-    showToast('❌ Error: ' + (err.message || err), 'error');
+    showNotification('❌ Error: ' + (err.message || err), 'error');
   }
 });
 
 
-  // ------------------------------
-  // CAREER SURVEY & EMPLOYMENT FORM
-  // ------------------------------
-  window.openCareerSurvey = function(career) {
-    window.currentCareer = career;
-    const modalEl = document.getElementById('careerSurveyModalBS');
-    const container = document.getElementById('surveyQuestions');
-    container.innerHTML = `
-      <div class="mb-2"><label class="form-label">First Name</label><input class="form-control" name="firstName" maxlength="20" required oninput="validateNameC(this)"></div>
-      <div class="mb-2"><label class="form-label">Last Name</label><input class="form-control" name="lastName" maxlength="20" required oninput="validateNameC(this)"></div>
-      <div class="mb-2"><label class="form-label">Are you interested?</label><select class="form-select" name="interested" required><option value="">-- Select --</option><option value="YES">YES</option><option value="NO">NO</option></select></div>
-      <div class="mb-2"><label class="form-label">Current employment status</label><select class="form-select" name="employmentStatus" required><option value="">-- Select --</option><option value="EMPLOYED">EMPLOYED</option><option value="UNEMPLOYED">UNEMPLOYED</option><option value="UNDEREMPLOYED">UNDEREMPLOYED</option></select></div>
-      <div class="mb-2"><label class="form-label">If employed, is your work inline with this career?</label><select class="form-select" name="inlineWork"><option value="">-- Select --</option><option value="YES">YES</option><option value="NO">NO</option><option value="MAYBE">MAYBE</option></select></div>`;
-    new bootstrap.Modal(modalEl).show();
+// ------------------------------
+// CAREER SURVEY & EMPLOYMENT FORM
+// ------------------------------
+document.getElementById('careerSurveyForm')?.addEventListener('submit', async function(ev) {
+  ev.preventDefault();
 
-    const surveyForm = document.getElementById('careerSurveyForm');
-    surveyForm.onsubmit = async function(ev) {
-      ev.preventDefault();
-      const formData = new FormData(surveyForm);
-      const payload = {
-        careerId: career.id,
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        interested: formData.get('interested'),
-        employmentStatus: formData.get('employmentStatus'),
-        inlineWork: formData.get('inlineWork') || null
-      };
-      try {
-        const res = await fetch('/api/responses/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to save survey');
-        bootstrap.Modal.getInstance(document.getElementById('careerSurveyModalBS')).hide();
-        if (payload.interested === 'NO') {
-          showSurveyNotification('❌ You are not interested. Career description will not be shown.', 'error');
-        } else {
-          document.getElementById('employmentFormModalBS') && new bootstrap.Modal(document.getElementById('employmentFormModalBS')).show();
-          document.getElementById('employmentCareerId').value = career.id || '';
-        }
-      } catch (err) {
-        console.error(err);
-        showSurveyNotification('❌ Failed to save your survey. Please try again.', 'error');
-      }
-    };
+  const form = ev.target;
+  const fd = new FormData(form);
+
+  // ✅ Build payload safely from form fields
+  const payload = {
+    userId: sessionStorage.getItem('userId'),
+    careerId: window.currentCareer?.id || '',
+    firstName: fd.get('firstName'),
+    lastName: fd.get('lastName'),
+    interested: fd.get('interested'),
+    employmentStatus: fd.get('employmentStatus'),
+    inlineWork: fd.get('inlineWork')
   };
 
-  // Employment form submit
-  document.getElementById('employmentForm')?.addEventListener('submit', async function(ev) {
-    ev.preventDefault();
-    const form = ev.target;
-    const fd = new FormData(form);
-    fd.set('careerId', window.currentCareer?.id || '');
-    try {
-      const res = await fetch('/api/applications/add', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit application');
-      showSurveyNotification('✅ Employment Application Submitted Successfully!', 'success');
-      bootstrap.Modal.getInstance(document.getElementById('employmentFormModalBS')).hide();
-    } catch (err) {
-      console.error(err);
-      showSurveyNotification('❌ Failed to submit application. Please try again.', 'error');
+  try {
+    const res = await fetch('/api/responses/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to submit survey');
+
+    showNotification('✅ Career survey submitted successfully!', 'success');
+
+    // Hide Career Survey modal
+    const modalEl = document.getElementById('careerSurveyModalBS');
+    bootstrap.Modal.getInstance(modalEl)?.hide();
+
+    // Show Employment Form modal immediately
+    const empModalEl = document.getElementById('employmentFormModalBS');
+    new bootstrap.Modal(empModalEl, { backdrop: 'static', keyboard: false }).show();
+
+  } catch (err) {
+    console.error(err);
+    showNotification('❌ Failed to submit survey. Please try again.', 'error');
+  }
+});
+
+
+
+
+// Employment form submit
+document.getElementById('employmentForm')?.addEventListener('submit', async function(ev) {
+  ev.preventDefault();
+  const form = ev.target;
+  const fd = new FormData(form);
+  fd.set('careerId', window.currentCareer?.id || '');
+
+  try {
+    const res = await fetch('/api/applications/add', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to submit application');
+
+    showNotification('✅ Employment application submitted successfully!', 'success');
+
+    // Hide modal properly
+    const modalEl = document.getElementById('employmentFormModalBS');
+    const employmentModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    employmentModal.hide();
+
+  } catch (err) {
+    console.error(err);
+    showNotification('❌ Failed to submit application. Please try again.', 'error');
+  }
+});
+
+
+// ✅ Make it global so feed can call it
+window.openCareerSurvey = async function(career) {
+    const userId = sessionStorage.getItem('userId');
+    const careerId = career.id;
+
+    if (!userId || !careerId) {
+        console.log('Survey check skipped: missing userId or careerId');
+        return;
     }
-  });
+
+    try {
+        const res = await fetch(`/api/responses/check?userId=${userId}&careerId=${careerId}`);
+        const data = await res.json();
+
+        const now = new Date();
+        let showSurvey = true;
+
+        if (data.submitted && data.dateSubmitted) {
+            const submittedDate = new Date(data.dateSubmitted);
+            const diffDays = Math.floor((now - submittedDate) / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 5) {
+                showSurvey = false; // ✅ show only employment form
+                startSurveyCountdown(data.dateSubmitted);
+            } else {
+                startSurveyCountdown(null);
+            }
+        } else {
+            startSurveyCountdown(null);
+        }
+
+        if (showSurvey) {
+            // ✅ Show Career Survey modal
+            const modalEl = document.getElementById('careerSurveyModalBS');
+            const container = document.getElementById('surveyQuestions');
+            container.innerHTML = `...`; // survey form HTML
+
+            const surveyModal = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+            surveyModal.show();
+        } else {
+            // ✅ Show Employment Form modal
+            const modalEl = document.getElementById('employmentFormModalBS');
+            const employmentModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            employmentModal.show();
+        }
+    } catch (err) {
+        console.error("❌ Failed to load survey status:", err);
+        startSurveyCountdown(null);
+    }
+};
 
   // ------------------------------
   // HOMECOMING form submit
   // ------------------------------
   let gcashEnabled = localStorage.getItem('gcashEnabled') !== 'false';
   function openGcashModal() {
-    if (!gcashEnabled) { showToast('❌ GCash payment option is currently disabled by admin.', 'error'); return; }
+    if (!gcashEnabled) { showNotification('❌ GCash payment option is currently disabled by admin.', 'error'); return; }
     const img = localStorage.getItem('gcashImage');
     const container = document.getElementById('modalImageContainer');
     container.innerHTML = img ? `<img src="${img}" alt="GCash" style="max-width:100%;"/>` : 'No GCash image uploaded yet.';
@@ -1092,18 +1261,18 @@ mbForm?.addEventListener('submit', async (e) => {
     ev.preventDefault();
     const fd = new FormData(ev.target);
     const addon = fd.get('addon');
-    if ((addon === '100' || addon === '500') && !gcashEnabled) { showToast('❌ Registration blocked: GCash payment disabled.', 'error'); return; }
-    if ((addon === '100' || addon === '500') && !fd.get('receipt')?.name) { showToast('❌ Receipt is required for selected add-on', 'error'); return; }
+    if ((addon === '100' || addon === '500') && !gcashEnabled) { showNotification('❌ Registration blocked: GCash payment disabled.', 'error'); return; }
+    if ((addon === '100' || addon === '500') && !fd.get('receipt')?.name) { showNotification('❌ Receipt is required for selected add-on', 'error'); return; }
     try {
       const res = await fetch('/api/homeregs', { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Server error');
-      showToast('🎉 Registration successful!', 'success');
+      showNotification('🎉 Registration successful!', 'success');
       bootstrap.Modal.getInstance(document.getElementById('homecomingModalBS')).hide();
       ev.target.reset();
     } catch (err) {
       console.error(err);
-      showToast('❌ ' + (err.message || err), 'error');
+      showNotification('❌ ' + (err.message || err), 'error');
     }
   });
 
@@ -1123,18 +1292,18 @@ mbForm?.addEventListener('submit', async (e) => {
       sportType: data.get('sportType')?.trim() || ''
     };
     if (!payload.firstName || !payload.lastName || !payload.gender || !payload.sportType) {
-      return showToast('❌ Please complete all required fields.', 'error');
+      return showNotification('❌ Please complete all required fields.', 'error');
     }
     try {
       const res = await fetch('/api/allsport/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Server error');
-      showToast('🎉 Sportfest registration successful!', 'success');
+      showNotification('🎉 Sportfest registration successful!', 'success');
       bootstrap.Modal.getInstance(document.getElementById('sportfestModalBS')).hide();
       ev.target.reset();
     } catch (err) {
       console.error(err);
-      showToast('❌ Error: ' + (err.message || err), 'error');
+      showNotification('❌ Error: ' + (err.message || err), 'error');
     }
   });
 
@@ -1148,12 +1317,12 @@ mbForm?.addEventListener('submit', async (e) => {
       const res = await fetch('/api/requests/add', { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Unknown error');
-      showToast('✅ Submission Successful!', 'success');
+      showNotification('✅ Submission Successful!', 'success');
       bootstrap.Modal.getInstance(document.getElementById('idRequestModalBS')).hide();
       form.reset();
     } catch (err) {
       console.error(err);
-      showToast('❌ Submission failed: ' + (err.message || err), 'error');
+      showNotification('❌ Submission failed: ' + (err.message || err), 'error');
     }
   }
 
@@ -1205,7 +1374,7 @@ mbForm?.addEventListener('submit', async (e) => {
       const res = await fetch('/api/fullInformation/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(updatedData) });
       const data = await res.json();
       if (data.success) {
-        showToast('✅ Profile updated!', 'success');
+        showNotification('✅ Profile updated!', 'success');
         document.getElementById('personalEmail').textContent = updatedData.personalEmail;
         document.getElementById('phoneNo').textContent = updatedData.phoneNo;
         document.getElementById('personalEmail').style.display = 'inline';
@@ -1215,11 +1384,11 @@ mbForm?.addEventListener('submit', async (e) => {
         document.getElementById('editBtn').style.display = 'inline-block';
         document.getElementById('saveBtn').style.display = 'none';
       } else {
-        showToast('❌ Error: ' + (data.error || 'unknown'), 'error');
+        showNotification('❌ Error: ' + (data.error || 'unknown'), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Server error while updating', 'error');
+      showNotification('Server error while updating', 'error');
     }
   }
 
@@ -1374,6 +1543,89 @@ mbForm?.addEventListener('submit', async (e) => {
   window.openCareerPopup = () => new bootstrap.Modal(document.getElementById('careerSurveyModalBS')).show();
 
   // End of module
+
+function startSurveyCountdown(lastSubmittedDate) {
+  const box = document.getElementById('surveyCountdownBox');
+  const countdownEl = document.getElementById('surveyCountdown');
+
+  if (!lastSubmittedDate) {
+    // No cooldown → hide
+    box.style.display = 'none';
+    return;
+  }
+
+  const submittedDate = new Date(lastSubmittedDate);
+  const cooldownEnd = new Date(submittedDate.getTime() + 5 * 24 * 60 * 60 * 1000);
+
+  function updateCountdown() {
+    const now = new Date();
+    const diff = cooldownEnd - now;
+
+    if (diff <= 0) {
+      box.style.display = 'none'; // Cooldown over → hide
+      clearInterval(timer);
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    box.style.display = 'block';
+  }
+
+  updateCountdown(); // Run immediately
+  const timer = setInterval(updateCountdown, 1000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  function startSurveyCountdown(lastSubmittedDate) {
+    const box = document.getElementById('surveyCountdownBox');
+    const countdownEl = document.getElementById('surveyCountdown');
+
+    if (!box || !countdownEl) {
+      console.warn("Countdown elements not found in DOM");
+      return;
+    }
+
+    if (!lastSubmittedDate) {
+      box.style.display = 'none';
+      return;
+    }
+
+    const submittedDate = new Date(lastSubmittedDate);
+    const cooldownEnd = new Date(submittedDate.getTime() + 5 * 24 * 60 * 60 * 1000);
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = cooldownEnd - now;
+
+      if (diff <= 0) {
+        box.style.display = 'none';
+        clearInterval(timer);
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      box.style.display = 'block';
+    }
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+  }
+
+  // 🔥 Test call: force it with a fake submitted date (yesterday)
+  startSurveyCountdown(new Date(Date.now() - 24 * 60 * 60 * 1000));
+});
+
+
   </script>
 </body>
 </html>

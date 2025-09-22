@@ -44,7 +44,6 @@
       z-index: 1050;
     }
     .topbar .navbar-brand { display:flex; align-items:center; gap:.6rem; }
-    .topbar .search-input { max-width:640px; width: 100%; border-radius:999px; }
     .topbar .btn-outline-light { border-color: rgba(255,255,255,0.2); color:white; }
     .topbar .btn-outline-light:hover { background: rgba(255,255,255,0.06); }
 
@@ -85,7 +84,6 @@
       .app-container { padding: 0 12px; }
       .left-column { display:none; }
       .right-column { display:none; }
-      .topbar .search-input { max-width: 380px; }
     }
   </style>
 </head>
@@ -104,18 +102,17 @@
   </div>
 
   <!-- Topbar -->
-  <nav class="navbar topbar">
+  <nav class="navbar topbar"
+    style="background: linear-gradient(175deg, #882323 55%, #000000 60%);">
     <div class="container">
       <a class="navbar-brand text-white" href="homepage.html">
         <img src="Logo2.png" alt="Logo" style="height:34px; border-radius:6px;">
         <span style="font-weight:600;">TUPC — Cavite Alumni</span>
       </a>
 
-      <div class="d-flex align-items-center mx-auto" style="flex:1; max-width:760px;">
-        <div class="input-group search-input">
-          <input class="form-control rounded-pill" placeholder="Search alumni, events, careers..." aria-label="search">
-        </div>
-      </div>
+      <form class="d-flex ms-auto me-3" role="search">
+        <input id="feedSearch" class="form-control form-control-sm" type="search" placeholder="🔍 Search events or careers..." oninput="filterFeed()">
+      </form>
 
       <div class="d-flex align-items-center ms-3 gap-2">
         <button class="btn btn-outline-light btn-sm" id="open-login-modal">Log In</button>
@@ -774,7 +771,7 @@
             </div>
 
             <div class="feed-meta">
-              <div><i class="fa-solid fa-location-dot"></i>&nbsp; ${post.location || 'N/A'}</div>
+              <div><i>🎉</i>&nbsp; ${post.location || 'N/A'}</div>
               <div>⏳ <span class="countdown" data-time="${deadlineMs}" id="count-${idx}"></span></div>
               <div><span class="badge-status ${badgeClass}">${status}</span></div>
             </div>
@@ -863,6 +860,16 @@
     loadAnnouncements();
     loadFeed();
   });
+
+    function filterFeed() {
+    const query = document.getElementById('feedSearch').value.toLowerCase();
+    document.querySelectorAll('.feed-card').forEach(card => {
+      const text = card.innerText.toLowerCase();
+      card.style.display = text.includes(query) ? 'block' : 'none';
+    });
+  }
+  window.filterFeed = filterFeed;
+  
   </script>
 </body>
 </html>

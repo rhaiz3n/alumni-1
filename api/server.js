@@ -109,7 +109,8 @@ async function initTables() {
     )`,
     responses: `CREATE TABLE IF NOT EXISTS responses (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      careerId INT, -- ✅ added
+      userId INT NOT NULL,          -- 👈 Added
+      careerId INT,                 -- 👈 Already there
       firstName VARCHAR(100),
       lastName VARCHAR(100),
       interested VARCHAR(100),
@@ -696,9 +697,9 @@ app.post('/api/responses/add', async (req, res) => {
     const notifLink = 'jobs-response.html';
 
     await connection.execute(`
-      INSERT INTO notifications (name, message, link, createdAt)
-      VALUES (?, ?, ?, ?)
-    `, ['Jobs Responses', message, notifLink, dateSubmitted]);
+      INSERT INTO responses (userId, careerId, firstName, lastName, interested, employmentStatus, inlineWork, dateSubmitted)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [userId, careerId, firstName, lastName, interested, employmentStatus, inlineWork || null, dateSubmitted]);
 
     await connection.commit();
     connection.release();
@@ -720,6 +721,25 @@ app.post('/api/responses/add', async (req, res) => {
   }
 });
 
+app.get('/api/responses/check', async (req, res) => {
+  const { userId, careerId } = req.query;
+
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM responses WHERE userId = ? AND careerId = ? LIMIT 1',
+      [userId, careerId]
+    );
+
+    if (rows.length > 0) {
+      res.json({ submitted: true, dateSubmitted: rows[0].dateSubmitted });
+    } else {
+      res.json({ submitted: false });
+    }
+  } catch (err) {
+    console.error("❌ Error in /api/responses/check:", err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
 
 // 📄 GET paginated + searchable job responses
 app.get('/api/responses', async (req, res) => {

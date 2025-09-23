@@ -738,50 +738,49 @@
       // Keep ordering by posted date desc
       const items = (events || []).sort((a,b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-      feedContainer.innerHTML = items.map((post, idx) => {
-        const imgSrc = '/api/events/image/' + (post.id || '');
-        let raw = post.eventDateTime || post.datePosted || '';
-        if (raw && raw.endsWith && raw.endsWith('Z')) raw = raw.replace('Z','');
-        const deadline = parseFlexibleDateTime(raw);
-        const deadlineMs = deadline ? deadline.getTime() : '';
+feedContainer.innerHTML = items.map((post, idx) => {
+  const imgSrc = post.image || '';
+  let raw = post.eventDateTime || post.datePosted || '';
+  if (raw && raw.endsWith && raw.endsWith('Z')) raw = raw.replace('Z','');
+  const deadline = parseFlexibleDateTime(raw);
+  const deadlineMs = deadline ? deadline.getTime() : '';
 
-        // Status logic
-        const now = Date.now();
-        let status = '';
-        let badgeClass = '';
-        if (deadline && deadlineMs <= now) {
-          status = 'CLOSE';
-          badgeClass = 'badge-closed';
-        } else {
-          status = 'ACTIVE';
-          badgeClass = 'badge-open';
-        }
+  // Status logic
+  const now = Date.now();
+  let status = '';
+  let badgeClass = '';
+  if (deadline && deadlineMs <= now) {
+    status = 'CLOSE';
+    badgeClass = 'badge-closed';
+  } else {
+    status = 'ACTIVE';
+    badgeClass = 'badge-open';
+  }
 
-        
-        return `
-          <article class="feed-card">
-            <div class="feed-header">
-              <img src="Logo2.png" class="avatar" alt="avatar">
-              <div>
-                <div class="feed-title">${(post.title||'Untitled Event')}</div>
-                <div class="feed-date">${new Date(post.datePosted).toLocaleString()}</div>
-              </div>
-            </div>
+  return `
+    <article class="feed-card">
+      <div class="feed-header">
+        <img src="Logo2.png" class="avatar" alt="avatar">
+        <div>
+          <div class="feed-title">${(post.title||'Untitled Event')}</div>
+          <div class="feed-date">${new Date(post.datePosted).toLocaleString()}</div>
+        </div>
+      </div>
 
-            ${post.image || post.hasImage ? `<img src="${imgSrc}" class="feed-image" alt="event image" onerror="this.style.display='none'">` : ''}
+      ${imgSrc ? `<img src="${imgSrc}" class="feed-image" alt="event image" onerror="this.style.display='none'">` : ''}
 
-            <div style="margin-top:10px;">
-              <div class="small" style="color:var(--muted);">${post.description || ''}</div>
-            </div>
+      <div style="margin-top:10px;">
+        <div class="small" style="color:var(--muted);">${post.description || ''}</div>
+      </div>
 
-            <div class="feed-meta">
-              <div><i>🎉</i>&nbsp; ${post.location || 'N/A'}</div>
-              <div>⏳ <span class="countdown" data-time="${deadlineMs}" id="count-${idx}"></span></div>
-              <div><span class="badge-status ${badgeClass}">${status}</span></div>
-            </div>
-          </article>
-        `;
-      }).join('') || '<div class="text-muted">No posts</div>';
+      <div class="feed-meta">
+        <div><i>🎉</i>&nbsp; ${post.location || 'N/A'}</div>
+        <div>⏳ <span class="countdown" data-time="${deadlineMs}" id="count-${idx}"></span></div>
+        <div><span class="badge-status ${badgeClass}">${status}</span></div>
+      </div>
+    </article>
+  `;
+}).join('') || '<div class="text-muted">No posts</div>';
 
       // start countdown loops
       function updateCountdowns(){

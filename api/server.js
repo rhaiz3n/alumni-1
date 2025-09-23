@@ -156,7 +156,7 @@ async function initTables() {
       location VARCHAR(255),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
       eventDateTime DATETIME,
-      image LONGBLOB,  -- ✅ store actual image as binary
+      image VARCHAR(255),  -- ✅ store relative file path (e.g. /uploads/events/event-123.png)
       status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
 
@@ -167,7 +167,7 @@ async function initTables() {
       link VARCHAR(255),
       userId VARCHAR(100),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
-      image LONGBLOB,  -- ✅ store actual image as binary
+      image VARCHAR(255),  -- ✅ store relative file path (e.g. /uploads/careers/career-456.jpg)
       status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
     homeregs: `CREATE TABLE IF NOT EXISTS homeregs (
@@ -416,9 +416,6 @@ app.delete('/api/alumni/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
-
 
 
 // --- Helper: normalize Excel headers ---
@@ -1524,26 +1521,32 @@ app.get('/api/fullInformation', async (req, res) => {
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// ////////////////////////////////////////////////////////////////////////////////////////////////////
+// Store uploaded event images in /public/uploads/events
+const eventStorage = multer.diskStorage({
+  destination: "public/uploads/events",
+  filename: (req, file, cb) => {
+    cb(null, "event-" + Date.now() + path.extname(file.originalname));
+  },
+});
+
+const eventUpload = multer({ storage: eventStorage });
 
 
 
-
-app.post('/api/events/add', imageUpload.single('image'), async (req, res) => {
+app.post("/api/events/add", eventUpload.single("image"), async (req, res) => {
   try {
     const { title, description, location, eventDateTime } = req.body;
 
-    let imageBuffer = null;
-    if (req.file) {
-      imageBuffer = req.file.buffer;
-    }
+    // store relative path (so we can serve via express static)
+    const imagePath = req.file ? `/uploads/events/${req.file.filename}` : null;
 
-    await pool.query(
-      `INSERT INTO events (title, description, location, eventDateTime, image, datePosted)
-       VALUES (?, ?, ?, ?, ?, NOW())`,
-      [title, description, location, eventDateTime, imageBuffer]
+    const [result] = await pool.query(
+      `INSERT INTO events (title, description, location, eventDateTime, datePosted, image)
+       VALUES (?, ?, ?, ?, NOW(), ?)`,
+      [title, description, location, eventDateTime, imagePath]
     );
 
-    res.json({ success: true });
+    res.json({ success: true, id: result.insertId });
   } catch (err) {
     console.error("❌ Event insert error:", err);
     res.status(500).json({ error: "Internal server error" });
@@ -1742,7 +1745,7 @@ app.get('/api/careers/image/:id', async (req, res) => {
 app.get('/api/events/image/:id', async (req, res) => {
   try {
     const [rows] = await pool.execute(
-      'SELECT image FROM events WHERE id = ?',
+      'SELECT image, imageType FROM events WHERE id = ?',
       [req.params.id]
     );
 
@@ -1750,14 +1753,15 @@ app.get('/api/events/image/:id', async (req, res) => {
       return res.status(404).send('No image found');
     }
 
-    // ✅ Default content type (better: store mimetype when uploading)
-    res.setHeader('Content-Type', 'image/jpeg');
+    // ✅ Use stored mimetype if available, fallback to jpeg
+    res.setHeader('Content-Type', rows[0].imageType || 'image/jpeg');
     res.send(rows[0].image);
   } catch (err) {
     console.error("❌ Event image fetch error:", err);
     res.status(500).send('Server error');
   }
 });
+
 
 
 
@@ -1769,37 +1773,40 @@ function authorizeAdminOrEmployer(req, res, next) {
   next();
 }
 
-// Example for careers
-app.post(
-  '/api/careers/add',
-  authorizeAdminOrEmployer,
-  imageUpload.single('image'),
-  async (req, res) => {
+const careerStorage = multer.diskStorage({
+  destination: "public/uploads/careers",
+  filename: (req, file, cb) => {
+    cb(null, "career-" + Date.now() + path.extname(file.originalname));
+  },
+});
+
+const careerUpload = multer({ storage: careerStorage });
+
+app.post('/api/careers/add', authorizeAdminOrEmployer, careerUpload.single('image'), async (req, res) => {
+  try {
     const { title, description, link } = req.body;
     const user = req.session.user;
-
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image uploaded' });
-    }
-
-    // ✅ Who posted it
     const postedBy = user.isEmployer ? user.preferredUserId : user.userName;
 
-    try {
-      // ✅ Insert binary image + mimetype
-      const [result] = await pool.execute(
-        `INSERT INTO careers (image, mime_type, title, description, link, userId) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [req.file.buffer, req.file.mimetype, title, description, link, postedBy]
-      );
+    // ✅ Store relative path, not binary
+    const imagePath = req.file ? `/uploads/careers/${req.file.filename}` : null;
 
-      res.json({ success: true, id: result.insertId });
-    } catch (err) {
-      console.error("❌ Career insert error:", err);
-      res.status(500).json({ error: 'Server error' });
-    }
+    const [result] = await pool.execute(
+      `INSERT INTO careers (title, description, link, userId, datePosted, image)
+       VALUES (?, ?, ?, ?, NOW(), ?)`,
+      [title, description, link, postedBy, imagePath] // ← imagePath must be a string
+    );
+
+    res.json({ success: true, id: result.insertId });
+  } catch (err) {
+    console.error("❌ Career insert error:", err);
+    res.status(500).json({ error: 'Server error' });
   }
-);
+});
+
+
+
+
 
 
 app.get('/api/careers/all', async (req, res) => {

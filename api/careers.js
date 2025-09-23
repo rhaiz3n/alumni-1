@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/mysql");
+const path = require("path");
 const multer = require("multer");
 
 // Memory storage for images (BLOB)
@@ -40,31 +41,54 @@ router.get("/", authorizeEmployer, async (req, res) => {
 // ---------------------------
 // Employer/Admin: Add career
 // ---------------------------
-router.post("/add", uploadImage.single("image"), async (req, res) => {
-  const { title, description, link } = req.body;
-  const user = req.session.user;
-
-  if (!user || (!user.isEmployer && !user.isAdmin)) {
-    return res.status(401).json({ error: "Not logged in as employer or admin" });
+// --- Middleware: authorize admin or employer ---
+function authorizeAdminOrEmployer(req, res, next) {
+  const user = req.session?.user;
+  if (!user || (!user.isAdmin && !user.isEmployer)) {
+    return res.status(403).json({ error: 'Unauthorized access' });
   }
+  next();
+}
 
-  if (!req.file) return res.status(400).json({ error: "No image uploaded" });
-
-  try {
-    const userId = user.isAdmin ? "admin" : user.preferredUserId;
-
-    await pool.execute(
-      `INSERT INTO careers (title, description, link, userId, datePosted, image)
-       VALUES (?, ?, ?, ?, NOW(), ?)`,
-      [title || null, description || null, link || null, userId, req.file.buffer]
-    );
-
-    res.json({ success: true });
-  } catch (err) {
-    console.error("❌ Career insert error:", err);
-    res.status(500).json({ error: err.message });
-  }
+// --- Multer storage for career images ---
+const careerStorage = multer.diskStorage({
+  destination: "public/uploads/careers",
+  filename: (req, file, cb) => {
+    cb(null, "career-" + Date.now() + path.extname(file.originalname));
+  },
 });
+
+const careerUpload = multer({ storage: careerStorage });
+
+// --- Route: add new career ---
+router.post(
+  "/add",
+  authorizeAdminOrEmployer,
+  careerUpload.single("image"),
+  async (req, res) => {
+    const { title, description, link } = req.body;
+    const user = req.session.user;
+
+    if (!req.file) return res.status(400).json({ error: "No image uploaded" });
+
+    try {
+      const userId = user.isAdmin ? "admin" : user.preferredUserId;
+      const imagePath = `/uploads/careers/${req.file.filename}`; // store relative path
+
+      await pool.execute(
+        `INSERT INTO careers (title, description, link, userId, datePosted, image)
+         VALUES (?, ?, ?, ?, NOW(), ?)`,
+        [title || null, description || null, link || null, userId, imagePath]
+      );
+
+      res.json({ success: true });
+    } catch (err) {
+      console.error("❌ Career insert error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
+
 
 // ---------------------------
 // Serve career image

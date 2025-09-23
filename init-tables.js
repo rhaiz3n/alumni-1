@@ -196,7 +196,7 @@ async function initTables() {
       resumePath VARCHAR(255) NOT NULL,
       dateSubmitted DATETIME,
       archivedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`,
+    )`
     };
 
     for (const [name, ddl] of Object.entries(sql)) {

@@ -78,6 +78,17 @@
       .left-column { display:none; }
       .right-column { display:none; }
     }
+    .is-invalid {
+      border: 2px solid red !important;
+    }
+    .modal-content {
+      background-color: #ffffff; /* light gray */
+      border-color: 5px #000000;
+    }
+
+    .text-justify {
+      text-align: justify;
+    }
   </style>
 </head>
 <body>
@@ -106,6 +117,16 @@
         <input id="feedSearch" class="form-control" type="search" placeholder="🔍 Search events or careers..." oninput="filterFeed()">
       </form>
 
+      <!-- Feed Filter Bar -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="btn-group" role="group" aria-label="Feed Filters">
+          <button class="btn btn-outline-primary active" id="filterAll">ALL</button>
+          <button class="btn btn-outline-success" id="filterActive">ACTIVE</button>
+          <button class="btn btn-outline-danger" id="filterClosed">CLOSED</button>
+        </div>
+        <button class="btn btn-danger d-none" id="deleteClosedBtn" onclick="deleteAllClosed()">🗑 Delete All Closed</button>
+      </div>
+
       <div class="d-flex align-items-center ms-3 gap-2">
         <button id="notificationToggle" class="btn btn-outline-light position-relative">
           <i class="fas fa-bell"></i>
@@ -127,7 +148,7 @@
             <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalEvent"><i class="fa-solid fa-calendar-days fa-lg" style="color:#0b5ed7;"></i><div><strong>Post Event</strong><div class="small" style="color:var(--muted)">Create new event</div></div></div>
             <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalCareer"><i class="fa-solid fa-briefcase fa-lg" style="color:#198754;"></i><div><strong>Post Career</strong><div class="small" style="color:var(--muted)">New job opportunity</div></div></div>
             <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalGallery"><i class="fa-solid fa-images fa-lg" style="color:#d63384;"></i><div><strong>Gallery</strong><div class="small" style="color:var(--muted)">Upload images</div></div></div>
-            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalID"><i class="fa-solid fa-id-card fa-lg" style="color:#6c757d;"></i><div><strong>ID Announcement</strong><div class="small" style="color:var(--muted)">Post ID info</div></div></div>
+            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalID"><i class="fa-solid fa-id-card fa-lg" style="color:#6c757d;"></i><div><strong>ID Announcement</strong><div class="small" style="color:var(--muted); text-align: justify;">Post ID info</div></div></div>
             <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalApps"><i class="fa-solid fa-list fa-lg" style="color:#ffc107;"></i><div><strong>Applications</strong><div class="small" style="color:var(--muted)">Career applicants</div></div></div>
             <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalGcash"><i class="fa-solid fa-credit-card fa-lg" style="color:#0dcaf0;"></i><div><strong>Manage GCash</strong><div class="small" style="color:var(--muted)">Upload QR</div></div></div>
           </div>
@@ -148,6 +169,7 @@
       <!-- Center Feed -->
       <div class="col-lg-6">
         <div id="feed">
+          
           <!-- feed cards go here -->
         </div>
       </div>
@@ -181,174 +203,188 @@
   <!-- Toast wrapper -->
   <div id="toastWrapper" style="position: fixed; top: 16px; right: 16px; z-index: 13000;"></div>
 
-  <!-- =================== MODALS =================== -->
-  <!-- Event Modal -->
-  <div class="modal fade" id="modalEvent" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form id="eventForm" enctype="multipart/form-data">
-          <div class="modal-header">
-            <h5 class="modal-title">Post Event</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <label class="form-label">Event Title</label>
-            <select id="title" name="title" class="form-select" required>
-              <option value="">-- Choose Event --</option>
-              <option value="HOMECOMING EVENT">HOME-COMING EVENT</option>
-              <option value="SPORT FEST EVENT">SPORT FEST EVENT</option>
-              <option value="MENSBASKETBALL">MEN'S BASKETBALL</option>
-              <option value="Other">Other</option>
-            </select>
-            
-            <input type="text" class="form-control mt-2 d-none" id="eventTitleOther" placeholder="Enter custom event title">
+<!-- =================== MODALS =================== -->
 
-            <label class="form-label mt-2">Indicate Type of Event</label>
-            <input class="form-control" type="text" id="location" name="location" placeholder="Type of Event" required maxlength="95">
 
-            <label class="form-label mt-2">Event Schedule</label>
-            <input class="form-control" type="datetime-local" id="eventDateTime" name="eventDateTime" required>
-
-            <label class="form-label mt-2">Upload Image</label>
-            <input class="form-control" type="file" id="eventImage" name="image" accept="image/*" required>
-
-            <label class="form-label mt-2">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary" type="submit">Publish</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Career Modal -->
-  <div class="modal fade" id="modalCareer" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form id="careerForm" enctype="multipart/form-data">
-          <div class="modal-header">
-            <h5 class="modal-title">Post Career</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <label class="form-label">Career Type</label>
-            <select id="careerType" name="title" class="form-select" required>
-              <option value="">-- Select Career --</option>
-              <option value="Electrician">Electrician</option>
-              <option value="Mechanic">Mechanic</option>
-              <option value="Education">Education</option>
-              <option value="Software Developer">Software Developer</option>
-              <option value="Network Engineer">Network Engineer</option>
-              <option value="Telecommunications Engineer">Telecommunications Engineer</option>
-              <option value="Electrical Engineer">Electrical Engineer</option>
-              <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
-              <option value="Other">Other</option>
-            </select>
-            
-            <input type="text" class="form-control mt-2 d-none" id="careerTitleOther" placeholder="Enter custom career type">
-
-            <label class="form-label mt-2">Company Name</label>
-            <input class="form-control" type="text" id="careerLink" name="link" placeholder="Company Name">
-
-            <label class="form-label mt-2">Upload Image</label>
-            <input class="form-control" type="file" id="careerImage" name="image" accept="image/*" required>
-
-            <label class="form-label mt-2">Description</label>
-            <textarea class="form-control" id="careerDesc" name="description" rows="3" required></textarea>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-success" type="submit">Publish</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Gallery Modal -->
-  <div class="modal fade" id="modalGallery" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Gallery Posting “Max 25 Pictures per post”</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+<!-- Event Modal -->
+<div class="modal fade" id="modalEvent" tabindex="-1"  data-bs-backdrop="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="eventForm" enctype="multipart/form-data" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title">Post Event</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
         <div class="modal-body">
-          <form id="uploadForm" class="mb-3">
-            <label class="form-label">Select Images</label>
-            <input class="form-control" type="file" name="images" multiple accept="image/*" required>
-            <div class="mt-2 d-flex justify-content-end">
-              <button class="btn btn-primary" type="submit">Upload Images</button>
-            </div>
-          </form>
-          <div id="galleryGrid" class="row g-2"></div>
+          <label class="form-label">Event Title</label>
+          <select id="title" name="title" class="form-select" required>
+            <option value="">-- Choose Event --</option>
+            <option value="HOMECOMING EVENT">HOME-COMING EVENT</option>
+            <option value="SPORT FEST EVENT">SPORT FEST EVENT</option>
+            <option value="MENSBASKETBALL">MEN'S BASKETBALL</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" class="form-control mt-2 d-none" 
+                id="eventTitleOther" 
+                placeholder="Enter custom event title" 
+                disabled>
+
+          <label class="form-label mt-2">Indicate Type of Event</label>
+          <input class="form-control" type="text" id="location" name="location" placeholder="Type of Event" required maxlength="95">
+
+          <label class="form-label mt-2">Event Schedule</label>
+          <input class="form-control" type="datetime-local" id="eventDateTime" name="eventDateTime" required>
+
+          <label class="form-label mt-2">Upload Image</label>
+          <input class="form-control" type="file" id="eventImage" name="image" accept="image/*" required>
+
+          <label class="form-label mt-2">Description</label>
+          <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
         </div>
-      </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" type="submit">Publish</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
 
-  <!-- ID Announcement Modal -->
-  <div class="modal fade" id="modalID" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form id="idPostForm" class="modal-form">
-          <div class="modal-header"><h5 class="modal-title">Post ID Announcement</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-          <div class="modal-body">
-            <label class="form-label">Title</label>
-            <input class="form-control" name="title" required>
-            <label class="form-label mt-2">Description</label>
-            <textarea class="form-control" name="description" rows="4" required></textarea>
-            <div id="idPostResult" class="mt-2"></div>
-          </div>
-          <div class="modal-footer"><button type="submit" class="btn btn-warning">📩 Post Announcement</button></div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Applications Modal -->
-  <div class="modal fade" id="modalApps" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Career Applications</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+<!-- Career Modal -->
+<div class="modal fade" id="modalCareer" tabindex="-1" data-bs-backdrop="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="careerForm" enctype="multipart/form-data" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title">Post Career</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
         <div class="modal-body">
-          <table class="table table-striped">
-            <thead>
-              <tr><th>Full Name</th><th>Phone</th><th>Email</th><th>Resume</th><th>Submitted At</th></tr>
-            </thead>
-            <tbody id="adminApplicationsTableBody"></tbody>
-          </table>
+          <label class="form-label">Career Type</label>
+          <select id="careerType" name="title" class="form-select" required>
+            <option value="">-- Select Career --</option>
+            <option value="Electrician">Electrician</option>
+            <option value="Mechanic">Mechanic</option>
+            <option value="Education">Education</option>
+            <option value="Software Developer">Software Developer</option>
+            <option value="Network Engineer">Network Engineer</option>
+            <option value="Telecommunications Engineer">Telecommunications Engineer</option>
+            <option value="Electrical Engineer">Electrical Engineer</option>
+            <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" class="form-control mt-2 d-none" id="careerTitleOther" placeholder="Enter custom career type">
+
+          <label class="form-label mt-2">Company Name</label>
+          <input class="form-control" type="text" id="careerLink" name="link" placeholder="Company Name" required>
+
+          <label class="form-label mt-2">Upload Image</label>
+          <input class="form-control" type="file" id="careerImage" name="image" accept="image/*" required>
+
+          <label class="form-label mt-2">Description</label>
+          <textarea class="form-control" id="careerDesc" name="description" rows="3" required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" type="submit">Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Gallery Modal -->
+<div class="modal fade" id="modalGallery" tabindex="-1" data-bs-backdrop="false">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Gallery Posting “Max 25 Pictures per post”</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm" class="mb-3" enctype="multipart/form-data" novalidate>
+          <label class="form-label">Select Images</label>
+          <input class="form-control" type="file" name="images" multiple accept="image/*" required>
+          <div class="mt-2 d-flex justify-content-end">
+            <button class="btn btn-primary" type="submit">Upload Images</button>
+          </div>
+        </form>
+        <div id="galleryGrid" class="row g-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ID Announcement Modal -->
+<div class="modal fade" id="modalID" tabindex="-1"  data-bs-backdrop="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="idPostForm" class="modal-form" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title">Post ID Announcement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label">Title</label>
+          <input class="form-control" name="title" required>
+          <label class="form-label mt-2">Description</label>
+          <textarea class="form-control" name="description" rows="4" required></textarea>
+          <div id="idPostResult" class="mt-2"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-warning">📩 Post Announcement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Applications Modal -->
+<div class="modal fade" id="modalApps" tabindex="-1" data-bs-backdrop="false">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Career Applications</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped">
+          <thead>
+            <tr><th>Full Name</th><th>Phone</th><th>Email</th><th>Resume</th><th>Submitted At</th></tr>
+          </thead>
+          <tbody id="adminApplicationsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GCash Modal -->
+<div class="modal fade" id="modalGcash" tabindex="-1" data-bs-backdrop="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Manage GCash QR Code</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <button class="btn btn-outline-primary mb-2" onclick="toggleEdit()">Upload GCash QR Code</button>
+        <div id="editSection" style="display:none;">
+          <input type="file" id="gcashUpload" accept="image/*" class="form-control mb-2" required>
+          <div class="d-flex gap-2 justify-content-center">
+            <button class="btn btn-success" onclick="saveImage()">Save</button>
+            <button class="btn btn-secondary" onclick="closeEdit()">Close</button>
+          </div>
+          <div id="previewBox" class="mt-2">No QR uploaded</div>
+        </div>
+        <div class="mt-3">
+          <button id="disableGcashBtn" class="btn btn-danger" onclick="toggleGcash(this)">Disable User GCash Button</button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- GCash Modal -->
-  <div class="modal fade" id="modalGcash" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Manage GCash QR Code</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body text-center">
-          <button class="btn btn-outline-primary mb-2" onclick="toggleEdit()">Upload GCash QR Code</button>
-          <div id="editSection" style="display:none;">
-            <input type="file" id="gcashUpload" accept="image/*" class="form-control mb-2">
-            <div class="d-flex gap-2 justify-content-center">
-              <button class="btn btn-success" onclick="saveImage()">Save</button>
-              <button class="btn btn-secondary" onclick="closeEdit()">Close</button>
-            </div>
-            <div id="previewBox" class="mt-2">No QR uploaded</div>
-          </div>
-          <div class="mt-3">
-            <button id="disableGcashBtn" class="btn btn-danger" onclick="toggleGcash(this)">Disable User GCash Button</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- CONFIRM modal (custom) -->
-  <div id="confirmModal" class="d-none">
-    <!-- re-used confirm uses simple overlay created in JS -->
-  </div>
+<!-- CONFIRM modal (custom) -->
+<div id="confirmModal" class="d-none">
 
   <!-- socket.io -->
   <script src="/socket.io/socket.io.js"></script>
@@ -356,10 +392,32 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-  /***********************
-   * ADMIN HOMEPAGE LOGIC
-   * Single file: feed, modals, gallery, apps, gcash, notifications
-   ***********************/
+
+    
+  // ✅ Initialize all modals so Bootstrap can track them
+  ["modalEvent", "modalCareer", "modalGallery", "modalID", "modalApps", "modalGcash"]
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        new bootstrap.Modal(el);
+      }
+    });
+
+  // ✅ Patch Bootstrap’s auto-hide behavior to prevent null errors
+  const originalGetInstance = bootstrap.Modal.getInstance;
+  bootstrap.Modal.getInstance = function(element) {
+    return originalGetInstance.call(this, element) || null;
+  };
+
+  // Monkey-patch hide logic (optional chaining)
+  document.addEventListener("show.bs.modal", function (event) {
+    const alreadyOpen = document.querySelector(".modal.show");
+    if (alreadyOpen && alreadyOpen !== event.target) {
+      bootstrap.Modal.getInstance(alreadyOpen)?.hide();
+    }
+  });
+
+
 
   // --- Helper: toast notifications (small custom) ---
   function showToast(message, type = 'info') {
@@ -445,123 +503,151 @@
     return isNaN(d.getTime()) ? null : d;
   }
 
+let fullFeed = []; // store all posts globally
+
 // --- LOAD FEED (events + careers) ---
 async function loadFeed() {
   const container = document.getElementById('feed');
-  container.innerHTML = '<div class="text-center py-5 text-muted">Loading feed...</div>';
 
   try {
     const [eventsRes, careersRes] = await Promise.all([
       fetch('/api/events'),
       fetch('/api/careers/all')
     ]);
+
     if (!eventsRes.ok || !careersRes.ok) throw new Error('Failed to fetch feed data');
 
     const { events = [] } = await eventsRes.json();
     const { careers = [] } = await careersRes.json();
 
-    const formattedEvents = (events || []).map(e => ({ ...e, type: 'Event' }));
-    const formattedCareers = (careers || []).map(c => ({ ...c, type: 'Career' }));
-    const feed = [...formattedEvents, ...formattedCareers]
+    const formattedEvents = events.map(e => ({ ...e, type: 'Event' }));
+    const formattedCareers = careers.map(c => ({ ...c, type: 'Career' }));
+
+    fullFeed = [...formattedEvents, ...formattedCareers]
       .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-    if (!feed.length) {
-      container.innerHTML = '<div class="text-center py-5 text-muted">No posts yet.</div>';
-      return;
-    }
-
-    container.innerHTML = feed.map((post, index) => {
-      let badgeClass = post.type === 'Career' ? 'success' : 'primary';
-      let imgSrc = post.type === 'Career'
-        ? `/api/careers/image/${post.id}`
-        : `/api/events/image/${post.id}`;
-
-      // compute deadline/time for countdown
-      let deadlineDate = null;
-      if (post.type === 'Career') {
-        const posted = parseFlexibleDateTime(post.datePosted) || new Date();
-        deadlineDate = new Date(posted.getTime() + 5 * 24 * 60 * 60 * 1000);
-      } else if (post.type === 'Event') {
-        const raw = post.eventDateTime || post.datePosted;
-        deadlineDate = parseFlexibleDateTime(raw);
-      }
-      const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
-
-      const title = (post.title || '').toString();
-      const desc = (post.description || '').toString();
-
-      return `
-        <div class="feed-card" id="post-${post.type}-${post.id}">
-          
-          <!-- Header -->
-          <div class="feed-header">
-            <img src="Logo2.png" class="avatar" alt="Avatar">
-            <div>
-              <div class="feed-title">
-                TUP Cavite Alumni Association
-                <span class="badge bg-${badgeClass} ms-2">${post.type}</span>
-              </div>
-              <div class="feed-date">Posted: ${new Date(post.datePosted).toLocaleString()}</div>
-            </div>
-            <button class="btn delete-btn-small ms-auto" onclick="deletePost('${post.type}', ${post.id})">✖</button>
-          </div>
-
-          <!-- Image -->
-          ${imgSrc ? `<img src="${imgSrc}" class="feed-image" alt="post image">` : ''}
-
-          <!-- Content -->
-          <div class="feed-content">
-            <p class="mb-1"><strong>${title}</strong></p>
-            <p class="small-muted mb-2">${desc}</p>
-            ${
-              post.type === 'Event'
-                ? `<p class="small-muted">📍 ${post.location || 'N/A'} | 🗓 ${post.eventDateTime || '—'}</p>`
-                : `<p class="small-muted">🏢 ${post.link || 'Company N/A'}</p>`
-            }
-          </div>
-
-          <!-- Countdown -->
-          <div class="feed-meta">
-            ⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // update countdowns every second
-    function updateCountdowns() {
-      const now = Date.now();
-      document.querySelectorAll('.countdown').forEach(el => {
-        const ms = Number(el.dataset.time);
-        if (!ms || isNaN(ms)) { el.textContent = '—'; return; }
-        const diff = ms - now;
-        const card = el.closest('.feed-card');
-
-        if (diff <= 0) {
-          el.textContent = '❌ Closed';
-          if (card) card.classList.add('grayscale');
-          return;
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        el.textContent = days > 0
-          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
-          : `${hours}h ${minutes}m ${seconds}s left`;
-      });
-    }
-    updateCountdowns();
-    if (window._feedCountdownInterval) clearInterval(window._feedCountdownInterval);
-    window._feedCountdownInterval = setInterval(updateCountdowns, 1000);
-
+    renderFeed("ALL");
   } catch (err) {
-    console.error('Failed to load feed:', err);
-    document.getElementById('feed').innerHTML = '<div class="text-center py-5 text-danger">⚠️ Failed to load feed.</div>';
+    console.error('❌ Failed to load feed:', err);
+
+    if (!fullFeed.length) {
+      container.innerHTML =
+        '<div class="text-center py-5 text-danger">⚠️ Failed to load feed.</div>';
+    } else {
+      showToast("❌ Failed to refresh feed", "error");
+    }
   }
 }
+
+
+// --- RENDER FEED with filter ---
+function renderFeed(filterType = "ALL") {
+  const container = document.getElementById('feed');
+  const deleteClosedBtn = document.getElementById('deleteClosedBtn');
+
+  if (!fullFeed.length) {
+    container.innerHTML = '<div class="text-center py-5 text-muted">No posts yet.</div>';
+    return;
+  }
+
+  const now = Date.now();
+  const cards = fullFeed.map((post, index) => {
+    let extraInfo = post.type === 'Event'
+      ? `🎉 Type: ${post.location || 'N/A'}`
+      : `🏢 Company: ${post.link || 'N/A'}`;
+
+    const imgSrc = post.image || '';
+
+    // deadline / closed logic
+    let isClosed = false;
+    let deadlineMs = null;
+    if (post.type === 'Event') {
+      const deadlineDate = parseFlexibleDateTime(post.eventDateTime || post.datePosted);
+      deadlineMs = deadlineDate ? deadlineDate.getTime() : null;
+      isClosed = deadlineMs && deadlineMs < now;
+    }
+
+    if (filterType === "ACTIVE" && isClosed) return "";
+    if (filterType === "CLOSED" && !isClosed) return "";
+
+    const title = (post.title || '').toUpperCase();
+    const desc = (post.description || '');
+
+    return `
+      <div class="feed-card ${isClosed ? 'grayscale' : ''}" id="post-${post.type}-${post.id}">
+        <div class="feed-header">
+          <img src="Logo2.png" alt="avatar" class="avatar">
+          <div>
+            <div class="feed-title">
+              TUP Cavite Alumni Association
+              <span class="badge ${post.type==='Event'?'bg-primary':'bg-success'} ms-2">${post.type}</span>
+            </div>
+            <div class="feed-date">Posted: ${ new Date(post.datePosted).toLocaleString() }</div>
+          </div>
+        </div>
+        ${ imgSrc ? `<img src="${imgSrc}" class="feed-image" alt="post image" loading="lazy"
+                      style="background:#f0f0f0; min-height:150px;">` : '' }
+        <div class="feed-content">
+          <p class="mb-1"><strong>${title}</strong></p>
+          <p class="small-muted text-justify">${desc}</p>
+
+          <div class="feed-meta">
+            <span>${extraInfo}</span>
+          </div>
+
+          ${post.type === 'Event' && deadlineMs ? `
+            <div class="text-end mt-2">
+              ⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span>
+            </div>
+          ` : ''}
+        </div>
+
+        <button class="btn delete-btn-small position-absolute" style="top:10px;right:10px"
+          onclick="deletePost('${post.type}', ${post.id})">✖</button>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = cards || '<div class="text-center py-5 text-muted">No posts in this view.</div>';
+
+  deleteClosedBtn.classList.toggle('d-none', filterType !== "CLOSED");
+
+  updateCountdowns(); // make sure your countdown updater iterates all .countdown elements
+}
+
+
+// --- COUNTDOWN ---
+function updateCountdowns() {
+  const now = Date.now();
+  document.querySelectorAll('.countdown').forEach(el => {
+    const ms = Number(el.dataset.time);
+    if (!ms || isNaN(ms)) { el.textContent = '—'; return; }
+    const diff = ms - now;
+    if (diff <= 0) { el.textContent = '❌ Closed'; return; }
+    const d = Math.floor(diff / 86400000),
+          h = Math.floor((diff % 86400000)/3600000),
+          m = Math.floor((diff % 3600000)/60000),
+          s = Math.floor((diff % 60000)/1000);
+    el.textContent = d > 0 ? `${d}d ${h}h ${m}m ${s}s left` : `${h}h ${m}m ${s}s left`;
+  });
+}
+if (window._feedCountdownInterval) clearInterval(window._feedCountdownInterval);
+window._feedCountdownInterval = setInterval(updateCountdowns, 1000);
+
+// --- DELETE ALL CLOSED ---
+function deleteAllClosed() {
+  const closedCards = document.querySelectorAll('.feed-card.grayscale');
+  closedCards.forEach(card => {
+    const [ , type, id ] = card.id.split('-');
+    deletePost(type, id);
+  });
+  alert('All closed feeds deleted.');
+}
+
+// --- FILTER BUTTONS ---
+document.getElementById('filterAll').addEventListener('click', () => renderFeed("ALL"));
+document.getElementById('filterActive').addEventListener('click', () => renderFeed("ACTIVE"));
+document.getElementById('filterClosed').addEventListener('click', () => renderFeed("CLOSED"));
 
   // --- Delete post (Event or Career) ---
   async function deletePost(type, id) {
@@ -685,36 +771,56 @@ async function loadFeed() {
     });
   }
 
-  // ID Post form submit
-  document.getElementById('idPostForm')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(this).entries());
-    if (!data.title || !data.description) { document.getElementById('idPostResult').textContent = 'Fill all fields'; return; }
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const orig = submitBtn.textContent;
-    submitBtn.textContent = 'Posting...'; submitBtn.disabled = true;
-    try {
-      const res = await fetch('/api/admin/id-announcement', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to post');
-      document.getElementById('idPostResult').textContent = '✅ Posted!';
-      showToast('✅ ID announcement posted', 'success');
-      setTimeout(()=> { const bs = bootstrap.Modal.getInstance(document.getElementById('modalID')); bs?.hide(); }, 900);
-      loadIdAnnouncements();
-    } catch (err) {
-      console.error('ID post error:', err);
-      document.getElementById('idPostResult').textContent = '❌ Error posting';
-      showToast('❌ Failed to post ID announcement', 'error');
-    } finally {
-      submitBtn.textContent = orig; submitBtn.disabled = false;
-      this.reset();
-      setTimeout(()=> document.getElementById('idPostResult').textContent = '', 2000);
-    }
-  });
+document.getElementById('idPostForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const form = this;
+
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+
+  const data = Object.fromEntries(new FormData(form).entries());
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const orig = submitBtn.textContent;
+
+  submitBtn.textContent = 'Posting...';
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/admin/id-announcement', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to post');
+
+    document.getElementById('idPostResult').textContent = '✅ Posted!';
+    showToast('✅ ID announcement posted', 'success');
+
+    // ✅ Hide modal first
+    const modalEl = document.getElementById("modalID");
+    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    modal.hide();
+
+    // ✅ Then reset
+    form.reset();
+    form.classList.remove("was-validated");
+
+    loadIdAnnouncements();
+  } catch (err) {
+    console.error("❌ ID post error:", err);
+    document.getElementById('idPostResult').textContent = '❌ Error posting';
+    showToast('❌ Failed to post ID announcement', 'error');
+  } finally {
+    submitBtn.textContent = orig;
+    submitBtn.disabled = false;
+    setTimeout(() => document.getElementById('idPostResult').textContent = '', 2000);
+  }
+});
+
+
 
   // --- Events & Careers load (summaries on right side) ---
   async function loadEvents() {
@@ -775,100 +881,173 @@ async function loadFeed() {
   const appsModalEl = document.getElementById('modalApps');
   appsModalEl?.addEventListener('show.bs.modal', loadApplications);
 
-// ===== Event Form: Replace "Other" with custom value =====
+// ===== Event Modal: Toggle "Other" required =====
+document.getElementById("title").addEventListener("change", function () {
+  const otherInput = document.getElementById("eventTitleOther");
+  if (this.value === "Other") {
+    otherInput.classList.remove("d-none");
+    otherInput.removeAttribute("disabled");
+    otherInput.setAttribute("required", "true");
+  } else {
+    otherInput.classList.add("d-none");
+    otherInput.setAttribute("disabled", "true");
+    otherInput.removeAttribute("required");
+    otherInput.value = "";
+  }
+});
+
 document.getElementById("eventForm").addEventListener("submit", async function (e) {
   e.preventDefault();
-  
-  const formData = new FormData(this);
+  const form = this;
+
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+
+  const formData = new FormData(form);
   const select = document.getElementById("title");
   const other = document.getElementById("eventTitleOther");
 
   if (select.value === "Other" && other.value.trim()) {
-    formData.set("title", other.value.trim()); // replace value before sending
+    formData.set("title", other.value.trim());
   }
 
   try {
-    const res = await fetch("/api/events/add", {
-      method: "POST",
-      body: formData,
-      credentials: "include" // ensure session is sent
-    });
-
+    const res = await fetch("/api/events/add", { method: "POST", body: formData });
     if (!res.ok) throw new Error("Failed to post event");
-    this.reset();
-    document.getElementById("eventTitleOther").classList.add("d-none"); // hide Other input
-    bootstrap.Modal.getInstance(document.getElementById("modalEvent")).hide();
-    loadFeed(); // refresh feed without reloading
+
+    // ✅ Hide modal first
+    const modalEl = document.getElementById("modalEvent");
+    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    modal.hide();
+
+    // 👇 fix focus issue
+    document.activeElement.blur();
+    document.body.focus();
+
+    // ✅ Reset form after closing
+    form.reset();
+    form.classList.remove("was-validated");
+    other.classList.add("d-none");
+
+    loadFeed();
   } catch (err) {
-    console.error("Event submission error:", err);
+    console.error("❌ Event submission error:", err);
   }
 });
 
-// ===== Career Form: Replace "Other" with custom value =====
-document.getElementById("careerForm").addEventListener("submit", async function (e) {
+
+
+
+
+// ===== Career Modal: Toggle "Other" required =====
+document.getElementById("careerType").addEventListener("change", function () {
+  const otherInput = document.getElementById("careerTitleOther");
+  if (this.value === "Other") {
+    otherInput.classList.remove("d-none");
+    otherInput.removeAttribute("disabled");
+    otherInput.setAttribute("required", "true");
+  } else {
+    otherInput.classList.add("d-none");
+    otherInput.setAttribute("disabled", "true");
+    otherInput.removeAttribute("required");
+    otherInput.value = "";
+  }
+});
+
+document.getElementById("careerForm").addEventListener("submit", async function(e) {
   e.preventDefault();
-  
-  const formData = new FormData(this);
+  const form = this;
+
+  if (!form.checkValidity()) {
+    form.classList.add("was-validated");
+    return;
+  }
+
+  const formData = new FormData(form);
   const select = document.getElementById("careerType");
   const other = document.getElementById("careerTitleOther");
 
   if (select.value === "Other" && other.value.trim()) {
-    formData.set("title", other.value.trim()); // replace value before sending
+    formData.set("title", other.value.trim());
   }
 
   try {
-    const res = await fetch("/api/careers/add", {
-      method: "POST",
-      body: formData,
-      credentials: "include" // ensure session is sent
-    });
-
+    const res = await fetch("/api/careers/add", { method: "POST", body: formData });
     if (!res.ok) throw new Error("Failed to post career");
-    this.reset();
-    document.getElementById("careerTitleOther").classList.add("d-none"); // hide Other input
-    bootstrap.Modal.getInstance(document.getElementById("modalCareer")).hide();
-    loadFeed(); // refresh feed without reloading
+
+    const modalEl = document.getElementById("modalCareer");
+    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    modal.hide();
+
+    form.reset();
+    form.classList.remove("was-validated");
+    other.classList.add("d-none");
+
+    loadFeed(); // reload feed after submission
   } catch (err) {
-    console.error("Career submission error:", err);
+    console.error("❌ Career submission error:", err);
   }
 });
 
 
-  // --- GCash utilities ---
-  function toggleEdit() {
-    const s = document.getElementById('editSection');
-    s.style.display = s.style.display === 'none' || s.style.display === '' ? 'block' : 'none';
-  }
-  function closeEdit() { document.getElementById('editSection').style.display = 'none'; }
 
-  function saveImage() {
-    const file = document.getElementById('gcashUpload').files[0];
-    if (!file) return alert('No file selected!');
-    const reader = new FileReader();
-    reader.onload = () => {
-      localStorage.setItem('gcashImage', reader.result);
-      document.getElementById('previewBox').innerHTML = `<img src="${reader.result}" style="max-width:200px" />`;
-      showToast('✅ GCash QR saved locally', 'success');
-    };
-    reader.readAsDataURL(file);
-  }
 
-  function toggleGcash(button) {
-    const cur = localStorage.getItem('gcashEnabled') === 'true';
-    const next = !cur;
-    localStorage.setItem('gcashEnabled', next);
-    button.textContent = next ? 'Disable User GCash Button' : 'Enable User GCash Button';
-    showToast(`✔️ GCash ${next ? 'enabled' : 'disabled'}`, 'success');
-  }
+ // --- GCash utilities ---
+function toggleEdit() {
+  const s = document.getElementById('editSection');
+  s.style.display = s.style.display === 'none' || s.style.display === '' ? 'block' : 'none';
+}
 
-  // initialize GCash button state
-  (function initGcashState() {
-    if (localStorage.getItem('gcashEnabled') === null) localStorage.setItem('gcashEnabled','true');
-    const btn = document.getElementById('disableGcashBtn');
-    if (btn) btn.textContent = localStorage.getItem('gcashEnabled') === 'true' ? 'Disable User GCash Button' : 'Enable User GCash Button';
-    const preview = localStorage.getItem('gcashImage');
-    if (preview) document.getElementById('previewBox').innerHTML = `<img src="${preview}" style="max-width:200px" />`;
-  })();
+function closeEdit() { 
+  document.getElementById('editSection').style.display = 'none'; 
+}
+
+function saveImage() {
+  const file = document.getElementById('gcashUpload').files[0];
+  if (!file) return alert('No file selected!');
+  const reader = new FileReader();
+  reader.onload = () => {
+    localStorage.setItem('gcashImage', reader.result);
+    document.getElementById('previewBox').innerHTML = `<img src="${reader.result}" style="max-width:200px" />`;
+    showToast('✅ GCash QR saved locally', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function toggleGcash(button) {
+  const cur = localStorage.getItem('gcashEnabled') === 'true';
+  const next = !cur;
+  localStorage.setItem('gcashEnabled', next);
+
+  // Update button text
+  button.textContent = next ? 'Disable User GCash Button' : 'Enable User GCash Button';
+
+  // ✅ Show or hide the actual GCash feature
+  const gcashFeature = document.getElementById('userGcashButton'); // the actual button in user page
+  if (gcashFeature) gcashFeature.style.display = next ? 'inline-block' : 'none';
+
+  showToast(`✔️ GCash ${next ? 'enabled' : 'disabled'}`, 'success');
+}
+
+// --- initialize GCash button state ---
+(function initGcashState() {
+  if (localStorage.getItem('gcashEnabled') === null) localStorage.setItem('gcashEnabled','true');
+
+  const btn = document.getElementById('disableGcashBtn');
+  const enabled = localStorage.getItem('gcashEnabled') === 'true';
+  if (btn) btn.textContent = enabled ? 'Disable User GCash Button' : 'Enable User GCash Button';
+
+  // Show/hide actual GCash button
+  const gcashFeature = document.getElementById('userGcashButton'); // the real GCash button
+  if (gcashFeature) gcashFeature.style.display = enabled ? 'inline-block' : 'none';
+
+  // Load saved image
+  const preview = localStorage.getItem('gcashImage');
+  if (preview) document.getElementById('previewBox').innerHTML = `<img src="${preview}" style="max-width:200px" />`;
+})();
+
 
   // --- Notification (inbox) system + socket.io real-time ---
   function initNotificationSystem() {
@@ -959,18 +1138,16 @@ document.getElementById("careerForm").addEventListener("submit", async function 
     // Ensure modals close properly when clicking outside etc handled by bootstrap automatically
 
     // Small UX: open gallery modal loads gallery grid
-    const galleryModalEl = document.getElementById('modalGallery');
-    galleryModalEl?.addEventListener('show.bs.modal', () => loadGallery());
+    const galleryModalEl = document.getElementById("modalGallery");
+    const galleryModal = galleryModalEl
+      ? bootstrap.Modal.getInstance(galleryModalEl) || new bootstrap.Modal(galleryModalEl)
+      : null;
 
-    // reload feed when any modal hides (to reflect changes)
-    document.querySelectorAll('.modal').forEach(m => {
-      m.addEventListener('hidden.bs.modal', () => {
-        loadFeed();
-        loadEvents();
-        loadCareers();
-        loadIdAnnouncements();
-      });
-    });
+    // Optional: hide if needed
+    galleryModal?.hide();
+
+    // Load gallery each time modal is opened
+    galleryModalEl?.addEventListener("show.bs.modal", () => loadGallery());
   });
 
   // Expose deletePost & deleteImage functions to global (already declared) so inline onclick works
@@ -1015,22 +1192,26 @@ document.getElementById("careerType").addEventListener("change", function () {
   otherInput.classList.toggle("d-none", this.value !== "Other");
 });
 
-// ===== Event Form: Replace "Other" with custom value =====
-document.getElementById("eventForm").addEventListener("submit", function (e) {
-  const select = document.getElementById("title");
-  const other = document.getElementById("eventTitleOther");
-  if (select.value === "Other" && other.value.trim()) {
-    select.value = other.value.trim();
-  }
-});
 
-// ===== Career Form: Replace "Other" with custom value =====
-document.getElementById("careerForm").addEventListener("submit", function (e) {
-  const select = document.getElementById("careerType");
-  const other = document.getElementById("careerTitleOther");
-  if (select.value === "Other" && other.value.trim()) {
-    select.value = other.value.trim();
-  }
+
+document.querySelectorAll("form").forEach(form => {
+  form.addEventListener("submit", function(e) {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+      form.querySelectorAll(":invalid").forEach(input => {
+        input.classList.add("is-invalid");
+      });
+    }
+  });
+
+  form.querySelectorAll("input, select, textarea").forEach(input => {
+    input.addEventListener("input", () => {
+      if (input.checkValidity()) {
+        input.classList.remove("is-invalid");
+      }
+    });
+  });
 });
 
 
@@ -1042,6 +1223,16 @@ document.getElementById("careerForm").addEventListener("submit", function (e) {
     });
   }
   window.filterFeed = filterFeed;
+
+
+  // Always restore scroll when any modal is hidden
+document.addEventListener("hidden.bs.modal", () => {
+  if (!document.querySelector(".modal.show")) {
+    document.body.classList.remove("modal-open");
+    document.body.style.removeProperty("overflow");
+    document.body.style.removeProperty("padding-right");
+  }
+});
   </script>
 </body>
 </html>

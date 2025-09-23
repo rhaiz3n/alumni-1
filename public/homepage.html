@@ -518,6 +518,9 @@
       sessionStorage.setItem('userName', u);
       if (d.user && d.user.id) sessionStorage.setItem('userId', d.user.id);
 
+      if (d.user && d.user.firstName) sessionStorage.setItem('firstName', d.user.firstName);
+      if (d.user && d.user.lastName) sessionStorage.setItem('lastName', d.user.lastName);
+      
       showToast('✅ Login successful!', 'success');
       bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
       setTimeout(() => {

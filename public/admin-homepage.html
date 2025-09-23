@@ -77,6 +77,24 @@
     #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
     .progress-bar-custom { width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin:auto; }
 
+    .inbox-panel {
+      display: none;             /* hidden by default */
+      position: absolute;
+      top: 60px;                 /* adjust depending on navbar height */
+      right: 10px;
+      width: 300px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    /* When .show is added, make it visible */
+    .inbox-panel.show {
+      display: block;
+    }
+
     /* Responsive */
     @media (max-width:991px) {
       .app-container { padding: 0 12px; }
@@ -405,6 +423,8 @@
   </div>
 </div>
 
+<div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 2000;"></div>
+
 <!-- CONFIRM modal (custom) -->
 <div id="confirmModal" class="d-none">
 
@@ -488,17 +508,8 @@
 
   // --- Sign out logic (simple) ---
   document.getElementById('signOutBtn').addEventListener('click', () => {
-    // clear session-like storage (adjust to your auth mechanism if needed)
-    sessionStorage.clear();
-    localStorage.removeItem('gcashEnabled');
+    sessionStorage.clear(); // ✅ only clear user session
     window.location.href = 'homepage.html';
-  });
-
-  // --- Inbox (notifications) toggling ---
-  const inboxPanel = document.getElementById('inboxPanel');
-  const notificationToggle = document.getElementById('notificationToggle');
-  notificationToggle?.addEventListener('click', () => {
-    inboxPanel.classList.toggle('show');
   });
 
   // --- Parse flexible datetime strings into a Date (robust) ---
@@ -1031,7 +1042,7 @@ document.getElementById("careerForm").addEventListener("submit", async function(
 
 
 
- // --- GCash utilities ---
+// --- GCash utilities ---
 function toggleEdit() {
   const s = document.getElementById('editSection');
   s.style.display = s.style.display === 'none' || s.style.display === '' ? 'block' : 'none';
@@ -1056,13 +1067,13 @@ function saveImage() {
 function toggleGcash(button) {
   const cur = localStorage.getItem('gcashEnabled') === 'true';
   const next = !cur;
-  localStorage.setItem('gcashEnabled', next);
+  localStorage.setItem('gcashEnabled', next ? 'true' : 'false');
 
   // Update button text
   button.textContent = next ? 'Disable User GCash Button' : 'Enable User GCash Button';
 
-  // ✅ Show or hide the actual GCash feature
-  const gcashFeature = document.getElementById('userGcashButton'); // the actual button in user page
+  // Optional: if admin preview also wants to hide/show button
+  const gcashFeature = document.getElementById('userGcashButton');
   if (gcashFeature) gcashFeature.style.display = next ? 'inline-block' : 'none';
 
   showToast(`✔️ GCash ${next ? 'enabled' : 'disabled'}`, 'success');
@@ -1070,92 +1081,102 @@ function toggleGcash(button) {
 
 // --- initialize GCash button state ---
 (function initGcashState() {
-  if (localStorage.getItem('gcashEnabled') === null) localStorage.setItem('gcashEnabled','true');
+  if (localStorage.getItem('gcashEnabled') === null) {
+    localStorage.setItem('gcashEnabled','true'); // default enabled
+  }
 
   const btn = document.getElementById('disableGcashBtn');
   const enabled = localStorage.getItem('gcashEnabled') === 'true';
   if (btn) btn.textContent = enabled ? 'Disable User GCash Button' : 'Enable User GCash Button';
 
-  // Show/hide actual GCash button
-  const gcashFeature = document.getElementById('userGcashButton'); // the real GCash button
-  if (gcashFeature) gcashFeature.style.display = enabled ? 'inline-block' : 'none';
-
-  // Load saved image
+  // Load saved QR preview
   const preview = localStorage.getItem('gcashImage');
-  if (preview) document.getElementById('previewBox').innerHTML = `<img src="${preview}" style="max-width:200px" />`;
+  if (preview) {
+    document.getElementById('previewBox').innerHTML = `<img src="${preview}" style="max-width:200px" />`;
+  }
 })();
 
 
-  // --- Notification (inbox) system + socket.io real-time ---
-  function initNotificationSystem() {
-    const inboxList = document.getElementById('inboxContentList');
-    const badge = document.getElementById('inboxBadge');
 
-    function updateBadge() {
-      const count = inboxList.querySelectorAll('.inbox-item').length;
-      badge.textContent = count;
-      badge.style.display = count > 0 ? 'inline-block' : 'none';
-    }
+function initNotificationSystem() {
+  const inboxList = document.getElementById('inboxContentList');
+  const badge = document.getElementById('inboxBadge');
+  const inboxPanel = document.getElementById('inboxPanel');
+  const notifToggle = document.getElementById('notificationToggle');
 
-    function renderNotification(notif) {
-      const item = document.createElement('div');
-      item.className = 'inbox-item p-2 border-bottom cursor-pointer';
-      item.innerHTML = `
-        <div class="d-flex align-items-start">
-          <div class="me-2"><i class="fas fa-bell fa-lg text-primary"></i></div>
-          <div class="flex-fill">
-            <div class="fw-bold">${notif.name || 'Notification'}</div>
-            <div class="small-muted">${notif.message || ''}</div>
-            <div class="small text-muted">${new Date(notif.createdAt || Date.now()).toLocaleString()}</div>
-          </div>
-        </div>
-      `;
-      item.addEventListener('click', () => {
-        fetch(`/api/notifications/${notif.id}`, { method: 'DELETE' }).catch(()=>{});
-        item.remove();
-        updateBadge();
-        if (notif.link) window.location.href = notif.link;
-      });
-      inboxList.prepend(item);
-      updateBadge();
-    }
-
-    // Fetch initial inbox
-    fetch('/api/admin/inbox')
-      .then(r => r.ok ? r.json() : Promise.reject('Failed'))
-      .then(data => {
-        data.reverse().forEach(renderNotification);
-      }).catch(e => {
-        console.warn('Failed to load inbox', e);
-      });
-
-    // socket.io
-    try {
-      const socket = io();
-      socket.on('newNotification', (n) => {
-        renderNotification(n);
-      });
-    } catch (err) {
-      console.warn('Socket.io not available', err);
-    }
-
-    // clear inbox action
-    document.getElementById('clearInboxBtn')?.addEventListener('click', () => {
-      showConfirm('Clear all notifications?', async () => {
-        try {
-          const res = await fetch('/api/notifications/clear', { method: 'DELETE' });
-          const data = await res.json();
-          if (data.success) {
-            document.getElementById('inboxContentList').innerHTML = '';
-            updateBadge();
-            showToast('✅ Inbox cleared', 'success');
-          } else throw new Error('clear failed');
-        } catch (err) {
-          showToast('❌ Failed to clear inbox', 'error');
-        }
-      });
-    });
+  function updateBadge() {
+    const count = inboxList.querySelectorAll('.inbox-item').length;
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
   }
+
+  function renderNotification(notif) {
+    const item = document.createElement('div');
+    item.className = 'inbox-item p-2 border-bottom cursor-pointer';
+    item.innerHTML = `
+      <div class="d-flex align-items-start">
+        <div class="me-2"><i class="fas fa-bell fa-lg text-primary"></i></div>
+        <div class="flex-fill">
+          <div class="fw-bold">${notif.name || 'Notification'}</div>
+          <div class="small-muted">${notif.message || ''}</div>
+          <div class="small text-muted">${new Date(notif.createdAt || Date.now()).toLocaleString()}</div>
+        </div>
+      </div>
+    `;
+    item.addEventListener('click', () => {
+      fetch(`/api/notifications/${notif.id}`, { method: 'DELETE' }).catch(()=>{});
+      item.remove();
+      updateBadge();
+      if (notif.link) window.location.href = notif.link;
+    });
+    inboxList.prepend(item);
+    updateBadge();
+  }
+
+  // 🔔 Toggle inbox panel
+  notifToggle?.addEventListener('click', () => {
+    inboxPanel.style.display = (inboxPanel.style.display === 'none' || inboxPanel.style.display === '') 
+      ? 'block' 
+      : 'none';
+  });
+
+  // 📥 Fetch initial inbox
+  fetch('/api/admin/inbox')
+    .then(r => r.ok ? r.json() : Promise.reject('Failed'))
+    .then(data => {
+      data.reverse().forEach(renderNotification);
+    }).catch(e => {
+      console.warn('Failed to load inbox', e);
+    });
+
+  // ⚡ Real-time notifications
+  try {
+    const socket = io();
+    socket.on('newNotification', (n) => {
+      renderNotification(n);
+    });
+  } catch (err) {
+    console.warn('Socket.io not available', err);
+  }
+
+  // 🗑 Clear inbox action
+  document.getElementById('clearInboxBtn')?.addEventListener('click', () => {
+    showConfirm('Clear all notifications?', async () => {
+      try {
+        const res = await fetch('/api/notifications/clear', { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          inboxList.innerHTML = '';
+          updateBadge();
+          showToast('✅ Inbox cleared', 'success');
+        } else throw new Error('clear failed');
+      } catch (err) {
+        showToast('❌ Failed to clear inbox', 'error');
+      }
+    });
+  });
+}
+
 
   // --- Initialize everything on DOM load ---
   document.addEventListener('DOMContentLoaded', () => {
@@ -1270,6 +1291,8 @@ document.addEventListener("hidden.bs.modal", () => {
     document.body.style.removeProperty("padding-right");
   }
 });
+
+
   </script>
 </body>
 </html>

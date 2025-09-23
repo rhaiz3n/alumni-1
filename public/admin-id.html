@@ -228,23 +228,18 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderTable() {
   const filter = statusFilter.value || 'ALL';
   tbody.innerHTML = '';
-  const statusOrder = { PENDING:0, ACCEPTED:1, DECLINED:2 };
 
   requests
-    .filter(r => filter==='ALL' || (r.status||'PENDING').toUpperCase()===filter)
-    .sort((a,b)=>{
-      const sa = statusOrder[(a.status||'PENDING').toUpperCase()];
-      const sb = statusOrder[(b.status||'PENDING').toUpperCase()];
-      return sa!==sb ? sa-sb : b.id-a.id;
-    })
+    .filter(r => filter === 'ALL' || (r.status || 'PENDING').toUpperCase() === filter)
     .forEach(r => {
-      const status = (r.status||'PENDING').toUpperCase();
+      const status = (r.status || 'PENDING').toUpperCase();
       const tr = document.createElement('tr');
 
       // ✅ Row background based on status
-      if (status === "PENDING") tr.classList.add("table-warning"); // yellow
-      if (status === "ACCEPTED") tr.classList.add("table-success"); // green
-      if (status === "DECLINED") tr.classList.add("table-danger"); // red
+      if (status.includes("PENDING")) tr.classList.add("table-warning"); 
+      if (status === "RELEASING") tr.classList.add("table-info"); 
+      if (status === "RELEASED") tr.classList.add("table-success"); 
+      if (status === "DECLINED") tr.classList.add("table-danger"); 
 
       tr.innerHTML = `
         <td>${r.fullName}</td>
@@ -257,20 +252,25 @@ function renderTable() {
           <button class="btn btn-sm btn-outline-secondary btn-view" 
                   data-url="${r.validIdUrl || ''}">View</button>
         </td>
-        <td class="status ${status}">${status}</td>
+        <td class="status">${status}</td>
         <td>
-          <button class="btn btn-sm btn-success btn-accept">Accept</button>
-          <button class="btn btn-sm btn-danger btn-decline">Decline</button>
+          <select class="form-select form-select-sm status-dropdown" data-id="${r.id}">
+            <option ${status==="PENDING" ? "selected":""}>PENDING</option>
+            <option ${status==="ACCEPTED - PENDING" ? "selected":""}>ACCEPTED - PENDING</option>
+            <option ${status==="RELEASING" ? "selected":""}>RELEASING</option>
+            <option ${status==="RELEASED" ? "selected":""}>RELEASED</option>
+            <option ${status==="DECLINED" ? "selected":""}>DECLINED</option>
+          </select>
         </td>
-        <td>${r.submittedAt ? new Date(r.submittedAt).toLocaleDateString('en-US',{month:'long',day:'2-digit',year:'numeric'}).toUpperCase() : 'N/A'}</td>
+        <td>${r.submittedAt ? new Date(r.submittedAt).toLocaleDateString() : 'N/A'}</td>
       `;
 
-      // ✅ Accept / Decline actions
-      tr.querySelector(".btn-accept").addEventListener("click", async () => {
-        await updateStatus(r.id, "ACCEPTED");
-      });
-      tr.querySelector(".btn-decline").addEventListener("click", async () => {
-        await updateStatus(r.id, "DECLINED");
+      // ✅ Dropdown change event
+      tr.querySelector(".status-dropdown").addEventListener("change", async (e) => {
+        const newStatus = e.target.value;
+        await updateStatus(r.id, newStatus);
+        r.status = newStatus;
+        renderTable(); // refresh row colors instantly
       });
 
       // ✅ View button

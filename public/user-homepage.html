@@ -28,9 +28,95 @@
     body { font-family: "Albert Sans", Arial, sans-serif; background:#e0e0e0; }
     .left-col { min-width: 220px; max-width: 270px; position: sticky; top: 80px; height: calc(100vh - 100px); overflow-y: auto;}
     .right-col { min-width: 260px; max-width: 320px; position: sticky; top: 80px; height: calc(100vh - 100px); overflow-y: auto; }
-    .feed-card {background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 5px rgba(0,0,0,.05); align-self: center;}
-    .feed-img { width:100%; height: 600px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;}
-    .profile-pic-sm1 { width:100px; height:100px; object-fit:cover; border-radius:50%; border: 2px solid #000000;}
+    .feed-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      border: 1px solid #e0e0e0;
+    }
+
+    .feed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .feed-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feed-header img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid #d8d8d8;
+    }
+
+    .feed-header strong {
+      font-size: 15px;
+    }
+
+    .feed-badges span {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+      margin-left: 6px;
+    }
+
+    .badge-career {
+      background-color: #198754;
+      color: #fff;
+    }
+
+    .badge-active {
+      background-color: #0d6efd;
+      color: #fff;
+    }
+
+    .feed-img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      border: 3px solid #000000;
+    }
+
+    .feed-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    .feed-desc {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 10px;
+    }
+
+    .feed-company {
+      font-size: 13px;
+      color: #6c757d;
+      margin-bottom: 8px;
+    }
+
+    .feed-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      font-size: 13px;
+      color: #6c757d;
+      gap: 5px;
+    }
+
+    .profile-pic-sm1 { width:80px; height:80px; object-fit:cover; border-radius:50%; border: 2px solid #000000;}
     .profile-pic-sm { width:40px; height:40px; object-fit:cover; border-radius:50%; border: 2px solid #000000;}
     .sidebar-link { display:flex; align-items:center; gap:.75rem; padding:.5rem .25rem; border-radius:8px; color:#111; text-decoration:none; }
     .sidebar-link:hover { background:#e9ecef; text-decoration:none; }
@@ -94,7 +180,7 @@
         <div class="d-flex align-items-center"></div>
 
         <!-- CENTERED SEARCH (absolute on lg+, static and stacked on mobile) -->
-      <form class="d-flex center-search w-75" role="search" onsubmit="return false;">
+      <form class="d-flex center-search w-50" role="search" onsubmit="return false;">
         <input id="feedSearch" class="form-control me-2" type="search"
               placeholder="🔍 Search events or careers..." oninput="filterFeed()">
       </form>
@@ -142,7 +228,7 @@
           <nav class="nav flex-column">
             <a class="sidebar-link" href="user-homepage.html"><i class="bi bi-house"></i> Home</a>
             <a class="sidebar-link" href="#" id="openApplicationsFromSidebar"><i class="bi bi-journal-text"></i> My Applications</a>
-            <a class="sidebar-link" href="#" id="openIdRequestFromSidebar"><i class="bi bi-credit-card"></i> ID Request</a>
+            <a class="sidebar-link" href="#" id="openIdStatusSidebar"><i class="bi bi-credit-card"></i> ID Request Status</a>
             <a class="sidebar-link" href="gallery-user.html?from=user-homepage.html"><i class="bi bi-image"></i> Gallery</a>
 
             <div id="fullSurveyCountdownBox" style="display:none;">
@@ -194,7 +280,25 @@
   <!-- Toast container -->
   <div id="toast-container" style="position: fixed; top: 80px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px;"></div>
 
-  <!-- ===== Bootstrap Modals (converted) ===== -->
+  <!-- ID REQUEST STATUS MODAL -->
+  <div class="modal fade" id="idStatusModalBS" tabindex="-1" aria-labelledby="idStatusModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="idStatusModalLabel">📌 ID Request Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="idRequestStatusContent">
+          Loading status...
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+
 
   <!-- PROFILE MODAL -->
   <div class="modal fade" id="modalProfile" tabindex="-1" aria-labelledby="modalProfileLabel">
@@ -286,7 +390,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Full Name on Official Records *</label>
-              <input type="text" id="fullName" name="fullName" class="form-control" maxlength="30" required oninput="this.value = formatName(this.value)">
+              <input type="text" id="fullName" name="fullName" class="form-control" maxlength="30" required readonly>
             </div>
             <div class="mb-3">
               <label class="form-label">Course Major [BET-COET/BTVTED-ET] *</label>
@@ -950,98 +1054,140 @@ document.getElementById("modalProfile").addEventListener("hide.bs.modal", (event
     return isNaN(d.getTime()) ? null : d;
   }
 
-  async function loadFeed() {
-    const container = document.getElementById('feed');
-    container.innerHTML = 'Loading feed...';
-    try {
-      const role = sessionStorage.getItem('userRole');
-      const careersUrl = role === 'employer' ? '/api/careers' : '/api/careers/public';
+async function loadFeed() {
+  const container = document.getElementById('feed');
+  container.innerHTML = 'Loading feed...';
+  try {
+    const role = sessionStorage.getItem('userRole');
+    const careersUrl = role === 'employer' ? '/api/careers' : '/api/careers/public';
 
-      const [eventsRes, careersRes] = await Promise.all([ fetch('/api/events'), fetch(careersUrl) ]);
-      if (!eventsRes.ok || !careersRes.ok) throw new Error('Failed to fetch');
+    const [eventsRes, careersRes] = await Promise.all([ fetch('/api/events'), fetch(careersUrl) ]);
+    if (!eventsRes.ok || !careersRes.ok) throw new Error('Failed to fetch');
 
-      const { events } = await eventsRes.json();
-      const { careers } = await careersRes.json();
+    const { events } = await eventsRes.json();
+    const { careers } = await careersRes.json();
 
-      const feed = [
-        ...(events || []).map(e => ({ ...e, type: 'Event' })),
-        ...(careers || []).map(c => ({ ...c, type: 'Career' }))
-      ].sort((a,b) => new Date(b.datePosted) - new Date(a.datePosted));
-
-container.innerHTML = feed.map((post, idx) => {
-  const imgSrc = post.image || "";  // directly use the stored path
-  const extraInfo = post.type === 'Event'
-    ? `🎉 Event Location: ${escapeHtml(post.location || 'N/A')}`
-    : `🏢 Company: ${escapeHtml(post.link || 'N/A')}`;
-
-  let deadlineDate = null;
-  if (post.type === 'Career') {
-    const posted = parseDate(post.datePosted) || new Date();
-    deadlineDate = new Date(posted.getTime() + 5*24*60*60*1000);
-  } else if (post.type === 'Event') {
-    deadlineDate = parseDate(post.eventDateTime) || parseDate(post.datePosted);
-  }
-  const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
-
-  return `
-    <div class="feed-card" id="feed-card-${post.id}">
-      ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="" onerror="this.style.display='none'">` : ''}
-      <div>
-        <h5 class="mb-1">${escapeHtml((post.title||'').toUpperCase())} 
-          <small class="text-muted">[${post.type}]</small></h5>
-        <p>${escapeHtml(post.description || '')}</p>
-        <small class="text-muted">${extraInfo}<br>🕒 Posted: ${new Date(post.datePosted).toLocaleString()}</small>
-        <div class="mt-2">
-          <span class="countdown" data-time="${deadlineMs}" id="countdown-${idx}"></span>
-          ${post.type === 'Career'
-            ? `<button class="btn btn-sm btn-primary register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
-            : `<button class="btn btn-sm btn-outline-primary register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
-        </div>
-      </div>
-    </div>`;
-}).join('');
-
-      // register click handler
-      container.addEventListener('click', (e) => {
-        const btn = e.target.closest('.register-btn');
-        if (!btn) return;
-        const id = btn.dataset.id;
-        const type = btn.dataset.type;
-        const post = feed.find(p => p.id == id && p.type === type);
-        if (type === 'Career') openCareerSurvey(post);
-        else openRegistrationModal(post);
-      });
-
-      // countdown updater
-      function updateCountdowns() {
-        const now = Date.now();
-        document.querySelectorAll('.countdown').forEach(el => {
-          const ms = Number(el.dataset.time);
-          if (!ms || isNaN(ms)) return el.textContent = '—';
-          const diff = ms - now;
-          const card = el.closest('.feed-card');
-          const btn = card?.querySelector('.register-btn');
-          if (diff <= 0) {
-            el.textContent = '❌ Closed';
-            card.style.filter = 'grayscale(100%)';
-            if (btn) { btn.disabled = true; btn.textContent = '❌ Closed'; }
-            return;
-          }
-          const d = Math.floor(diff / (1000*60*60*24));
-          const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-          const m = Math.floor((diff % (1000*60*60)) / (1000*60));
-          const s = Math.floor((diff % (1000*60)) / 1000);
-          el.textContent = d > 0 ? `${d}d ${h}h ${m}m ${s}s left` : `${h}h ${m}m ${s}s left`;
-        });
+    // ✅ Sort so active stay on top, closed go down
+    const feed = [
+      ...(events || []).map(e => ({ ...e, type: 'Event' })),
+      ...(careers || []).map(c => ({ ...c, type: 'Career' }))
+    ].sort((a, b) => {
+      function getDeadline(post) {
+        if (post.type === 'Career') {
+          const posted = parseDate(post.datePosted) || new Date();
+          return new Date(posted.getTime() + 5 * 24 * 60 * 60 * 1000);
+        } else if (post.type === 'Event') {
+          return parseDate(post.eventDateTime) || parseDate(post.datePosted);
+        }
+        return null;
       }
-      updateCountdowns();
-      setInterval(updateCountdowns, 1000);
 
-    } catch (err) {
-      console.error('Failed to load feed:', err);
-      container.innerHTML = '<div class="text-danger">⚠️ Failed to load feed.</div>';
+      const now = Date.now();
+      const aDeadline = getDeadline(a);
+      const bDeadline = getDeadline(b);
+
+      const aClosed = aDeadline && aDeadline.getTime() < now;
+      const bClosed = bDeadline && bDeadline.getTime() < now;
+
+      if (aClosed !== bClosed) return aClosed ? 1 : -1; // Active before closed
+      return new Date(b.datePosted) - new Date(a.datePosted); // Newest first
+    });
+
+    // ✅ Render feed
+    container.innerHTML = feed.map((post, idx) => {
+      const imgSrc = post.image || "";
+      const extraInfo = post.type === 'Event'
+        ? `🎉 Event Location: ${escapeHtml(post.location || 'N/A')}`
+        : `🏢 Company: ${escapeHtml(post.link || 'N/A')}`;
+
+      let deadlineDate = null;
+      if (post.type === 'Career') {
+        const posted = parseDate(post.datePosted) || new Date();
+        deadlineDate = new Date(posted.getTime() + 5 * 24 * 60 * 60 * 1000);
+      } else if (post.type === 'Event') {
+        deadlineDate = parseDate(post.eventDateTime) || parseDate(post.datePosted);
+      }
+      const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
+
+      return `
+        <div class="feed-card" id="feed-card-${post.id}">
+          <!-- Header with logo -->
+          <div class="feed-header d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex align-items-center">
+              <img src="Logo2.png" alt="Logo2" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
+              <div>
+                <div class="fw-bold">TUP Cavite Alumni Association</div>
+                <small class="text-muted">Posted: ${new Date(post.datePosted).toLocaleString()}</small>
+              </div>
+            </div>
+            <div>
+              ${post.type === 'Career' 
+                ? `<span class="badge bg-success">Career</span>` 
+                : `<span class="badge bg-info">Event</span>`}
+            </div>
+          </div>
+
+          <!-- Image -->
+          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="" onerror="this.style.display='none'">` : ''}
+
+          <!-- Content -->
+          <div class="fw-bold mt-2">${escapeHtml((post.title||'').toUpperCase())}</div>
+          <p class="mb-1">${escapeHtml(post.description || '')}</p>
+          <div class="text-muted small">
+            ${extraInfo}
+          </div>
+
+          <!-- Footer -->
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="countdown text-muted" data-time="${deadlineMs}" id="countdown-${idx}"></span>
+            ${post.type === 'Career'
+              ? `<button class="btn btn-sm btn-primary register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
+              : `<button class="btn btn-sm btn-outline-primary register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
+          </div>
+        </div>`;
+    }).join('');
+
+    // ✅ Handle register clicks
+    container.addEventListener('click', (e) => {
+      const btn = e.target.closest('.register-btn');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const type = btn.dataset.type;
+      const post = feed.find(p => p.id == id && p.type === type);
+      if (type === 'Career') openCareerSurvey(post);
+      else openRegistrationModal(post);
+    });
+
+    // ✅ Countdown updater
+    function updateCountdowns() {
+      const now = Date.now();
+      document.querySelectorAll('.countdown').forEach(el => {
+        const ms = Number(el.dataset.time);
+        if (!ms || isNaN(ms)) return el.textContent = '—';
+        const diff = ms - now;
+        const card = el.closest('.feed-card');
+        const btn = card?.querySelector('.register-btn');
+        if (diff <= 0) {
+          el.textContent = '❌ Closed';
+          card.style.filter = 'grayscale(100%)';
+          if (btn) { btn.disabled = true; btn.textContent = '❌ Closed'; }
+          return;
+        }
+        const d = Math.floor(diff / (1000*60*60*24));
+        const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+        const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+        const s = Math.floor((diff % (1000*60)) / 1000);
+        el.textContent = d > 0 ? `${d}d ${h}h ${m}m ${s}s left` : `${h}h ${m}m ${s}s left`;
+      });
     }
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+
+  } catch (err) {
+    console.error('Failed to load feed:', err);
+    container.innerHTML = '<div class="text-danger">⚠️ Failed to load feed.</div>';
   }
+}
 
   // ------------------------------
   // REGISTRATION MODAL OPENERS
@@ -1372,7 +1518,7 @@ window.openCareerSurvey = async function(career) {
   // ------------------------------
   // HOMECOMING form submit
   // ------------------------------
-  let gcashEnabled = localStorage.getItem('gcashEnabled') !== 'false';
+  let gcashEnabled = localStorage.getItem('gcashEnabled') === 'true';
   function openGcashModal() {
     if (!gcashEnabled) { showNotification('❌ GCash payment option is currently disabled by admin.', 'error'); return; }
     const img = localStorage.getItem('gcashImage');
@@ -1434,6 +1580,16 @@ window.openCareerSurvey = async function(career) {
   // ------------------------------
   // ID REQUEST submit
   // ------------------------------
+
+  // Auto-fill Full Name when the modal opens
+  const idRequestModal = document.getElementById('idRequestModalBS');
+  idRequestModal.addEventListener('show.bs.modal', function () {
+    const firstName = sessionStorage.getItem('firstName') || '';
+    const lastName = sessionStorage.getItem('lastName') || '';
+    const fullName = [firstName, lastName].filter(Boolean).join(' ') || '';
+    document.getElementById('fullName').value = fullName;
+  });
+
   async function submitIdRequestForm() {
     const form = document.getElementById('idRequestForm');
     const fd = new FormData(form);
@@ -1668,6 +1824,66 @@ window.openCareerSurvey = async function(career) {
 
   // End of module
 
+
+// ================================
+// 📌 ID Request Status (User Side)
+// ================================
+
+document.getElementById("openIdStatusSidebar").addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  const content = document.getElementById("idRequestStatusContent");
+  content.innerHTML = "Loading status...";
+
+  const firstName = sessionStorage.getItem("firstName");
+  const lastName = sessionStorage.getItem("lastName");
+
+  if (!firstName || !lastName) {
+    content.innerHTML = "⚠️ No user session found. Please log in first.";
+    new bootstrap.Modal(document.getElementById("idStatusModalBS")).show();
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/requests/user/byname/${encodeURIComponent(firstName)}/${encodeURIComponent(lastName)}`);
+    if (!res.ok) throw new Error("Failed to fetch request status");
+
+    const request = await res.json();
+
+    if (!request) {
+      content.innerHTML = "❌ You haven’t submitted an ID request yet.";
+    } else {
+      const status = request.status || "PENDING";
+      content.innerHTML = `
+        <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(status)}">${status}</span></p>
+      `;
+    }
+  } catch (err) {
+    console.error("❌ Error loading ID request:", err);
+    content.innerHTML = "⚠️ Could not load your ID request status.";
+  }
+
+  new bootstrap.Modal(document.getElementById("idStatusModalBS")).show();
+});
+
+function getStatusColor(status) {
+  switch ((status || "").toUpperCase()) {
+    case "PENDING": return "warning";
+    case "ACCEPTED": return "success";
+    case "ACCEPTED - PENDING": return "info";
+    case "RELEASING": return "primary";
+    case "RELEASED": return "dark";
+    case "DECLINED": return "danger";
+    default: return "secondary";
+  }
+}
+
+
+
+
+
+
+  
   </script>
 </body>
 </html>

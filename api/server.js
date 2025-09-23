@@ -2428,29 +2428,35 @@ app.get('/api/requests/list', async (req, res) => {
 app.patch('/api/requests/:id/status', async (req, res) => {
   const { status } = req.body;
   const { id } = req.params;
-  const validStatus = (status || '').toUpperCase();
+  const validStatuses = [
+    'PENDING', 
+    'ACCEPTED - PENDING', 
+    'RELEASING', 
+    'RELEASED', 
+    'DECLINED'
+  ];
 
-  if (!['PENDING', 'ACCEPTED', 'DECLINED'].includes(validStatus)) {
+  if (!validStatuses.includes(status)) {
     return res.status(400).json({ error: 'Invalid status' });
   }
 
   try {
-    // FIXED: Removed .promise()
     const [result] = await pool.execute(
       `UPDATE requests SET status = ? WHERE id = ?`,
-      [validStatus, id]
+      [status, id]
     );
-    
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Request not found' });
     }
 
-    res.json({ success: true, message: 'Status updated successfully' });
+    res.json({ success: true, message: `Status updated to ${status}` });
   } catch (err) {
     console.error('❌ Status Update Error:', err);
     res.status(500).json({ error: 'Failed to update status' });
   }
 });
+
 
 app.get('/api/requests/:id/image', async (req, res) => {
   const { id } = req.params;
@@ -2473,6 +2479,26 @@ app.get('/api/requests/:id/image', async (req, res) => {
     res.status(500).json({ error: 'Database error' });
   }
 });
+
+
+app.get('/api/requests/user/byname/:firstName/:lastName', async (req, res) => {
+  const { firstName, lastName } = req.params;
+
+  try {
+    const [rows] = await pool.execute(
+      `SELECT * FROM requests WHERE fullName = ? ORDER BY submittedAt DESC LIMIT 1`,
+      [`${firstName} ${lastName}`]
+    );
+
+    if (rows.length === 0) return res.json(null);
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("❌ Error fetching request by name:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

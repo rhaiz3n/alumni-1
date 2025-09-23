@@ -1702,19 +1702,19 @@ app.get('/api/careers/image/:id', async (req, res) => {
       return res.status(404).send('No image found');
     }
 
-    // ✅ Always serve as binary
-    res.setHeader('Content-Type', 'image/jpeg'); // adjust if you want PNG detection
-    res.send(rows[0].image);
+    const imagePath = path.join(__dirname, 'public', rows[0].image.replace(/^\/+/, ''));
+    res.sendFile(imagePath);
   } catch (err) {
     console.error("❌ Career image fetch error:", err);
     res.status(500).send('Server error');
   }
 });
 
+
 app.get('/api/events/image/:id', async (req, res) => {
   try {
     const [rows] = await pool.execute(
-      'SELECT image, imageType FROM events WHERE id = ?',
+      'SELECT image FROM events WHERE id = ?',
       [req.params.id]
     );
 
@@ -1722,9 +1722,8 @@ app.get('/api/events/image/:id', async (req, res) => {
       return res.status(404).send('No image found');
     }
 
-    // ✅ Use stored mimetype if available, fallback to jpeg
-    res.setHeader('Content-Type', rows[0].imageType || 'image/jpeg');
-    res.send(rows[0].image);
+    const imagePath = path.join(__dirname, 'public', rows[0].image.replace(/^\/+/, ''));
+    res.sendFile(imagePath);
   } catch (err) {
     console.error("❌ Event image fetch error:", err);
     res.status(500).send('Server error');

@@ -67,7 +67,7 @@ async function initTables() {
       location VARCHAR(255),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
       eventDateTime DATETIME,
-      image LONGBLOB,  -- ✅ store actual image as binary
+      image varchar(255),  -- ✅ store actual image as binary
       status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
 
@@ -78,7 +78,7 @@ async function initTables() {
       link VARCHAR(255),
       userId VARCHAR(100),
       datePosted DATETIME DEFAULT CURRENT_TIMESTAMP,
-      image LONGBLOB,  -- ✅ store actual image as binary
+      image varchar(255),  -- ✅ store actual image as binary
       status ENUM('active','deleted') DEFAULT 'active' -- ✅ soft delete
     )`,
     homeregs: `CREATE TABLE IF NOT EXISTS homeregs (

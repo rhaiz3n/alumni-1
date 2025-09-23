@@ -61,13 +61,55 @@
     .popup-warning.show { display: block; }
 
     /* --- Print rules: by default hide everything but table when printing --- */
-    @media print {
-      body * { visibility: hidden; }
-      #printZone, #printZone * { visibility: visible; }
-      #printZone { position: absolute; left:0; top:0; width:100%; }
-      /* hide action buttons in print */
-      #registrationsTable .action-btn { display: none !important; }
-    }
+@media print {
+  body * {
+    visibility: hidden; /* hide everything else */
+  }
+
+  #printZone,
+  #printZone * {
+    visibility: visible; /* show only printZone */
+  }
+
+  #printZone {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Remove horizontal scroll for printing */
+  #printZone .table-responsive {
+    overflow: visible !important;
+  }
+
+  /* Table formatting */
+  #registrationsTable {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: auto; /* auto width for columns */
+  }
+
+  #registrationsTable th,
+  #registrationsTable td {
+    border: 1px solid #000 !important;
+    padding: 4px !important;
+    white-space: nowrap; /* prevent wrapping */
+  }
+
+  /* Hide action buttons */
+  #registrationsTable .action-btn {
+    display: none !important;
+  }
+
+  /* Center the title */
+  #printZone h5,
+  #printZone small {
+    text-align: center;
+    display: block;
+  }
+}
+
 
     /* --- Small helpers --- */
     .controls-row .form-control, .controls-row .form-select { min-width: 150px; }

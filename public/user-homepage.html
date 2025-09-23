@@ -1,4 +1,7 @@
 
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,10 +27,11 @@
     /* Minimal custom styles to get a FB-like feel */
     body { font-family: "Albert Sans", Arial, sans-serif; background:#e0e0e0; }
     .left-col { min-width: 220px; max-width: 270px; position: sticky; top: 80px; height: calc(100vh - 100px); overflow-y: auto;}
-    .right-col { min-width: 260px; max-width: 320px; position: sticky; top: 80px; height: calc(100vh - 100px); overflow-y: auto;}
-    .feed-card {background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 5px rgba(0,0,0,.05); }
+    .right-col { min-width: 260px; max-width: 320px; position: sticky; top: 80px; height: calc(100vh - 100px); overflow-y: auto; }
+    .feed-card {background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 5px rgba(0,0,0,.05); align-self: center;}
     .feed-img { width:100%; height: 600px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;}
-    .profile-pic-sm { width:40px; height:40px; object-fit:cover; border-radius:50%; }
+    .profile-pic-sm1 { width:100px; height:100px; object-fit:cover; border-radius:50%; border: 2px solid #000000;}
+    .profile-pic-sm { width:40px; height:40px; object-fit:cover; border-radius:50%; border: 2px solid #000000;}
     .sidebar-link { display:flex; align-items:center; gap:.75rem; padding:.5rem .25rem; border-radius:8px; color:#111; text-decoration:none; }
     .sidebar-link:hover { background:#e9ecef; text-decoration:none; }
     .badge-custom { background: #e9ecef; color:#333; padding:.25rem .5rem; border-radius: .5rem; font-size: .72rem; }
@@ -70,104 +74,122 @@
 <body>
 
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-light border-bottom"
-        style="background: linear-gradient(175deg, #882323 55%, #000000 60%);">
-      <div class="container-fluid">
+ <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light border-bottom" style="background: linear-gradient(175deg, #882323 55%, #000000 60%);">
+    <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center gap-2" href="user-homepage.html">
         <img src="Logo.png" alt="logo" width="38" height="38">
-        <strong style="color: white;">TUPC Cavite</strong>
+        <strong>TUPC Cavite</strong>
       </a>
 
-      <form class="d-flex ms-auto me-3" role="search">
-        <input id="feedSearch" class="form-control form-control-sm" type="search" placeholder="🔍 Search events or careers..." oninput="filterFeed()">
+      <!-- toggler for mobile -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+              aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- collapse area -->
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <!-- left placeholder (keeps symmetrical spacing when search is centered) -->
+        <div class="d-flex align-items-center"></div>
+
+        <!-- CENTERED SEARCH (absolute on lg+, static and stacked on mobile) -->
+      <form class="d-flex center-search w-75" role="search" onsubmit="return false;">
+        <input id="feedSearch" class="form-control me-2" type="search"
+              placeholder="🔍 Search events or careers..." oninput="filterFeed()">
       </form>
 
-      <div class="d-flex align-items-center gap-2">
-        <button id="galleryBtn" class="btn btn-outline-secondary btn-sm">Gallery</button>
-        <button id="signOutBtn" class="btn btn-outline-danger btn-sm">Sign Out</button>
+        <!-- Right-side actions -->
+        <div class="d-flex align-items-center nav-actions ms-auto">
+          <button id="galleryBtn" class="btn btn-outline-secondary btn-sm" style="margin-right:10px;">Gallery</button>
 
-        <div class="dropdown ms-2">
-          <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-            <img id="profilePicSmall" src="/public/images/default-profile.png" alt="profile" class="profile-pic-sm">
-            <span id="displayName" class="ms-2 d-none d-lg-inline" style="color: white;">GUEST</span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#" id="openProfileMenu">View Profile</a></li>
-            <li><a class="dropdown-item" href="#" id="viewApplicationsBtnSidebar">My Applications</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" id="openIdRequestBtn">ID Request</a></li>
-          </ul>
+          <button id="signOutBtn" class="btn btn-outline-danger btn-sm">Sign Out</button>
+
+          <div class="dropdown ms-2">
+            <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <img id="profilePicSmall" src="/public/images/default-profile.png" alt="profile" class="profile-pic-sm">
+              <span id="displayName" class="ms-2 d-none d-lg-inline" style="color: white;">GUEST</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" id="openProfileMenu">View Profile</a></li>
+              <li><a class="dropdown-item" href="#" id="viewApplicationsBtnSidebar">My Applications</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="openIdRequestBtn">ID Request</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- MAIN LAYOUT -->
-  <div class="container-fluid mt-3">
-    <div class="row gx-4">
-      <!-- LEFT SIDEBAR -->
-      <aside class="col-lg-3 left-col">
-        <div class="card mb-3">
-          <div class="card-body">
-            <div class="profile-card">
-              <img id="profilePic" src="/public/images/default-profile.png" alt="profile" class="profile-pic-sm">
-              <div>
-                <h6 id="nameTop" class="mb-0">NAME</h6>
-                <small id="userNameTop">Username</small>
-              </div>
+<!-- MAIN LAYOUT -->
+<div class="container mt-3">
+  <div class="row gx-4">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="col-lg-3 left-col">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="profile-card d-flex align-items-center">
+            <img id="profilePic" src="/public/images/default-profile.png" alt="profile" class="profile-pic-sm1 me-2">
+            <div>
+              <h6 id="nameTop" class="mb-0">NAME</h6>
+              <small id="userNameTop">Username</small>
             </div>
-            <hr>
-              <nav class="nav flex-column">
-                <a class="sidebar-link" href="user-homepage.html"><i class="bi bi-house"></i> Home</a>
-                <a class="sidebar-link" href="#" id="openApplicationsFromSidebar"><i class="bi bi-journal-text"></i> My Applications</a>
-                <a class="sidebar-link" href="#" id="openIdRequestFromSidebar"><i class="bi bi-credit-card"></i> ID Request</a>
-                <a class="sidebar-link" href="gallery-user.html?from=user-homepage.html"><i class="bi bi-image"></i> Gallery</a>
-
-                <div id="fullSurveyCountdownBox" style="display:none;">
-                  ⏳ Full Survey available in <span id="fullSurveyCountdown"></span>
-                </div>
-                <div id="miniSurveyCountdownBox" style="display:none;">
-                  ⏳ Mini Survey available in <span id="miniSurveyCountdown"></span>
-                </div>
-              </nav>
-            </nav>
           </div>
-        </div>
+          <hr>
+          <nav class="nav flex-column">
+            <a class="sidebar-link" href="user-homepage.html"><i class="bi bi-house"></i> Home</a>
+            <a class="sidebar-link" href="#" id="openApplicationsFromSidebar"><i class="bi bi-journal-text"></i> My Applications</a>
+            <a class="sidebar-link" href="#" id="openIdRequestFromSidebar"><i class="bi bi-credit-card"></i> ID Request</a>
+            <a class="sidebar-link" href="gallery-user.html?from=user-homepage.html"><i class="bi bi-image"></i> Gallery</a>
 
-        <div class="card">
-          <div class="card-body">
-            <h6 class="mb-2">ID Announcements</h6>
-            <div id="idAnnouncementList">Loading...</div>
-          </div>
+            <div id="fullSurveyCountdownBox" style="display:none;">
+              ⏳ Full Survey available in <span id="fullSurveyCountdown"></span>
+            </div>
+            <div id="miniSurveyCountdownBox" style="display:none;">
+              ⏳ Mini Survey available in <span id="miniSurveyCountdown"></span>
+            </div>
+          </nav>
         </div>
-      </aside>
+      </div>
 
-      <!-- FEED -->
-      <main class="col-lg-6">
-        <div id="feed" class="mb-3">
-          <!-- feed cards inserted here -->
+      <div class="card">
+        <div class="card-body">
+          <h6 class="mb-2">ID Announcements</h6>
+          <div id="idAnnouncementList">Loading...</div>
         </div>
-      </main>
+      </div>
+    </aside>
 
-      <!-- RIGHT SIDEBAR -->
-      <aside class="col-lg-3 right-col">
-        <div class="card mb-3">
-          <div class="card-body">
-            <h6>Events Announcements</h6>
-            <div id="eventList">Loading...</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-body">
-            <h6>Career Opportunities</h6>
-            <div id="careerList">Loading...</div>
-          </div>
-        </div>
-      </aside>
+    <!-- CENTER FEED -->
+    <div class="col-lg-6">
+      <div id="feed">
+        <!-- feed cards go here -->
+      </div>
     </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="col-lg-3 right-col">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6>Events Announcements</h6>
+          <div id="eventList">Loading...</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h6>Career Opportunities</h6>
+          <div id="careerList">Loading...</div>
+        </div>
+      </div>
+    </aside>
+
   </div>
+</div>
+
 
   <!-- Toast container -->
   <div id="toast-container" style="position: fixed; top: 80px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px;"></div>
@@ -946,30 +968,38 @@ document.getElementById("modalProfile").addEventListener("hide.bs.modal", (event
         ...(careers || []).map(c => ({ ...c, type: 'Career' }))
       ].sort((a,b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-      container.innerHTML = feed.map((post, idx) => {
-        const imgSrc = post.type === 'Career' ? `/api/careers/image/${post.id}` : `/api/events/image/${post.id}`;
-        const extraInfo = post.type === 'Event' ? `🎉 Event Type: ${escapeHtml(post.location || 'N/A')}` : `🏢 Company: ${escapeHtml(post.link || 'N/A')}`;
-        let deadlineDate = null;
-        if (post.type === 'Career') {
-          const posted = parseDate(post.datePosted) || new Date();
-          deadlineDate = new Date(posted.getTime() + 5*24*60*60*1000);
-        } else if (post.type === 'Event') {
-          deadlineDate = parseDate(post.eventDateTime) || parseDate(post.datePosted);
-        }
-        const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
-        return `<div class="feed-card" id="feed-card-${post.id}">
-          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="">` : ''}
-          <div>
-            <h5 class="mb-1">${escapeHtml((post.title||'').toUpperCase())} <small class="text-muted">[${post.type}]</small></h5>
-            <p>${escapeHtml(post.description || '')}</p>
-            <small class="text-muted">${extraInfo}<br>🕒 Posted: ${new Date(post.datePosted).toLocaleString()}</small>
-            <div class="mt-2">
-              <span class="countdown" data-time="${deadlineMs}" id="countdown-${idx}"></span>
-              ${post.type === 'Career' ? `<button class="btn btn-sm btn-primary register-btn" data-id="${post.id}" data-type="Career">Apply</button>` : `<button class="btn btn-sm btn-outline-primary register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
-            </div>
-          </div>
-        </div>`;
-      }).join('');
+container.innerHTML = feed.map((post, idx) => {
+  const imgSrc = post.image || "";  // directly use the stored path
+  const extraInfo = post.type === 'Event'
+    ? `🎉 Event Location: ${escapeHtml(post.location || 'N/A')}`
+    : `🏢 Company: ${escapeHtml(post.link || 'N/A')}`;
+
+  let deadlineDate = null;
+  if (post.type === 'Career') {
+    const posted = parseDate(post.datePosted) || new Date();
+    deadlineDate = new Date(posted.getTime() + 5*24*60*60*1000);
+  } else if (post.type === 'Event') {
+    deadlineDate = parseDate(post.eventDateTime) || parseDate(post.datePosted);
+  }
+  const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
+
+  return `
+    <div class="feed-card" id="feed-card-${post.id}">
+      ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="" onerror="this.style.display='none'">` : ''}
+      <div>
+        <h5 class="mb-1">${escapeHtml((post.title||'').toUpperCase())} 
+          <small class="text-muted">[${post.type}]</small></h5>
+        <p>${escapeHtml(post.description || '')}</p>
+        <small class="text-muted">${extraInfo}<br>🕒 Posted: ${new Date(post.datePosted).toLocaleString()}</small>
+        <div class="mt-2">
+          <span class="countdown" data-time="${deadlineMs}" id="countdown-${idx}"></span>
+          ${post.type === 'Career'
+            ? `<button class="btn btn-sm btn-primary register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
+            : `<button class="btn btn-sm btn-outline-primary register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
+        </div>
+      </div>
+    </div>`;
+}).join('');
 
       // register click handler
       container.addEventListener('click', (e) => {

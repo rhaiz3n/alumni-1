@@ -52,14 +52,70 @@
     }
     .popup-warning.show { display:block; }
 
-    /* Print styles: show only printZone and hide action buttons */
-    @media print {
-      body * { visibility: hidden; }
-      #printZone, #printZone * { visibility: visible; }
-      #printZone { position:absolute; left:0; top:0; width:100%; }
-      /* hide action buttons */
-      #athleteTable .action-btn { display:none !important; }
-    }
+/* Print styles: show only printZone and hide unnecessary columns */
+@media print {
+  /* Hide everything outside printZone */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Only show printZone */
+  #printZone,
+  #printZone * {
+    visibility: visible !important;
+  }
+
+  /* Position table to top-left */
+  #printZone {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Remove scroll wrapper */
+  #printZone .table-responsive {
+    overflow: visible !important;
+  }
+
+  /* Table formatting */
+  #athleteTable {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 50 !important; /* aligned left */
+    table-layout: auto !important;
+  }
+
+  #athleteTable thead th,
+  #athleteTable tbody td {
+    border: 1px solid #000 !important;
+    padding: 6px !important;
+    text-align: left !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+
+  /* Dark header */
+  #athleteTable thead th {
+    background-color: #000 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide action buttons */
+  #athleteTable .action-btn {
+    display: none !important;
+  }
+
+  /* Hide the Response column (last column) */
+  #athleteTable th:last-child,
+  #athleteTable td:last-child {
+    display: none !important;
+  }
+}
+
+
 
     /* Controls minimum widths for nicer layout */
     .controls-row .form-control, .controls-row .form-select { min-width:160px; }
@@ -128,18 +184,16 @@
     <div class="table-responsive">
       <table id="athleteTable" class="table table-bordered table-hover align-middle">
         <thead class="table-dark">
-          <tr>
-            <th>FIRST NAME</th>
-            <th>MIDDLE NAME</th>
-            <th>LAST NAME</th>
-            <th>GENDER</th>
-            <th>SUFFIX</th>
-            <th>YEAR GRADUATED</th>
-            <th>SPORT</th>
-            <th>DATE OF SUBMISSION</th>
-            <th>STATUS</th>
-            <th>RESPONSE</th>
-          </tr>
+        <tr>
+          <th>FULL NAME</th>
+          <th>GENDER</th>
+          <th>SUFFIX</th>
+          <th>YEAR GRADUATED</th>
+          <th>SPORT</th>
+          <th>DATE OF SUBMISSION</th>
+          <th>STATUS</th>
+          <th>RESPONSE</th>
+        </tr>
         </thead>
         <tbody id="athleteTableBody">
           <tr><td colspan="10">Loading…</td></tr>
@@ -268,9 +322,7 @@
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${r.firstName || ''}</td>
-          <td>${r.middleName || ''}</td>
-          <td>${r.lastName || ''}</td>
+          <td>${[r.firstName, r.middleName, r.lastName].filter(Boolean).join(" ")}</td>
           <td>${r.gender || ''}</td>
           <td>${r.extension || ''}</td>
           <td>${r.yearGraduated || ''}</td>

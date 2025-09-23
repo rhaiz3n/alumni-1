@@ -69,6 +69,8 @@
     .badge-open { background: #e7f7ec; color:#1a7f32; }
     .badge-closed { background:#f8e9e9; color:#a11a1a; }
 
+    
+
     /* Right sidebar */
     .right-card { padding:14px; margin-bottom: 18px; }
 
@@ -726,86 +728,89 @@
     const fallback = new Date(s); return isNaN(fallback.getTime()) ? null : fallback;
   }
 
-  async function loadFeed() {
-    const feedContainer = document.getElementById('feed');
-    feedContainer.innerHTML = '<div class="text-muted">Loading feed...</div>';
-    try {
-      // fetch events (main content)
-      const eventsRes = await fetch('/api/events');
-      if (!eventsRes.ok) throw new Error('Failed to fetch events');
-      const { events } = await eventsRes.json();
+async function loadFeed() {
+  const feedContainer = document.getElementById('feed');
+  feedContainer.innerHTML = '<div class="text-muted">Loading feed...</div>';
+  try {
+    const eventsRes = await fetch('/api/events');
+    if (!eventsRes.ok) throw new Error('Failed to fetch events');
+    const { events } = await eventsRes.json();
 
-      // Keep ordering by posted date desc
-      const items = (events || []).sort((a,b) => new Date(b.datePosted) - new Date(a.datePosted));
-
-feedContainer.innerHTML = items.map((post, idx) => {
-  const imgSrc = post.image || '';
-  let raw = post.eventDateTime || post.datePosted || '';
-  if (raw && raw.endsWith && raw.endsWith('Z')) raw = raw.replace('Z','');
-  const deadline = parseFlexibleDateTime(raw);
-  const deadlineMs = deadline ? deadline.getTime() : '';
-
-  // Status logic
-  const now = Date.now();
-  let status = '';
-  let badgeClass = '';
-  if (deadline && deadlineMs <= now) {
-    status = 'CLOSE';
-    badgeClass = 'badge-closed';
-  } else {
-    status = 'ACTIVE';
-    badgeClass = 'badge-open';
-  }
-
-  return `
-    <article class="feed-card">
-      <div class="feed-header">
-        <img src="Logo2.png" class="avatar" alt="avatar">
-        <div>
-          <div class="feed-title">${(post.title||'Untitled Event')}</div>
-          <div class="feed-date">${new Date(post.datePosted).toLocaleString()}</div>
-        </div>
-      </div>
-
-      ${imgSrc ? `<img src="${imgSrc}" class="feed-image" alt="event image" onerror="this.style.display='none'">` : ''}
-
-      <div style="margin-top:10px;">
-        <div class="small" style="color:var(--muted);">${post.description || ''}</div>
-      </div>
-
-      <div class="feed-meta">
-        <div><i>🎉</i>&nbsp; ${post.location || 'N/A'}</div>
-        <div>⏳ <span class="countdown" data-time="${deadlineMs}" id="count-${idx}"></span></div>
-        <div><span class="badge-status ${badgeClass}">${status}</span></div>
-      </div>
-    </article>
-  `;
-}).join('') || '<div class="text-muted">No posts</div>';
-
-      // start countdown loops
-      function updateCountdowns(){
-        const now = Date.now();
-        document.querySelectorAll('.countdown').forEach(el => {
-          const ms = Number(el.dataset.time);
-          if (!ms || isNaN(ms)) { el.textContent = '—'; return; }
-          const diff = ms - now;
-          if (diff <= 0) { el.textContent = '❌ Closed'; return; }
-          const days = Math.floor(diff / (1000*60*60*24));
-          const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-          const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
-          const seconds = Math.floor((diff % (1000*60)) / 1000);
-          el.textContent = days > 0 ? `${days}d ${hours}h ${minutes}m ${seconds}s left` : `${hours}h ${minutes}m ${seconds}s left`;
-        });
-      }
-      updateCountdowns();
-      setInterval(updateCountdowns, 1000);
-
-    } catch (err) {
-      console.error(err);
-      feedContainer.innerHTML = '<div class="text-danger">Failed to load feed.</div>';
-      showToast('⚠️ Failed to load feed', 'error');
+    if (!events || !events.length) {
+      feedContainer.innerHTML = '<div class="text-muted">No posts</div>';
+      return;
     }
+
+    const now = Date.now();
+
+    // Separate active and closed events
+    const activeEvents = [];
+    const closedEvents = [];
+
+    events.forEach(post => {
+      let raw = post.eventDateTime || post.datePosted || '';
+      if (raw.endsWith && raw.endsWith('Z')) raw = raw.replace('Z','');
+      const deadline = parseFlexibleDateTime(raw);
+      const deadlineMs = deadline ? deadline.getTime() : 0;
+
+      const isClosed = deadline && deadlineMs <= now;
+
+      const feedHtml = `
+        <article class="feed-card">
+          <div class="feed-header">
+            <img src="Logo2.png" class="avatar" alt="avatar">
+            <div>
+              <div class="feed-title">${(post.title||'Untitled Event')}</div>
+              <div class="feed-date">${new Date(post.datePosted).toLocaleString()}</div>
+            </div>
+          </div>
+
+          ${post.image ? `<img src="${post.image}" class="feed-image" alt="event image" onerror="this.style.display='none'">` : ''}
+
+          <div style="margin-top:10px;">
+            <div class="small" style="color:var(--muted);">${post.description || ''}</div>
+          </div>
+
+          <div class="feed-meta">
+            <div><i>🎉</i>&nbsp; ${post.location || 'N/A'}</div>
+            <div>⏳ <span class="countdown" data-time="${deadlineMs}" id="count-${post.id}"></span></div>
+            <div><span class="badge-status ${isClosed ? 'badge-closed' : 'badge-open'}">${isClosed ? 'CLOSE' : 'ACTIVE'}</span></div>
+          </div>
+        </article>
+      `;
+
+      if (isClosed) closedEvents.push(feedHtml);
+      else activeEvents.push(feedHtml);
+    });
+
+    // Combine: active first, closed last
+    feedContainer.innerHTML = [...activeEvents, ...closedEvents].join('');
+
+    // Countdown updater
+    function updateCountdowns() {
+      const now = Date.now();
+      document.querySelectorAll('.countdown').forEach(el => {
+        const ms = Number(el.dataset.time);
+        if (!ms || isNaN(ms)) { el.textContent = '—'; return; }
+        const diff = ms - now;
+        if (diff <= 0) { el.textContent = '❌ Closed'; return; }
+        const days = Math.floor(diff / (1000*60*60*24));
+        const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+        const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((diff % (1000*60)) / 1000);
+        el.textContent = days > 0 ? `${days}d ${hours}h ${minutes}m ${seconds}s left` : `${hours}h ${minutes}m ${seconds}s left`;
+      });
+    }
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+
+  } catch (err) {
+    console.error(err);
+    feedContainer.innerHTML = '<div class="text-danger">Failed to load feed.</div>';
+    showToast('⚠️ Failed to load feed', 'error');
   }
+}
+
 
   /*******************************
    * Announcements loader (preserve endpoints)

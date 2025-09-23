@@ -112,9 +112,16 @@ router.get("/image/:id", async (req, res) => {
 router.get("/public", async (req, res) => {
   try {
     const [rows] = await pool.execute(
-      "SELECT id, title, description, link, datePosted FROM careers ORDER BY datePosted DESC"
+      "SELECT id, title, description, link, datePosted, image FROM careers WHERE status='active' ORDER BY datePosted DESC"
     );
-    res.json({ careers: rows });
+
+    // Ensure the frontend can use the path directly
+    const careers = rows.map(c => ({
+      ...c,
+      image: c.image ? `/uploads/careers/${path.basename(c.image)}` : null
+    }));
+
+    res.json({ careers });
   } catch (err) {
     console.error("❌ Error fetching public careers:", err);
     res.status(500).json({ error: "Server error" });

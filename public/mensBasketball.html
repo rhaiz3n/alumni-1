@@ -24,14 +24,45 @@
     #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
     .progress-bar-custom { left: 100px; width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
     .modal-content { max-width: 700px; margin: auto; }
-    @media print {
-      body.print-teams #teamsTable td button,
-      body.print-teams #teamsTable td select { display: none !important; }
-      body.print-members #membersModal button { display: none !important; }
-    }
+@media print {
+  /* Hide inputs and print button */
+  #searchInput,
+  #statusFilter,
+  #pageSelect,
+  #fw-bold,
+  #printAcceptedBtn {
+    display: none !important;
+  }
+
+  /* Make table clean */
+  #teamsTable {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  #teamsTable th,
+  #teamsTable td {
+    border: 1px solid #000 !important;
+    padding: 6px !important;
+    font-size: 12pt;
+  }
+
+  #teamsTable tbody tr:hover {
+    background-color: transparent !important;
+  }
+
+  /* Optionally hide Actions column */
+  #teamsTable th:last-child,
+  #teamsTable td:last-child {
+    display: none !important;
+  }
+}
+
+
   </style>
 </head>
 <body>
+
   <!-- Loader (Bootstrap replacement) -->
   <div id="loader-wrapper" role="status" aria-live="polite">
     <div style="text-align:center;">
@@ -47,17 +78,12 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
     <a class="navbar-brand d-flex align-items-center" href="admin-homepage.html">
-      <img src="Logo.png" alt="University Logo" class="me-2"> TUPC Events
+      <img src="Logo.png" alt="University Logo" class="me-2"> TUPC Events Basketball
     </a>
     <button class="btn btn-outline-light ms-auto" onclick="location.href='event-registration.html'">
       <i class="fas fa-arrow-left"></i> Back
     </button>
   </nav>
-
-  <!-- Header -->
-  <div class="container text-center mt-4">
-    <h2 class="fw-bold">Men's Basketball Teams Dashboard</h2>
-  </div>
 
   <!-- Controls -->
   <div class="container mt-4">
@@ -132,171 +158,177 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Original Backend JS -->
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const tbody = document.querySelector('#teamsTable tbody');
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const pageSelect = document.getElementById('pageSelect');
-    const membersModal = new bootstrap.Modal(document.getElementById('membersModal'));
-    const modalTeamName = document.getElementById('modalTeamName');
-    const membersTable = document.querySelector('#membersTable tbody');
-    const printTeamBtn = document.getElementById('printTeamBtn');
-    const printAcceptedBtn = document.getElementById('printAcceptedBtn');
-    const teamsPrintTitle = document.getElementById('teamsPrintTitle');
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.querySelector('#teamsTable tbody');
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+  const pageSelect = document.getElementById('pageSelect');
+  const membersModal = new bootstrap.Modal(document.getElementById('membersModal'));
+  const modalTeamName = document.getElementById('modalTeamName');
+  const membersTable = document.querySelector('#membersTable tbody');
+  const printTeamBtn = document.getElementById('printTeamBtn');
+  const printAcceptedBtn = document.getElementById('printAcceptedBtn');
+  const teamsPrintTitle = document.getElementById('teamsPrintTitle');
+  const loaderWrapper = document.getElementById('loader-wrapper');
+  const progressBar = document.getElementById('progress-bar');
+  const percentage = document.getElementById('percentage');
 
-    let teams = [], perPage = 100, currentPage = 1, showOnlyAccepted = false;
-
-    async function loadTeams() {
-      try {
-        const res = await fetch('/api/sportfest/teams');
-        if (!res.ok) throw new Error('Failed to fetch teams');
-        const { teams: data } = await res.json();
-        teams = data || [];
-        render();
-      } catch (err) {
-        console.error(err);
-        alert('❌ Error loading teams');
-      }
-    }
-
-    function render() {
-      const search = searchInput.value.trim().toLowerCase();
-      const filterStatus = statusFilter.value;
-      let filtered = teams.filter(t => t.teamName.toLowerCase().includes(search));
-      if (filterStatus !== 'ALL') filtered = filtered.filter(t => t.status === filterStatus);
-      if (showOnlyAccepted) filtered = filtered.filter(t => t.status === 'ACCEPTED');
-
-      const statusOrder = { PENDING: 0, ACCEPTED: 1, DECLINED: 2 };
-      filtered.sort((a, b) => statusOrder[a.status || 'PENDING'] - statusOrder[b.status || 'PENDING']);
-
-      const totalPages = Math.ceil(filtered.length / perPage) || 1;
-      pageSelect.innerHTML = '';
-      for (let i = 1; i <= totalPages; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `Page ${i}`;
-        if (i === currentPage) opt.selected = true;
-        pageSelect.appendChild(opt);
-      }
-
-      tbody.innerHTML = '';
-      const start = (currentPage - 1) * perPage;
-      filtered.slice(start, start + perPage).forEach(t => {
-        const tr = document.createElement('tr');
-        const submitted = new Date(t.submittedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-
-        tr.innerHTML = `
-          <td>${t.teamName}</td>
-          <td>${t.ageRange}</td>
-          <td>${submitted}</td>
-          <td class="status ${t.status}">${t.status}</td>
-          <td>
-            <button class="btn btn-success btn-sm me-1 accept-btn">Accept</button>
-            <button class="btn btn-danger btn-sm me-1 decline-btn">Decline</button>
-            <button class="btn btn-secondary btn-sm show">Show Members</button>
-          </td>
-        `;
-
-        tbody.appendChild(tr);
-
-        tr.querySelector('.accept-btn').onclick = () => updateStatus(t.id, 'ACCEPTED', tr);
-        tr.querySelector('.decline-btn').onclick = () => updateStatus(t.id, 'DECLINED', tr);
-        tr.querySelector('.show').onclick = () => showMembers(t);
-      });
-    }
-
-    async function updateStatus(id, status, tr) {
-      try {
-        const res = await fetch(`/api/sportfest/teams/${id}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to update');
-
-        const cell = tr.querySelector('.status');
-        cell.textContent = data.status;
-        cell.className = `status ${data.status}`;
-
-        const team = teams.find(t => t.id === id);
-        if (team) team.status = data.status;
-
-      } catch (err) {
-        alert('❌ ' + err.message);
-      }
-    }
-
-    async function showMembers(team) {
-      modalTeamName.textContent = `Team Name: ${team.teamName}`;
-      membersTable.innerHTML = '';
-      try {
-        const res = await fetch(`/api/sportfest/teams/${team.id}/members`);
-        const { members } = await res.json();
-        members.forEach((m, i) => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${i + 1}</td><td>${m.firstName}</td><td>${m.middleInitial || ''}</td><td>${m.lastName}</td>`;
-          membersTable.appendChild(tr);
-        });
-        membersModal.show();
-      } catch (err) {
-        alert('❌ Failed to load members');
-      }
-    }
-
-    searchInput.addEventListener('input', () => { currentPage = 1; render(); });
-    statusFilter.addEventListener('change', () => { currentPage = 1; render(); });
-    pageSelect.addEventListener('change', () => { currentPage = +pageSelect.value; render(); });
-
-    printAcceptedBtn.addEventListener('click', () => {
-      showOnlyAccepted = true;
-      teamsPrintTitle.classList.remove('d-none');
-      document.body.classList.add('print-teams');
-      render();
-      setTimeout(() => window.print(), 100);
-    });
-
-    window.addEventListener('afterprint', () => {
-      showOnlyAccepted = false;
-      document.body.classList.remove('print-teams');
-      teamsPrintTitle.classList.add('d-none');
-      render();
-    });
-
-    printTeamBtn.addEventListener('click', () => {
-      document.body.classList.add('print-members');
-      setTimeout(() => {
-        window.print();
-        document.body.classList.remove('print-members');
-      }, 100);
-    });
+  let teams = [], perPage = 100, currentPage = 1, showOnlyAccepted = false;
 
   /*******************************
    * Loader progress
    *******************************/
-  document.addEventListener('DOMContentLoaded', () => {
+  function startLoader() {
     let p = 0;
-    const bar = document.getElementById('progress-bar');
-    const pct = document.getElementById('percentage');
-    const wrap = document.getElementById('loader-wrapper');
-    const iv = setInterval(() => {
-      p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
-      bar.style.width = p + '%';
-      pct.textContent = p + '%';
+    const interval = setInterval(() => {
+      p = Math.min(100, p + Math.floor(Math.random() * 5) + 1); // random smooth increment
+      progressBar.style.width = p + '%';
+      percentage.textContent = p + '%';
       if (p >= 100) {
-        clearInterval(iv);
-        wrap.style.display = 'none';
+        clearInterval(interval);
+        loaderWrapper.style.display = 'none';
       }
-    }, 70);
+    }, 50);
+  }
+
+  startLoader(); // start loader immediately
+
+  /*******************************
+   * Load Teams
+   *******************************/
+  async function loadTeams() {
+    try {
+      const res = await fetch('/api/sportfest/teams');
+      if (!res.ok) throw new Error('Failed to fetch teams');
+      const { teams: data } = await res.json();
+      teams = data || [];
+      render();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function render() {
+    const search = searchInput.value.trim().toLowerCase();
+    const filterStatus = statusFilter.value;
+    let filtered = teams.filter(t => t.teamName.toLowerCase().includes(search));
+    if (filterStatus !== 'ALL') filtered = filtered.filter(t => t.status === filterStatus);
+    if (showOnlyAccepted) filtered = filtered.filter(t => t.status === 'ACCEPTED');
+
+    const statusOrder = { PENDING: 0, ACCEPTED: 1, DECLINED: 2 };
+    filtered.sort((a, b) => statusOrder[a.status || 'PENDING'] - statusOrder[b.status || 'PENDING']);
+
+    const totalPages = Math.ceil(filtered.length / perPage) || 1;
+    pageSelect.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `Page ${i}`;
+      if (i === currentPage) opt.selected = true;
+      pageSelect.appendChild(opt);
+    }
+
+    tbody.innerHTML = '';
+    const start = (currentPage - 1) * perPage;
+    filtered.slice(start, start + perPage).forEach(t => {
+      const tr = document.createElement('tr');
+      const submitted = new Date(t.submittedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+
+      tr.innerHTML = `
+        <td>${t.teamName}</td>
+        <td>${t.ageRange}</td>
+        <td>${submitted}</td>
+        <td class="status ${t.status}">${t.status}</td>
+        <td>
+          <button class="btn btn-success btn-sm me-1 accept-btn">Accept</button>
+          <button class="btn btn-danger btn-sm me-1 decline-btn">Decline</button>
+          <button class="btn btn-secondary btn-sm show">Show Members</button>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+
+      tr.querySelector('.accept-btn').onclick = () => updateStatus(t.id, 'ACCEPTED', tr);
+      tr.querySelector('.decline-btn').onclick = () => updateStatus(t.id, 'DECLINED', tr);
+      tr.querySelector('.show').onclick = () => showMembers(t);
+    });
+  }
+
+  async function updateStatus(id, status, tr) {
+    try {
+      const res = await fetch(`/api/sportfest/teams/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update');
+
+      const cell = tr.querySelector('.status');
+      cell.textContent = data.status;
+      cell.className = `status ${data.status}`;
+
+      const team = teams.find(t => t.id === id);
+      if (team) team.status = data.status;
+
+    } catch (err) {
+      alert('❌ ' + err.message);
+    }
+  }
+
+  async function showMembers(team) {
+    modalTeamName.textContent = `Team Name: ${team.teamName}`;
+    membersTable.innerHTML = '';
+    try {
+      const res = await fetch(`/api/sportfest/teams/${team.id}/members`);
+      const { members } = await res.json();
+      members.forEach((m, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i + 1}</td><td>${m.firstName}</td><td>${m.middleInitial || ''}</td><td>${m.lastName}</td>`;
+        membersTable.appendChild(tr);
+      });
+      membersModal.show();
+    } catch (err) {
+      alert('❌ Failed to load members');
+    }
+  }
+
+  searchInput.addEventListener('input', () => { currentPage = 1; render(); });
+  statusFilter.addEventListener('change', () => { currentPage = 1; render(); });
+  pageSelect.addEventListener('change', () => { currentPage = +pageSelect.value; render(); });
+
+  printAcceptedBtn.addEventListener('click', () => {
+    showOnlyAccepted = true;
+    teamsPrintTitle.classList.remove('d-none');
+    document.body.classList.add('print-teams');
+    render();
+    setTimeout(() => window.print(), 100);
   });
 
-    // Admin role check
-    const role = sessionStorage.getItem('userRole');
-    if (role !== 'admin') window.location.href = 'homepage.html';
-
-    loadTeams();
+  window.addEventListener('afterprint', () => {
+    showOnlyAccepted = false;
+    document.body.classList.remove('print-teams');
+    teamsPrintTitle.classList.add('d-none');
+    render();
   });
-  </script>
+
+  printTeamBtn.addEventListener('click', () => {
+    document.body.classList.add('print-members');
+    setTimeout(() => {
+      window.print();
+      document.body.classList.remove('print-members');
+    }, 100);
+  });
+
+  // Admin role check
+  const role = sessionStorage.getItem('userRole');
+  if (role !== 'admin') window.location.href = 'homepage.html';
+
+  // Load teams
+  loadTeams();
+});
+</script>
+
 </body>
 </html>

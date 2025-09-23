@@ -11,7 +11,7 @@
 
   <style>
     body { background:#8d8d8d; color:#111827; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; }
-    .topbar { background:#fff; border-bottom:1px solid #e6e9ee; }
+    .topbar { background: linear-gradient(175deg, #882323 55%, #000000 60%); }
     .card-surface { background:#fff; border:1px solid #eef2f6; border-radius:10px; box-shadow:0 6px 18px rgba(16,24,40,0.04); }
     .btn-primary-accent { background:#0b5cff; border:none; color:#fff; }
     .small-muted { color:#64748b; font-size:.88rem; }
@@ -20,32 +20,51 @@
     #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
     .progress-bar-custom { left: 100px; width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
     @media (max-width: 769px) { .topbar .container { gap: .10rem; } }
-        @media print {
+@media print {
   body * {
-    visibility: hidden; /* Hide everything by default */
+    visibility: hidden; /* hide everything by default */
   }
 
-  #careerTableBody, #careerTableBody * {
-    visibility: visible; /* Only show the table and its contents */
+  /* Show only this table and its title */
+  #responseTableTitle,
+  #responseTable,
+  #responseTable * {
+    visibility: visible;
   }
 
-  #careerTableBody {
+  /* Position the title and table */
+  #responseTableTitle {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    text-align: center;
+  }
+
+  #responseTable {
+    position: absolute;
+    left: 0;
+    top: 60px; /* leave space for title */
+    width: 100%;
   }
 }
+
   </style>
 </head>
 <body>
   <!-- Topbar -->
   <nav class="topbar py-2">
     <div class="container d-flex align-items-center gap-3">
-      <a class="btn btn-outline-secondary btn-sm" href="admin-homepage.html" title="Back"><i class="fa-solid fa-arrow-left"></i></a>
+      <a class="btn btn-outline-light btn-sm" href="admin-homepage.html">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
       <div>
-        <div class="fw-bold">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
-        <div class="small-muted">Jobs Response — Admin</div>
+        <div class="fw-bold text-white">
+          TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
+        </div>
+        <div class="small-muted text-white">
+          Career Survey — Admin
+        </div>
       </div>
       <div class="ms-auto d-flex gap-2">
         <button id="printBtn" class="btn btn-light btn-sm" title="Print"><i class="fa-solid fa-print"></i></button>

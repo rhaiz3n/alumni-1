@@ -133,6 +133,10 @@
     .applications-table th, .applications-table td { padding:.5rem; border-bottom:1px solid #eee; text-align:left; }
     .modal-body .form-label { font-weight:600; }
     .register-btn { margin-top: 8px; }
+    .badge-pending {
+      background-color: orange;
+      color: white;
+    }
     /* Responsive */
     @media (max-width: 991px) {
       .left-col, .right-col { display:none; }
@@ -374,55 +378,87 @@
     </div>
   </div>
 
-  <!-- ID REQUEST MODAL -->
-  <div class="modal fade" id="idRequestModalBS" tabindex="-1" aria-labelledby="idRequestModalLabel">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <form id="idRequestForm" enctype="multipart/form-data">
-          <div class="modal-header">
-            <h5 class="modal-title">ID Request Form</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+ <!-- ID REQUEST MODAL -->
+<div class="modal fade" id="idRequestModalBS" tabindex="-1" aria-labelledby="idRequestModalLabel">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form id="idRequestForm" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title">ID Request Form</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Upload Valid ID *</label>
+            <input type="file" name="idImage" class="form-control" required>
           </div>
-          <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Full Name on Official Records *</label>
+            <input type="text" id="fullName" name="fullName" class="form-control" maxlength="30" required readonly>
+          </div>
             <div class="mb-3">
-              <label class="form-label">Upload Valid ID *</label>
-              <input type="file" name="idImage" class="form-control" required>
+              <label class="form-label">Course Major *</label>
+              <select id="degree" name="degree" class="form-control" required>
+                <!-- BET Programs -->
+                <option value="">Select Major</option>
+                <option value="BET">BET</option>
+                <option value="BET-CoET">BET-CoET</option>
+                <option value="BET-ET">BET-ET</option>
+                <option value="BET-ElecT">BET-ElecT</option>
+                <option value="BET-MT">BET-MT</option>
+                <option value="BET-MT-Auto">BET-MT-Auto</option>
+                <option value="BET-MT-PP">BET-MT-PP</option>
+
+                <!-- BTVTEd Programs -->
+                <option value="BTVTEd">BTVTEd</option>
+                <option value="BTVTEd-CP">BTVTEd-CP</option>
+                <option value="BTVTEd-ET">BTVTEd-ET</option>
+
+                <!-- BSIE Programs -->
+                <option value="BSIE">BSIE</option>
+                <option value="BSIE-HE">BSIE-HE</option>
+                <option value="BSIE-IA">BSIE-IA</option>
+                <option value="BSIE-ICT">BSIE-ICT</option>
+
+                <!-- Engineering Programs -->
+                <option value="BSCE">BSCE</option>
+                <option value="BSEE">BSEE</option>
+                <option value="BSME">BSME</option>
+              </select>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Full Name on Official Records *</label>
-              <input type="text" id="fullName" name="fullName" class="form-control" maxlength="30" required readonly>
+          <div class="row g-2">
+            <div class="col">
+              <label class="form-label">Year Graduated *</label>
+              <input type="text" id="yearGraduated" name="yearGraduated" class="form-control" maxlength="4" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
-            <div class="mb-3">
-              <label class="form-label">Course Major [BET-COET/BTVTED-ET] *</label>
-              <input type="text" id="degree" name="degree" class="form-control" maxlength="9" required oninput="this.value = formatDegree(this.value)">
-            </div>
-            <div class="row g-2">
-              <div class="col">
-                <label class="form-label">Year Graduated *</label>
-                <input type="text" id="yearGraduated" name="yearGraduated" class="form-control" maxlength="4" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-              </div>
-              <div class="col">
-                <label class="form-label">Student No. *</label>
-                <input type="text" id="studentNo" name="studentNo" class="form-control" maxlength="4" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-              </div>
-            </div>
-            <div class="mb-3 mt-2">
-              <label class="form-label">Phone No. *</label>
-              <input type="tel" id="idRequestPhoneNo" name="phoneNo" class="form-control" maxlength="12" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Personal Email Address *</label>
-              <input type="email" id="email" name="email" class="form-control" maxlength="40" required oninput="this.value = this.value.replace(/\s/g, '')">
+            <div class="col">
+              <label class="form-label">Student No. *</label>
+              <input type="text" id="studentNo" name="studentNo" class="form-control" maxlength="4" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" onclick="submitIdRequestForm()">Submit</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('idRequestForm').reset()">Close</button>
+          <div class="mb-3 mt-2">
+            <label class="form-label">Phone No. *</label>
+            <input type="tel" id="idRequestPhoneNo" name="phoneNo" class="form-control" maxlength="12" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
           </div>
-        </form>
-      </div>
+          <div class="mb-3">
+            <label class="form-label">Personal Email Address *</label>
+            <input type="email" id="email" name="email" class="form-control" maxlength="40" required oninput="this.value = this.value.replace(/\s/g, '')">
+          </div>
+
+          <!-- Instruction box (hidden initially) -->
+          <div class="mb-3" id="idRequestInstructions" style="display:none; background:#f8f9fa; padding:10px; border-radius:5px;">
+            <!-- Instructions will appear here after submission -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="submitIdRequestForm()">Submit</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="document.getElementById('idRequestForm').reset()">Close</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+
 
   <!-- MENS BASKETBALL MODAL -->
   <div class="modal fade" id="mensBasketballModalBS" tabindex="-1">
@@ -1590,21 +1626,40 @@ window.openCareerSurvey = async function(career) {
     document.getElementById('fullName').value = fullName;
   });
 
-  async function submitIdRequestForm() {
-    const form = document.getElementById('idRequestForm');
-    const fd = new FormData(form);
-    try {
-      const res = await fetch('/api/requests/add', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Unknown error');
-      showNotification('✅ Submission Successful!', 'success');
-      bootstrap.Modal.getInstance(document.getElementById('idRequestModalBS')).hide();
-      form.reset();
-    } catch (err) {
-      console.error(err);
-      showNotification('❌ Submission failed: ' + (err.message || err), 'error');
-    }
+async function submitIdRequestForm() {
+  const form = document.getElementById('idRequestForm');
+  const instructionsDiv = document.getElementById('idRequestInstructions');
+  const modal = bootstrap.Modal.getInstance(document.getElementById('idRequestModalBS'));
+
+  const fd = new FormData(form);
+
+  try {
+    const res = await fetch('/api/requests/add', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Unknown error');
+
+    showNotification('✅ Submission Successful!', 'success');
+
+    // Disable form inputs
+    form.querySelectorAll('input, button').forEach(el => el.disabled = true);
+
+    // Show instructions
+    instructionsDiv.style.display = 'block';
+    instructionsDiv.innerHTML = `
+      <h5>Request Submitted Successfully!</h5>
+      <p>Please wait for your ID request to be processed. You can check your request status anytime in the "ID Request Status" section.</p>
+      <p>Do not submit multiple requests for the same ID.</p>
+    `;
+
+    // Keep the modal open so user can read instructions
+
+  } catch (err) {
+    console.error(err);
+    showNotification('❌ Submission failed: ' + (err.message || err), 'error');
   }
+}
+
+
 
   // ------------------------------
   // PROFILE data loading, edit & save
@@ -1828,57 +1883,61 @@ window.openCareerSurvey = async function(career) {
 // ================================
 // 📌 ID Request Status (User Side)
 // ================================
-
-document.getElementById("openIdStatusSidebar").addEventListener("click", async (e) => {
+// Open ID Request Status modal
+document.getElementById('openIdStatusSidebar')?.addEventListener('click', async (e) => {
   e.preventDefault();
+  await fetchUserIdRequestStatus();
+});
 
-  const content = document.getElementById("idRequestStatusContent");
-  content.innerHTML = "Loading status...";
 
-  const firstName = sessionStorage.getItem("firstName");
-  const lastName = sessionStorage.getItem("lastName");
 
-  if (!firstName || !lastName) {
-    content.innerHTML = "⚠️ No user session found. Please log in first.";
-    new bootstrap.Modal(document.getElementById("idStatusModalBS")).show();
+async function fetchUserIdRequestStatus() {
+  const content = document.getElementById('idRequestStatusContent');
+  content.innerHTML = 'Loading status...';
+
+  const userName = sessionStorage.getItem('userName');
+  if (!userName) {
+    content.innerHTML = '⚠️ No user session found. Please log in first.';
+    new bootstrap.Modal(document.getElementById('idStatusModalBS')).show();
     return;
   }
 
   try {
-    const res = await fetch(`/api/requests/user/byname/${encodeURIComponent(firstName)}/${encodeURIComponent(lastName)}`);
-    if (!res.ok) throw new Error("Failed to fetch request status");
+    const res = await fetch(`/api/requests/user/byusername/${encodeURIComponent(userName)}`);
+    if (!res.ok) throw new Error('Failed to fetch request status');
 
     const request = await res.json();
-
     if (!request) {
-      content.innerHTML = "❌ You haven’t submitted an ID request yet.";
+      content.innerHTML = '❌ You haven’t submitted an ID request yet.';
     } else {
-      const status = request.status || "PENDING";
+      const status = request.status || 'PENDING';
       content.innerHTML = `
         <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(status)}">${status}</span></p>
+        <p><strong>Submitted On:</strong> ${new Date(request.submittedAt).toLocaleString()}</p>
       `;
     }
   } catch (err) {
-    console.error("❌ Error loading ID request:", err);
-    content.innerHTML = "⚠️ Could not load your ID request status.";
+    console.error('❌ Error loading ID request:', err);
+    content.innerHTML = '⚠️ Could not load your ID request status.';
   }
 
-  new bootstrap.Modal(document.getElementById("idStatusModalBS")).show();
-});
-
-function getStatusColor(status) {
-  switch ((status || "").toUpperCase()) {
-    case "PENDING": return "warning";
-    case "ACCEPTED": return "success";
-    case "ACCEPTED - PENDING": return "info";
-    case "RELEASING": return "primary";
-    case "RELEASED": return "dark";
-    case "DECLINED": return "danger";
-    default: return "secondary";
-  }
+  new bootstrap.Modal(document.getElementById('idStatusModalBS')).show();
 }
 
-
+// ================================
+// 📌 HELPER: STATUS BADGE COLOR
+// ================================
+function getStatusColor(status) {
+  switch ((status || '').toUpperCase()) {
+    case 'PENDING': return 'warning';
+    case 'ACCEPTED': return 'success';
+    case 'ACCEPTED - PENDING': return 'info';
+    case 'RELEASING': return 'primary';
+    case 'RELEASED': return 'dark';
+    case 'DECLINED': return 'danger';
+    default: return 'secondary';
+  }
+}
 
 
 

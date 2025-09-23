@@ -2481,20 +2481,23 @@ app.get('/api/requests/:id/image', async (req, res) => {
 });
 
 
-app.get('/api/requests/user/byname/:firstName/:lastName', async (req, res) => {
-  const { firstName, lastName } = req.params;
+app.get('/api/requests/user/byusername/:userName', async (req, res) => {
+  const { userName } = req.params;
 
   try {
     const [rows] = await pool.execute(
-      `SELECT * FROM requests WHERE fullName = ? ORDER BY submittedAt DESC LIMIT 1`,
-      [`${firstName} ${lastName}`]
+      `SELECT r.* 
+       FROM requests r 
+       JOIN registration reg ON CONCAT(reg.firstName, ' ', reg.lastName) = r.fullName
+       WHERE reg.userName = ?
+       ORDER BY r.submittedAt DESC LIMIT 1`,
+      [userName]
     );
 
     if (rows.length === 0) return res.json(null);
-
     res.json(rows[0]);
   } catch (err) {
-    console.error("❌ Error fetching request by name:", err);
+    console.error("❌ Error fetching request by username:", err);
     res.status(500).json({ error: "Database error" });
   }
 });

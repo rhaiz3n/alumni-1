@@ -520,7 +520,8 @@
 
       if (d.user && d.user.firstName) sessionStorage.setItem('firstName', d.user.firstName);
       if (d.user && d.user.lastName) sessionStorage.setItem('lastName', d.user.lastName);
-      
+      if (d.user && d.user.personalEmail) sessionStorage.setItem('userEmail', d.user.personalEmail); // <-- THIS IS CRUCIAL
+
       showToast('✅ Login successful!', 'success');
       bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
       setTimeout(() => {

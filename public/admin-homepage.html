@@ -2,151 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ADMIN PAGE | TUP - Cavite</title>
 
-  <!-- Bootstrap 5 CSS -->
+  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <link rel="icon" type="image/png" href="/Logo2.png">
 
+  <!-- Custom unified styles -->
   <style>
-    /* --- Custom styles (kept compact) --- */
-    body { background: #bebebe; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-    .feed-card {background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 5px rgba(0,0,0,.05); }
-    .feed-img { width:100%; height: 600px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
-    .feed-content { padding: 14px; }
-    .badge-mini { font-size: .7rem; padding: .25rem .5rem; border-radius: .35rem; }
-    .toast-custom { position: fixed; right: 20px; bottom: 20px; z-index: 9999; }
-    .gallery-thumb { border-radius: .5rem; overflow: hidden; }
-    .grayscale { filter: grayscale(100%); opacity: .6; }
-    .inbox-panel { position: fixed; right: 20px; top: 70px; width: 300px; z-index: 1050; display:none; background-color: beige;}
-    .inbox-panel.show { display:block; }
-    .cursor-pointer { cursor: pointer; }
-    .small-muted { font-size: .85rem; color:#6c757d; }
-    .modal .form-label { font-weight: 600; }
-    .delete-btn-small { background:#e63946;color:#fff;border:none;padding:.25rem .5rem;border-radius:.35rem; }
-    /* responsive tweaks */
-    @media (max-width: 991px) {
-      .inbox-panel { width: 95%; right: 7px; top: 80px; }
+    :root {
+      --fb-blue:#1877f2;
+      --muted:#6c757d;
+      --card-bg: #ffffff;
+      --card-radius: 14px;
+      --shadow: 0 6px 18px rgba(15,23,42,0.08);
     }
-    /* Loader overlay */
-    #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
-    .progress-bar-custom { left: 100px; width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
-    .navbar {
-      position: sticky;
-      top: 0;        /* sticks to the top */
-      z-index: 1050; /* ensures it's above other content */
+    body {
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: #bebebe;
+      color: #111827;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
 
-    .sticky-sidebar {
+    /* Navbar */
+    .topbar {
+      background: linear-gradient(175deg, #882323 55%, #000000 60%);
+      color: white;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.06);
       position: sticky;
-      top: var(--bs-navbar-height, 50px); /* Bootstrap default navbar height */
+      top: 0;
+      z-index: 1050;
+    }
+    .topbar .navbar-brand { display:flex; align-items:center; gap:.6rem; }
+    .topbar .btn-outline-light { border-color: rgba(255,255,255,0.2); color:white; }
+    .topbar .btn-outline-light:hover { background: rgba(255,255,255,0.06); }
+
+    /* Layout */
+    .app-container { max-width:1200px; margin: 22px auto; padding: 0 16px; }
+    .left-card, .right-card, .feed-card { background: var(--card-bg); border-radius: var(--card-radius); box-shadow: var(--shadow); }
+
+    /* Left Sidebar */
+    .left-card { padding: 18px; margin-bottom: 18px; position: sticky; top: 70px; z-index: 1020;}
+    .shortcut-btn { border-radius: 10px; background: linear-gradient(180deg,#fff,#f7f9fb); border:1px solid #e6e9ee; padding:12px; text-align:left; display:flex; gap:12px; align-items:center; transition: transform .12s ease, box-shadow .12s ease; cursor:pointer;}
+    .shortcut-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
+
+    /* Feed */
+    .feed-card { padding: 14px; margin-bottom: 16px; }
+    .feed-header { display:flex; gap:12px; align-items:center; }
+    .avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 8px rgba(15,23,42,0.06); }
+    .feed-title { font-weight:600; font-size:15px; }
+    .feed-date { color:var(--muted); font-size:12px; }
+    .feed-image { width:100%; border-radius:10px; margin-top:12px; max-height:420px; object-fit:cover; }
+    .feed-meta { display:flex; gap:12px; margin-top:10px; color:var(--muted); font-size:13px; align-items:center; }
+
+    /* Right Sidebar */
+    .right-card { padding:14px; margin-bottom: 18px; }
+
+    /* Loader */
+    #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
+    .progress-bar-custom { width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin:auto; }
+
+    /* Responsive */
+    @media (max-width:991px) {
+      .app-container { padding: 0 12px; }
+      .left-column { display:none; }
+      .right-column { display:none; }
     }
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary"
-    style="background: linear-gradient(175deg, #882323 55%, #000000 60%);">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="admin-homepage.html">
-        <img src="Logo.png" alt="logo" style="height:36px; margin-right:10px;">
-        <span><strong>TUP Cavite — Admin</strong></span>
+
+  <!-- Loader -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div style="text-align:center;">
+      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+      <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
+        <div id="progress-bar" class="progress-bar-custom"></div>
+      </div>
+      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar topbar">
+    <div class="container">
+      <a class="navbar-brand text-white" href="admin-homepage.html">
+        <img src="Logo2.png" alt="Logo" style="height:34px; border-radius:6px;">
+        <span style="font-weight:600;">TUP Cavite — Admin</span>
       </a>
 
-
       <form class="d-flex ms-auto me-3 flex-grow-1" role="search" style="max-width: 600px;">
-        <input id="feedSearch" 
-              class="form-control" 
-              type="search" 
-              placeholder="🔍 Search events or careers..." 
-              oninput="filterFeed()">
+        <input id="feedSearch" class="form-control" type="search" placeholder="🔍 Search events or careers..." oninput="filterFeed()">
       </form>
 
-      <div class="d-flex align-items-center ms-auto">
-        <button id="notificationToggle" class="btn btn-outline-light me-2 position-relative">
+      <div class="d-flex align-items-center ms-3 gap-2">
+        <button id="notificationToggle" class="btn btn-outline-light position-relative">
           <i class="fas fa-bell"></i>
           <span id="inboxBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
         </button>
-        <button id="signOutBtn" class="btn btn-light">Sign out</button>
+        <button id="signOutBtn" class="btn btn-light btn-sm text-primary">Sign out</button>
       </div>
     </div>
   </nav>
 
-  <!-- MAIN LAYOUT -->
-<div class="container-fluid my-3">
-  <div class="row gx-3">
-    <!-- LEFT SIDEBAR -->
-    <div class="col-lg-3 mb-3">
-      <div class="card shadow-sm sticky-sidebar">
-        <div class="card-body">
+  <!-- Layout -->
+  <div class="app-container">
+    <div class="row gx-4">
+
+      <!-- Left Sidebar -->
+      <div class="col-lg-3 left-column">
+        <div class="left-card">
           <div class="d-grid gap-2">
-            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEvent">📅 Post Event</button>
-            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalCareer">💼 Post Career</button>
-            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalGallery">🖼️ Gallery</button>
-            <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalID">🪪 ID Announcement</button>
-            <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modalApps">📋 Applications</button>
-            <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#modalGcash">💳 Manage GCash</button>
+            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalEvent"><i class="fa-solid fa-calendar-days fa-lg" style="color:#0b5ed7;"></i><div><strong>Post Event</strong><div class="small" style="color:var(--muted)">Create new event</div></div></div>
+            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalCareer"><i class="fa-solid fa-briefcase fa-lg" style="color:#198754;"></i><div><strong>Post Career</strong><div class="small" style="color:var(--muted)">New job opportunity</div></div></div>
+            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalGallery"><i class="fa-solid fa-images fa-lg" style="color:#d63384;"></i><div><strong>Gallery</strong><div class="small" style="color:var(--muted)">Upload images</div></div></div>
+            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalID"><i class="fa-solid fa-id-card fa-lg" style="color:#6c757d;"></i><div><strong>ID Announcement</strong><div class="small" style="color:var(--muted)">Post ID info</div></div></div>
+            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalApps"><i class="fa-solid fa-list fa-lg" style="color:#ffc107;"></i><div><strong>Applications</strong><div class="small" style="color:var(--muted)">Career applicants</div></div></div>
+            <div class="shortcut-btn" data-bs-toggle="modal" data-bs-target="#modalGcash"><i class="fa-solid fa-credit-card fa-lg" style="color:#0dcaf0;"></i><div><strong>Manage GCash</strong><div class="small" style="color:var(--muted)">Upload QR</div></div></div>
           </div>
 
-          <hr class="my-3"/>
-
-          <div class="list-group">
-            <a class="list-group-item list-group-item-action" href="alumni-Database.html">Alumni Database</a>
-            <a class="list-group-item list-group-item-action" href="jobs-response.html">Jobs Response</a>
-            <a class="list-group-item list-group-item-action" href="data-registration.html">Registration</a>
-            <a class="list-group-item list-group-item-action" href="admin-id.html">ID Request</a>
-            <a class="list-group-item list-group-item-action" href="event-registration.html">Event Registration</a>
-            <a class="list-group-item list-group-item-action" href="admin-employer.html">Employer Registration</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-      <!-- FEED COLUMN -->
-      <div class="col-lg-6 mb-3">
-        <div id="feed" class="mb-3">
-          <!-- feed cards rendered here -->
+          <hr style="margin:14px 0;border-color:#eef2f6;">
+          <div class="small" style="color:var(--muted);">Quick Links</div>
+          <ul class="list-unstyled mt-2">
+            <li><a href="alumni-Database.html" class="text-decoration-none">Alumni Database</a></li>
+            <li><a href="jobs-response.html" class="text-decoration-none">Jobs Response</a></li>
+            <li><a href="data-registration.html" class="text-decoration-none">Registration</a></li>
+            <li><a href="admin-id.html" class="text-decoration-none">ID Request</a></li>
+            <li><a href="event-registration.html" class="text-decoration-none">Event Registration</a></li>
+            <li><a href="admin-employer.html" class="text-decoration-none">Employer Registration</a></li>
+          </ul>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN -->
-      <div class="col-lg-3 mb-3">
-        <div class="card shadow-sm mb-3">
-          <div class="card-header bg-primary text-white">ID Announcements</div>
-          <div class="card-body" id="idAnnouncementList">Loading...</div>
+      <!-- Center Feed -->
+      <div class="col-lg-6">
+        <div id="feed">
+          <!-- feed cards go here -->
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="col-lg-3 right-column">
+        <div class="right-card mb-3">
+          <div style="font-weight:700; margin-bottom:8px;">ID Announcements</div>
+          <div id="idAnnouncementList" class="small-muted">Loading...</div>
         </div>
 
-        <div class="card shadow-sm mb-3">
-          <div class="card-header bg-success text-white">Event Announcements</div>
-          <div class="card-body" id="eventList">Loading...</div>
+        <div class="right-card mb-3">
+          <div style="font-weight:700; margin-bottom:8px;">Event Announcements</div>
+          <div id="eventList" class="small-muted">Loading...</div>
         </div>
 
-        <div class="card shadow-sm">
-          <div class="card-header bg-warning">Career Opportunities</div>
-          <div class="card-body" id="careerList">Loading...</div>
+        <div class="right-card">
+          <div style="font-weight:700; margin-bottom:8px;">Career Opportunities</div>
+          <div id="careerList" class="small-muted">Loading...</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- INBOX PANEL -->
-  <div id="inboxPanel" class="card inbox-panel shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <span>ADMIN INBOX</span>
-    </div>
-    <div class="card-body" style="max-height: 400px; overflow:auto;">
-      <div id="inboxContentList"></div>
-    </div>
+  <!-- Inbox Panel -->
+  <div id="inboxPanel" class="right-card" style="position:fixed; right:20px; top:70px; width:300px; z-index:1050; display:none;">
+    <div style="font-weight:700; margin-bottom:8px;">ADMIN INBOX</div>
+    <div style="max-height:400px; overflow:auto;" id="inboxContentList"></div>
   </div>
 
-  <!-- TOAST CONTAINER (custom) -->
-  <div id="toast-container" class="toast-custom"></div>
+  <!-- Toast wrapper -->
+  <div id="toastWrapper" style="position: fixed; top: 16px; right: 16px; z-index: 13000;"></div>
 
   <!-- =================== MODALS =================== -->
   <!-- Event Modal -->
@@ -311,19 +344,6 @@
     </div>
   </div>
 
-  <!-- Loader (Bootstrap replacement) -->
-  <div id="loader-wrapper" role="status" aria-live="polite">
-    <div style="text-align:center;">
-      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
-      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
-      <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
-        <div id="progress-bar" class="progress-bar-custom"></div>
-      </div>
-      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
-    </div>
-  </div>
-
-  
 
   <!-- CONFIRM modal (custom) -->
   <div id="confirmModal" class="d-none">
@@ -425,106 +445,123 @@
     return isNaN(d.getTime()) ? null : d;
   }
 
-  // --- LOAD FEED (events + careers) ---
-  async function loadFeed() {
-    const container = document.getElementById('feed');
-    container.innerHTML = '<div class="text-center py-5 text-muted">Loading feed...</div>';
+// --- LOAD FEED (events + careers) ---
+async function loadFeed() {
+  const container = document.getElementById('feed');
+  container.innerHTML = '<div class="text-center py-5 text-muted">Loading feed...</div>';
 
-    try {
-      const [eventsRes, careersRes] = await Promise.all([
-        fetch('/api/events'),
-        fetch('/api/careers/all')
-      ]);
-      if (!eventsRes.ok || !careersRes.ok) throw new Error('Failed to fetch feed data');
+  try {
+    const [eventsRes, careersRes] = await Promise.all([
+      fetch('/api/events'),
+      fetch('/api/careers/all')
+    ]);
+    if (!eventsRes.ok || !careersRes.ok) throw new Error('Failed to fetch feed data');
 
-      const { events = [] } = await eventsRes.json();
-      const { careers = [] } = await careersRes.json();
+    const { events = [] } = await eventsRes.json();
+    const { careers = [] } = await careersRes.json();
 
-      const formattedEvents = (events || []).map(e => ({ ...e, type: 'Event' }));
-      const formattedCareers = (careers || []).map(c => ({ ...c, type: 'Career' }));
-      const feed = [...formattedEvents, ...formattedCareers].sort((a,b) => new Date(b.datePosted) - new Date(a.datePosted));
+    const formattedEvents = (events || []).map(e => ({ ...e, type: 'Event' }));
+    const formattedCareers = (careers || []).map(c => ({ ...c, type: 'Career' }));
+    const feed = [...formattedEvents, ...formattedCareers]
+      .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
 
-      if (!feed.length) {
-        container.innerHTML = '<div class="text-center py-5 text-muted">No posts yet.</div>';
-        return;
-      }
-
-      container.innerHTML = feed.map((post, index) => {
-        let extraInfo = '';
-        if (post.type === 'Event') extraInfo = `🎉 Type: ${post.location || 'N/A'}`;
-        if (post.type === 'Career') extraInfo = `🏢 Company: ${post.link || 'N/A'}`;
-
-        let imgSrc = '';
-        if (post.type === 'Career') imgSrc = `/api/careers/image/${post.id}`;
-        else if (post.type === 'Event') imgSrc = `/api/events/image/${post.id}`;
-
-        // compute deadline/time for countdown
-        let deadlineDate = null;
-        if (post.type === 'Career') {
-          const posted = parseFlexibleDateTime(post.datePosted) || new Date();
-          deadlineDate = new Date(posted.getTime() + 5*24*60*60*1000); // 5 days window
-        } else if (post.type === 'Event') {
-          // use eventDateTime if present otherwise datePosted
-          const raw = post.eventDateTime || post.datePosted;
-          deadlineDate = parseFlexibleDateTime(raw);
-        }
-        const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
-
-        // fallback title & desc
-        const title = (post.title || '').toString().toUpperCase();
-        const desc = (post.description || '').toString();
-
-        return `
-          <div class="feed-card" id="post-${post.type}-${post.id}">
-            <div class="position-relative">
-              ${ imgSrc ? `<img src="${imgSrc}" class="feed-img" alt="post image">` : '' }
-              <button class="btn delete-btn-small position-absolute" style="top:10px;right:10px" onclick="deletePost('${post.type}', ${post.id})">✖</button>
-            </div>
-            <div class="feed-content">
-              <h5 class="mb-1">${title} <small class="text-muted">[${post.type}]</small></h5>
-              <p class="small-muted mb-2">${desc}</p>
-              <div class="d-flex justify-content-between align-items-center small-muted">
-                <div>${extraInfo}</div>
-                <div>Posted: ${ new Date(post.datePosted).toLocaleString() }</div>
-              </div>
-              <div class="mt-2 small text-end">⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // update countdowns every second
-      function updateCountdowns() {
-        const now = Date.now();
-        document.querySelectorAll('.countdown').forEach(el => {
-          const ms = Number(el.dataset.time);
-          if (!ms || isNaN(ms)) { el.textContent = '—'; return; }
-          const diff = ms - now;
-          const card = el.closest('.feed-card');
-
-          if (diff <= 0) {
-            el.textContent = '❌ Closed';
-            if (card) card.classList.add('grayscale');
-            return;
-          }
-
-          const days = Math.floor(diff / (1000*60*60*24));
-          const hours = Math.floor((diff % (1000*60*60*24))/(1000*60*60));
-          const minutes = Math.floor((diff % (1000*60*60))/(1000*60));
-          const seconds = Math.floor((diff % (1000*60))/1000);
-
-          el.textContent = days > 0 ? `${days}d ${hours}h ${minutes}m ${seconds}s left` : `${hours}h ${minutes}m ${seconds}s left`;
-        });
-      }
-      updateCountdowns();
-      if (window._feedCountdownInterval) clearInterval(window._feedCountdownInterval);
-      window._feedCountdownInterval = setInterval(updateCountdowns, 1000);
-
-    } catch (err) {
-      console.error('Failed to load feed:', err);
-      document.getElementById('feed').innerHTML = '<div class="text-center py-5 text-danger">⚠️ Failed to load feed.</div>';
+    if (!feed.length) {
+      container.innerHTML = '<div class="text-center py-5 text-muted">No posts yet.</div>';
+      return;
     }
+
+    container.innerHTML = feed.map((post, index) => {
+      let badgeClass = post.type === 'Career' ? 'success' : 'primary';
+      let imgSrc = post.type === 'Career'
+        ? `/api/careers/image/${post.id}`
+        : `/api/events/image/${post.id}`;
+
+      // compute deadline/time for countdown
+      let deadlineDate = null;
+      if (post.type === 'Career') {
+        const posted = parseFlexibleDateTime(post.datePosted) || new Date();
+        deadlineDate = new Date(posted.getTime() + 5 * 24 * 60 * 60 * 1000);
+      } else if (post.type === 'Event') {
+        const raw = post.eventDateTime || post.datePosted;
+        deadlineDate = parseFlexibleDateTime(raw);
+      }
+      const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
+
+      const title = (post.title || '').toString();
+      const desc = (post.description || '').toString();
+
+      return `
+        <div class="feed-card" id="post-${post.type}-${post.id}">
+          
+          <!-- Header -->
+          <div class="feed-header">
+            <img src="Logo2.png" class="avatar" alt="Avatar">
+            <div>
+              <div class="feed-title">
+                TUP Cavite Alumni Association
+                <span class="badge bg-${badgeClass} ms-2">${post.type}</span>
+              </div>
+              <div class="feed-date">Posted: ${new Date(post.datePosted).toLocaleString()}</div>
+            </div>
+            <button class="btn delete-btn-small ms-auto" onclick="deletePost('${post.type}', ${post.id})">✖</button>
+          </div>
+
+          <!-- Image -->
+          ${imgSrc ? `<img src="${imgSrc}" class="feed-image" alt="post image">` : ''}
+
+          <!-- Content -->
+          <div class="feed-content">
+            <p class="mb-1"><strong>${title}</strong></p>
+            <p class="small-muted mb-2">${desc}</p>
+            ${
+              post.type === 'Event'
+                ? `<p class="small-muted">📍 ${post.location || 'N/A'} | 🗓 ${post.eventDateTime || '—'}</p>`
+                : `<p class="small-muted">🏢 ${post.link || 'Company N/A'}</p>`
+            }
+          </div>
+
+          <!-- Countdown -->
+          <div class="feed-meta">
+            ⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // update countdowns every second
+    function updateCountdowns() {
+      const now = Date.now();
+      document.querySelectorAll('.countdown').forEach(el => {
+        const ms = Number(el.dataset.time);
+        if (!ms || isNaN(ms)) { el.textContent = '—'; return; }
+        const diff = ms - now;
+        const card = el.closest('.feed-card');
+
+        if (diff <= 0) {
+          el.textContent = '❌ Closed';
+          if (card) card.classList.add('grayscale');
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        el.textContent = days > 0
+          ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
+          : `${hours}h ${minutes}m ${seconds}s left`;
+      });
+    }
+    updateCountdowns();
+    if (window._feedCountdownInterval) clearInterval(window._feedCountdownInterval);
+    window._feedCountdownInterval = setInterval(updateCountdowns, 1000);
+
+  } catch (err) {
+    console.error('Failed to load feed:', err);
+    document.getElementById('feed').innerHTML = '<div class="text-center py-5 text-danger">⚠️ Failed to load feed.</div>';
   }
+}
 
   // --- Delete post (Event or Career) ---
   async function deletePost(type, id) {

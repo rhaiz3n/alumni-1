@@ -57,7 +57,12 @@
     .shortcut-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
 
     /* Feed */
-    .feed-card { padding: 14px; margin-bottom: 16px; }
+    .feed-card { padding: 14px; margin-bottom: 16px; position: relative;}
+    .feed-card.grayscale {
+      filter: grayscale(80%);
+      opacity: 0.7;
+      transition: all 0.3s ease;
+    }
     .feed-header { display:flex; gap:12px; align-items:center; }
     .avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 8px rgba(15,23,42,0.06); }
     .feed-title { font-weight:600; font-size:15px; }
@@ -89,6 +94,23 @@
     .text-justify {
       text-align: justify;
     }
+
+    .delete-btn-small {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 14px;
+      background: rgba(255,0,0,0.1);
+      color: red;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .delete-btn-small:hover {
+      background: red;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -106,36 +128,36 @@
   </div>
 
   <!-- Navbar -->
-  <nav class="navbar topbar">
-    <div class="container">
-      <a class="navbar-brand text-white" href="admin-homepage.html">
-        <img src="Logo2.png" alt="Logo" style="height:34px; border-radius:6px;">
-        <span style="font-weight:600;">TUP Cavite — Admin</span>
-      </a>
+<nav class="navbar topbar">
+  <div class="container d-flex align-items-center">
+    <a class="navbar-brand text-white me-3" href="admin-homepage.html">
+      <img src="Logo2.png" alt="Logo" style="height:34px; border-radius:6px;">
+      <span style="font-weight:600;">TUP Cavite — Admin</span>
+    </a>
 
-      <form class="d-flex ms-auto me-3 flex-grow-1" role="search" style="max-width: 600px;">
-        <input id="feedSearch" class="form-control" type="search" placeholder="🔍 Search events or careers..." oninput="filterFeed()">
-      </form>
-
-      <!-- Feed Filter Bar -->
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="btn-group" role="group" aria-label="Feed Filters">
-          <button class="btn btn-outline-primary active" id="filterAll">ALL</button>
-          <button class="btn btn-outline-success" id="filterActive">ACTIVE</button>
-          <button class="btn btn-outline-danger" id="filterClosed">CLOSED</button>
-        </div>
-        <button class="btn btn-danger d-none" id="deleteClosedBtn" onclick="deleteAllClosed()">🗑 Delete All Closed</button>
-      </div>
-
-      <div class="d-flex align-items-center ms-3 gap-2">
-        <button id="notificationToggle" class="btn btn-outline-light position-relative">
-          <i class="fas fa-bell"></i>
-          <span id="inboxBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
-        </button>
-        <button id="signOutBtn" class="btn btn-light btn-sm text-primary">Sign out</button>
+    <!-- Search + Filter Buttons -->
+    <div class="d-flex flex-grow-1 align-items-center" style="max-width: 600px;">
+      <input id="feedSearch" class="form-control me-2" type="search" placeholder="🔍 Search events or careers..." oninput="filterFeed()">
+      
+      <div class="btn-group" role="group" aria-label="Feed Filters">
+        <button class="btn btn-outline-primary btn-sm active" id="filterAll">ALL</button>
+        <button class="btn btn-outline-success btn-sm" id="filterActive">ACTIVE</button>
+        <button class="btn btn-outline-danger btn-sm" id="filterClosed">CLOSED</button>
       </div>
     </div>
-  </nav>
+
+    <button class="btn btn-danger d-none ms-2" id="deleteClosedBtn" onclick="deleteAllClosed()">🗑 Delete All Closed</button>
+
+    <div class="d-flex align-items-center ms-3 gap-2">
+      <button id="notificationToggle" class="btn btn-outline-light position-relative">
+        <i class="fas fa-bell"></i>
+        <span id="inboxBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
+      </button>
+      <button id="signOutBtn" class="btn btn-light btn-sm text-primary">Sign out</button>
+    </div>
+  </div>
+</nav>
+
 
   <!-- Layout -->
   <div class="app-container">
@@ -551,53 +573,67 @@ function renderFeed(filterType = "ALL") {
   }
 
   const now = Date.now();
-  const cards = fullFeed.map((post, index) => {
-    let extraInfo = post.type === 'Event'
-      ? `🎉 Type: ${post.location || 'N/A'}`
-      : `🏢 Company: ${post.link || 'N/A'}`;
 
-    const imgSrc = post.image || '';
-
-    // deadline / closed logic
-    let isClosed = false;
+  // --- Add closed status dynamically & sort ---
+  const sortedFeed = fullFeed.map(post => {
     let deadlineMs = null;
-    if (post.type === 'Event') {
+    let isClosed = false;
+
+    if (post.type === 'Career') {
+      const posted = parseFlexibleDateTime(post.datePosted) || new Date();
+      const deadlineDate = new Date(posted.getTime() + 5*24*60*60*1000); // 5 days
+      deadlineMs = deadlineDate.getTime();
+      isClosed = deadlineMs < now;
+    } else if (post.type === 'Event') {
       const deadlineDate = parseFlexibleDateTime(post.eventDateTime || post.datePosted);
       deadlineMs = deadlineDate ? deadlineDate.getTime() : null;
       isClosed = deadlineMs && deadlineMs < now;
     }
 
-    if (filterType === "ACTIVE" && isClosed) return "";
-    if (filterType === "CLOSED" && !isClosed) return "";
+    return { ...post, isClosed, deadlineMs };
+  })
+  // active posts first, closed posts last
+  .sort((a, b) => a.isClosed - b.isClosed || new Date(b.datePosted) - new Date(a.datePosted));
+
+  // --- Render cards ---
+  const cards = sortedFeed.map((post, index) => {
+    if (filterType === "ACTIVE" && post.isClosed) return "";
+    if (filterType === "CLOSED" && !post.isClosed) return "";
 
     const title = (post.title || '').toUpperCase();
-    const desc = (post.description || '');
+    const desc = post.description || '';
+    const imgSrc = post.image || '';
+    const extraInfo = post.type === 'Event' ? `🎉 Type: ${post.location || 'N/A'}` : `🏢 Company: ${post.link || 'N/A'}`;
+    const statusBadge = `<span class="badge ms-2 ${post.isClosed ? 'bg-danger' : 'bg-success'}">
+                            ${post.isClosed ? 'CLOSED' : 'ACTIVE'}
+                         </span>`;
 
     return `
-      <div class="feed-card ${isClosed ? 'grayscale' : ''}" id="post-${post.type}-${post.id}">
+      <div class="feed-card ${post.isClosed ? 'grayscale' : ''}" id="post-${post.type}-${post.id}">
         <div class="feed-header">
           <img src="Logo2.png" alt="avatar" class="avatar">
           <div>
             <div class="feed-title">
               TUP Cavite Alumni Association
               <span class="badge ${post.type==='Event'?'bg-primary':'bg-success'} ms-2">${post.type}</span>
+              ${statusBadge}
             </div>
             <div class="feed-date">Posted: ${ new Date(post.datePosted).toLocaleString() }</div>
           </div>
         </div>
+
         ${ imgSrc ? `<img src="${imgSrc}" class="feed-image" alt="post image" loading="lazy"
                       style="background:#f0f0f0; min-height:150px;">` : '' }
+
         <div class="feed-content">
           <p class="mb-1"><strong>${title}</strong></p>
           <p class="small-muted text-justify">${desc}</p>
-
           <div class="feed-meta">
             <span>${extraInfo}</span>
           </div>
-
-          ${post.type === 'Event' && deadlineMs ? `
+          ${post.deadlineMs ? `
             <div class="text-end mt-2">
-              ⏳ <span class="countdown" data-time="${deadlineMs}" id="countdown-${index}"></span>
+              ⏳ <span class="countdown" data-time="${post.deadlineMs}" id="countdown-${index}"></span>
             </div>
           ` : ''}
         </div>
@@ -611,9 +647,10 @@ function renderFeed(filterType = "ALL") {
   container.innerHTML = cards || '<div class="text-center py-5 text-muted">No posts in this view.</div>';
 
   deleteClosedBtn.classList.toggle('d-none', filterType !== "CLOSED");
-
-  updateCountdowns(); // make sure your countdown updater iterates all .countdown elements
+  updateCountdowns();
 }
+
+
 
 
 // --- COUNTDOWN ---

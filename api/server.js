@@ -302,19 +302,38 @@ app.get('/api/auth/me', (req, res) => {
   res.json(req.session.user);
 });
 
+
 // ✅ Get logged-in employer info
-app.get('/api/employer/me', (req, res) => {
+app.get('/api/employer/me', async (req, res) => {
   if (!req.session.user || !req.session.user.isEmployer) {
     return res.json({ role: 'guest' });
   }
 
-  res.json({
-    role: 'employer',
-    employerId: req.session.user.id,
-    userId: req.session.user.preferredUserId,
-    employerName: req.session.user.employerName || '' // ✅ ensure it exists
-  });
+  try {
+    const [rows] = await pool.execute(
+      `SELECT companyLogo, companyEmail, mobileNo, landlineNo 
+       FROM employers WHERE id = ?`,
+      [req.session.user.id]
+    );
+
+    const employerData = rows[0] || {};
+
+    res.json({
+      role: 'employer',
+      employerId: req.session.user.id,
+      userId: req.session.user.preferredUserId,
+      employerName: req.session.user.employerName || '',
+      companyLogo: employerData.companyLogo || '',   // ✅ add this
+      companyEmail: employerData.companyEmail || '',
+      mobileNo: employerData.mobileNo || '',
+      landlineNo: employerData.landlineNo || ''
+    });
+  } catch (err) {
+    console.error('❌ /api/employer/me error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
 });
+
 
 
 // ✅ Insert alumni (single form submit)
@@ -1252,7 +1271,23 @@ app.post('/api/fullInformation/update', async (req, res) => {
 
 
 
+app.get('/api/employer/:identifier', async (req, res) => {
+  const identifier = req.params.identifier;
 
+  try {
+    const [rows] = await pool.execute(
+      `SELECT * FROM employers WHERE id = ? OR preferredUserId = ?`,
+      [identifier, identifier]
+    );
+
+    if (!rows.length) return res.status(404).json({ error: 'Employer not found' });
+
+    res.json({ employer: rows[0] });
+  } catch (err) {
+    console.error('❌ Employer fetch error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
 
 

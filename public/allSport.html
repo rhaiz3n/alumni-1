@@ -135,10 +135,7 @@
         <select id="sportSelectNav" class="form-select form-select-sm" style="width:180px;">
           <option value="" disabled selected>Sport Fest</option>
           <option value="mensBasketball">Men's Basketball</option>
-          <option value="womensVolleyball">Women's Volleyball</option>
-          <option value="mensVolleyball">Men's Volleyball</option>
-          <option value="chess">Chess</option>
-          <option value="darts">Darts</option>
+          <option value="other">Other Sports Events</option>>
         </select>
 
         <button class="btn btn-outline-light" onclick="location.href='event-registration.html'">
@@ -393,7 +390,7 @@
     // sport nav select behavior (keeps original)
     sportSelectNav.addEventListener('change', function () {
       const sport = this.value;
-      const allowed = ['womensVolleyball', 'mensVolleyball', 'chess', 'darts'];
+      const allowed = ['other'];
       if (allowed.includes(sport)) {
         const target = new URL('allSport.html', window.location.origin);
         target.searchParams.set('sportType', sport);

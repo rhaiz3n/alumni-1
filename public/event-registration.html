@@ -75,40 +75,59 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 200%;
+    padding: 10px;
+    font-size: 12pt;
   }
 
-  /* Remove horizontal scroll for printing */
   #printZone .table-responsive {
     overflow: visible !important;
   }
 
-  /* Table formatting */
   #registrationsTable {
-    width: 100% !important;
+    width: 150% !important;
     border-collapse: collapse !important;
-    table-layout: auto; /* auto width for columns */
+    table-layout: auto;
+    font-size: 10pt;
   }
 
   #registrationsTable th,
   #registrationsTable td {
     border: 1px solid #000 !important;
-    padding: 4px !important;
-    white-space: nowrap; /* prevent wrapping */
+    padding: 6px !important;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left;
   }
 
-  /* Hide action buttons */
-  #registrationsTable .action-btn {
+  #registrationsTable th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* Hide action buttons and unwanted columns */
+  #registrationsTable .action-btn,
+  #registrationsTable th:nth-child(6), /* RECEIPT */
+  #registrationsTable th:nth-child(8), /* RESPONSE */
+  #registrationsTable td:nth-child(6),
+  #registrationsTable td:nth-child(8) {
     display: none !important;
   }
 
-  /* Center the title */
   #printZone h5,
   #printZone small {
     text-align: center;
     display: block;
+    margin-bottom: 10px;
+  }
+
+  #registrationsTable tr {
+    page-break-inside: avoid;
   }
 }
+
 
 
     /* --- Small helpers --- */
@@ -135,10 +154,7 @@
         <select id="sportSelect" class="form-select form-select-sm" style="width:170px;">
           <option value="" disabled selected>Sport Fest</option>
           <option value="mensBasketball">Men's Basketball</option>
-          <option value="womensVolleyball">Women's Volleyball</option>
-          <option value="mensVolleyball">Men's Volleyball</option>
-          <option value="chess">Chess</option>
-          <option value="darts">Darts</option>
+          <option value="other">Other Sports Events</option>
         </select>
 
         <button class="btn btn-outline-light btn-back" onclick="location.href='admin-homepage.html'">
@@ -219,7 +235,6 @@
         <div class="modal-body">
           <div id="receiptBody" class="text-center"></div>
           <div class="text-center mt-3">
-            <button id="printReceiptBtn" class="btn btn-outline-primary"><i class="fas fa-print"></i> Print Receipt</button>
           </div>
         </div>
       </div>
@@ -437,7 +452,7 @@
     // Sport dropdown navigation (keeps behavior)
     document.getElementById('sportSelect').addEventListener('change', function () {
       const sport = this.value;
-      const allowed = ['womensVolleyball', 'mensVolleyball', 'chess', 'darts'];
+      const allowed = ['other'];
       if (allowed.includes(sport)) {
         const target = new URL('allSport.html', window.location.origin);
         target.searchParams.set('sportType', sport);
@@ -445,15 +460,6 @@
       } else if (sport === 'mensBasketball') {
         window.location.href = 'mensBasketball.html';
       }
-    });
-
-    // Print receipt button in modal
-    document.getElementById('printReceiptBtn').addEventListener('click', () => {
-      document.body.classList.add('print-receipt');
-      setTimeout(() => {
-        window.print();
-        document.body.classList.remove('print-receipt');
-      }, 100);
     });
 
   /*******************************

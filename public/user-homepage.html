@@ -86,7 +86,7 @@
       object-fit: cover;
       border-radius: 10px;
       margin-bottom: 12px;
-      border: 3px solid #000000;
+      border: 3px solid #b9b9b9;
     }
 
     .feed-title {
@@ -137,6 +137,10 @@
       background-color: orange;
       color: white;
     }
+    #idRequestStatusContent .badge {
+      font-size: 1.2rem;    /* larger text */
+      padding: 0.6em 1em;   /* more padding */
+    }
     /* Responsive */
     @media (max-width: 991px) {
       .left-col, .right-col { display:none; }
@@ -159,9 +163,25 @@
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
+        /* Loader */
+    #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
+    .progress-bar-custom { width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin:auto; }
   </style>
 </head>
 <body>
+
+  <!-- Loader -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div style="text-align:center;">
+      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+      <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
+        <div id="progress-bar" class="progress-bar-custom"></div>
+      </div>
+      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
+    </div>
+  </div>
+
 
 
  <!-- NAVBAR -->
@@ -224,7 +244,7 @@
           <div class="profile-card d-flex align-items-center">
             <img id="profilePic" src="/public/images/default-profile.png" alt="profile" class="profile-pic-sm1 me-2">
             <div>
-              <h6 id="nameTop" class="mb-0">NAME</h6>
+              <h6 id="nameTop" class="mb-0" style="text-transform: uppercase;">NAME</h6>
               <small id="userNameTop">Username</small>
             </div>
           </div>
@@ -237,9 +257,6 @@
 
             <div id="fullSurveyCountdownBox" style="display:none;">
               ⏳ Full Survey available in <span id="fullSurveyCountdown"></span>
-            </div>
-            <div id="miniSurveyCountdownBox" style="display:none;">
-              ⏳ Mini Survey available in <span id="miniSurveyCountdown"></span>
             </div>
           </nav>
         </div>
@@ -1039,7 +1056,7 @@ document.getElementById("modalProfile").addEventListener("hide.bs.modal", (event
       if (!res.ok) throw new Error('Failed to load ID announcements');
       const { announcements } = await res.json();
       container.innerHTML = (announcements && announcements.length) ? announcements.map(a => {
-        return `<div class="mb-2"><div class="small badge-custom">ID ANNOUNCEMENT</div><div class="fw-semibold">${escapeHtml(a.title || '')}</div><div class="small text-muted">${new Date(a.datePosted).toLocaleDateString()}</div></div>`;
+        return `<div class="mb-2"><div class="small badge-custom">ID ANNOUNCEMENT</div><div class="fw-semibold">${escapeHtml(a.title || '')}</div><div class="small text-muted">${new Date(a.datePosted).toLocaleDateString()}</div></div><div class="small-muted mt-1" style="text-align: justify;">${a.description}</div>`;
       }).join('') : '<div>No announcements found.</div>';
     } catch (err) {
       console.error(err);
@@ -1168,7 +1185,7 @@ async function loadFeed() {
 
           <!-- Content -->
           <div class="fw-bold mt-2">${escapeHtml((post.title||'').toUpperCase())}</div>
-          <p class="mb-1">${escapeHtml(post.description || '')}</p>
+          <p class="mb-1" style="text-align: justify;">${escapeHtml(post.description || '')}</p>
           <div class="text-muted small">
             ${extraInfo}
           </div>
@@ -1884,12 +1901,17 @@ async function submitIdRequestForm() {
 // 📌 ID Request Status (User Side)
 // ================================
 // Open ID Request Status modal
-document.getElementById('openIdStatusSidebar')?.addEventListener('click', async (e) => {
+document.getElementById('openIdStatusSidebar')?.addEventListener('click', (e) => {
   e.preventDefault();
-  await fetchUserIdRequestStatus();
+
+  // Show modal immediately
+  const modalEl = document.getElementById('idStatusModalBS');
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+
+  // Then fetch status
+  fetchUserIdRequestStatus();
 });
-
-
 
 async function fetchUserIdRequestStatus() {
   const content = document.getElementById('idRequestStatusContent');
@@ -1898,7 +1920,6 @@ async function fetchUserIdRequestStatus() {
   const userName = sessionStorage.getItem('userName');
   if (!userName) {
     content.innerHTML = '⚠️ No user session found. Please log in first.';
-    new bootstrap.Modal(document.getElementById('idStatusModalBS')).show();
     return;
   }
 
@@ -1920,8 +1941,6 @@ async function fetchUserIdRequestStatus() {
     console.error('❌ Error loading ID request:', err);
     content.innerHTML = '⚠️ Could not load your ID request status.';
   }
-
-  new bootstrap.Modal(document.getElementById('idStatusModalBS')).show();
 }
 
 // ================================
@@ -1940,6 +1959,24 @@ function getStatusColor(status) {
 }
 
 
+    /*******************************
+   * Loader progress
+   *******************************/
+  document.addEventListener('DOMContentLoaded', () => {
+    let p = 0;
+    const bar = document.getElementById('progress-bar');
+    const pct = document.getElementById('percentage');
+    const wrap = document.getElementById('loader-wrapper');
+    const iv = setInterval(() => {
+      p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
+      bar.style.width = p + '%';
+      pct.textContent = p + '%';
+      if (p >= 100) {
+        clearInterval(iv);
+        wrap.style.display = 'none';
+      }
+    }, 70);
+  });
 
 
   

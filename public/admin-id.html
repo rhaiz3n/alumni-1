@@ -87,7 +87,7 @@
         </div>
       </div>
       <div class="ms-auto">
-        <button class="btn btn-primary btn-sm" id="printBtn"><i class="fa-solid fa-print me-1"></i> Print Accepted Only</button>
+        <button class="btn btn-primary btn-sm" id="printBtn"><i class="fa-solid fa-print me-1"></i> Print RELEASED Only</button>
       </div>
     </div>
   </nav>
@@ -315,7 +315,7 @@ async function updateStatus(id, newStatus) {
   printBtn.addEventListener('click', ()=>{
     document.querySelectorAll('#reqBody tr').forEach(row=>{
       const status = row.querySelector('.status')?.innerText.trim();
-      row.style.display = status==='ACCEPTED'?'':'none';
+      row.style.display = status==='RELEASED'?'':'none';
     });
     setTimeout(()=>window.print(),100);
     setTimeout(()=>document.querySelectorAll('#reqBody tr').forEach(row=>row.style.display=''),500);

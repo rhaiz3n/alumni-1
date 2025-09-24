@@ -59,11 +59,23 @@
     /* Feed cards */
     .feed-card { padding: 14px; margin-bottom: 16px; }
     .feed-header { display:flex; gap:12px; align-items:center; }
-    .avatar { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 8px rgba(15,23,42,0.06); }
+    .avatar { width:50px; height:44px; border-radius:50%; object-fit:cover; border: 3px solid #c9c9c9; box-shadow:0 2px 8px rgba(15,23,42,0.06); }
+    .avatar1 { width:50px; height:50px; border-radius:50%; object-fit:cover; border: 3px solid #c9c9c9; box-shadow:0 2px 8px rgba(15,23,42,0.06); }
     .feed-title { font-weight:600; font-size:15px; }
     .feed-date { color:var(--muted); font-size:12px; }
-    .feed-image { width:100%; border-radius:10px; margin-top:12px; max-height:420px; object-fit:cover; }
+    .feed-image { width:100%; border-radius:10px; margin-top:12px; max-height:420px; object-fit:cover; border: 3px solid #b9b9b9;}
     .feed-meta { display:flex; gap:12px; margin-top:10px; color:var(--muted); font-size:13px; align-items:center; }
+    .text-justify {
+      text-align: justify;
+      font-weight: 400px;
+      font-size: medium;
+    }
+
+    .input-error {
+      border-color: red !important;
+      background-color: #ffe6e6;
+    }
+
 
     .badge-status { font-size:12px; padding:6px 8px; border-radius:999px; }
     .badge-open { background: #e7f7ec; color:#1a7f32; }
@@ -296,56 +308,57 @@
     </div>
   </div>
 
-  <!-- Employer Modal -->
-  <div class="modal fade" id="employerModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content p-3">
-        <div class="modal-header border-0">
-          <h5 class="modal-title">Employer Registration</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="employerRegForm">
-            <div class="row g-2">
-              <div class="col-md-6">
-                <input type="text" id="employerName" name="employerName" class="form-control" placeholder="Employer Name" maxlength="30" oninput="this.value = formatName(this.value)">
-              </div>
-              <div class="col-md-6">
-                <input type="text" id="businessName" name="businessName" class="form-control" placeholder="Business Name" maxlength="40" oninput="this.value = formatBusinessName(this.value)">
-              </div>
-              <div class="col-12">
-                <input type="text" id="businessAddress" name="businessAddress" class="form-control" placeholder="Business Address" maxlength="100" oninput="this.value = formatBusinessAddress(this.value)">
-              </div>
-              <div class="col-md-6">
-                <input type="text" id="landlineNo" name="landlineNo" class="form-control" placeholder="Landline Number" maxlength="15" oninput="var v=this.value.toUpperCase(); if(/^[0-9]*$/.test(v)||/^N$/.test(v)||/^NA$/.test(v)||/^NON?$/.test(v)||/^NONE$/.test(v)){this.value=v;} else{this.value=this.value.replace(/[^0-9]/g,'');}">
-              </div>
-              <div class="col-md-6">
-                <input type="text" id="mobileNo" name="mobileNo" class="form-control" placeholder="Mobile Number" maxlength="12" oninput="var v=this.value.toUpperCase(); if(/^[0-9]*$/.test(v)||/^N$/.test(v)||/^NA$/.test(v)||/^NON?$/.test(v)||/^NONE$/.test(v)){this.value=v;} else{this.value=this.value.replace(/[^0-9]/g,'');}">
-              </div>
-              <div class="col-md-6">
-                <input type="email" id="companyEmail" name="companyEmail" class="form-control" placeholder="Company Email Address" maxlength="40" required oninput="this.value = formatCompanyEmail(this.value)">
-              </div>
-              <div class="col-md-6">
-                <input type="url" id="companyWebsite" name="companyWebsite" class="form-control" placeholder="Company Website" maxlength="100" oninput="this.value = this.value.replace(/\s/g,'')">
-              </div>
-              <div class="col-md-6">
-                <input type="text" id="preferredUserId" name="preferredUserId" class="form-control" placeholder="Preferred User ID" maxlength="25" oninput="this.value = formatUserId(this.value)">
-              </div>
-              <div class="col-md-6 position-relative">
-                <input type="password" id="preferredPassword" name="preferredPassword" class="form-control" placeholder="Preferred User Password" maxlength="15" oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g,'')">
-                <span id="toggleEmployerPassword" class="position-absolute top-50 end-0 translate-middle-y me-3 toggle-icon">⌣</span>
-                <small id="passwordHelp" class="text-danger" style="display:none;">Password must be at least 10 characters</small>
-              </div>
+<!-- Employer Modal -->
+<div class="modal fade" id="employerModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">Employer Registration</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="employerRegForm">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <input type="text" id="employerName" name="employerName" class="form-control" placeholder="Employer Name" maxlength="30" required oninput="this.value = formatName(this.value)">
             </div>
+            <div class="col-md-6">
+              <input type="text" id="businessName" name="businessName" class="form-control" placeholder="Business Name" maxlength="40" required oninput="this.value = formatBusinessName(this.value)">
+            </div>
+            <div class="col-12">
+              <input type="text" id="businessAddress" name="businessAddress" class="form-control" placeholder="Business Address" maxlength="100" required oninput="this.value = formatBusinessAddress(this.value)">
+            </div>
+            <div class="col-md-6">
+              <input type="text" id="landlineNo" name="landlineNo" class="form-control" placeholder="Landline Number" maxlength="15" required oninput="var v=this.value.toUpperCase(); if(/^[0-9]*$/.test(v)||/^N$/.test(v)||/^NA$/.test(v)||/^NON?$/.test(v)||/^NONE$/.test(v)){this.value=v;} else{this.value=this.value.replace(/[^0-9]/g,'');}">
+            </div>
+            <div class="col-md-6">
+              <input type="text" id="mobileNo" name="mobileNo" class="form-control" placeholder="Mobile Number" maxlength="12" required oninput="var v=this.value.toUpperCase(); if(/^[0-9]*$/.test(v)||/^N$/.test(v)||/^NA$/.test(v)||/^NON?$/.test(v)||/^NONE$/.test(v)){this.value=v;} else{this.value=this.value.replace(/[^0-9]/g,'');}">
+            </div>
+            <div class="col-md-6">
+              <input type="email" id="companyEmail" name="companyEmail" class="form-control" placeholder="Company Email Address" maxlength="40" required oninput="this.value = formatCompanyEmail(this.value)">
+            </div>
+            <div class="col-md-6">
+              <input type="url" id="companyWebsite" name="companyWebsite" class="form-control" placeholder="Company Website" maxlength="100" required oninput="this.value = this.value.replace(/\s/g,'')">
+            </div>
+            <div class="col-md-6">
+              <input type="text" id="preferredUserId" name="preferredUserId" class="form-control" placeholder="Preferred User ID" maxlength="25" required oninput="this.value = formatUserId(this.value)">
+            </div>
+            <div class="col-md-6 position-relative">
+              <input type="password" id="preferredPassword" name="preferredPassword" class="form-control" placeholder="Preferred User Password" maxlength="15" required oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g,'')">
+              <span id="toggleEmployerPassword" class="position-absolute top-50 end-0 translate-middle-y me-3 toggle-icon">⌣</span>
+              <small id="passwordHelp" class="text-danger" style="display:none;">Password must be at least 10 characters</small>
+            </div>
+          </div>
 
-            <div class="d-grid mt-3">
-              <button type="button" id="employerSubmitBtn" class="btn btn-success">Submit Registration</button>
-            </div>
-          </form>
-        </div>
+          <div class="d-grid mt-3">
+            <button type="button" id="employerSubmitBtn" class="btn btn-success">Submit Registration</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- Toast wrapper -->
   <div id="toastWrapper" style="position: fixed; top: 16px; right: 16px; z-index: 13000;"></div>
@@ -675,43 +688,68 @@
    * Employer Registration
    * POST /api/employer/employers
    *******************************/
-  document.getElementById('employerSubmitBtn').addEventListener('click', async () => {
-    const data = {
-      employerName: document.getElementById('employerName').value.trim(),
-      businessName: document.getElementById('businessName').value.trim(),
-      businessAddress: document.getElementById('businessAddress').value.trim(),
-      landlineNo: document.getElementById('landlineNo').value.trim(),
-      mobileNo: document.getElementById('mobileNo').value.trim(),
-      companyEmail: document.getElementById('companyEmail').value.trim(),
-      companyWebsite: document.getElementById('companyWebsite').value.trim(),
-      preferredUserId: document.getElementById('preferredUserId').value.trim(),
-      preferredPassword: document.getElementById('preferredPassword').value.trim()
-    };
+document.getElementById('employerSubmitBtn').addEventListener('click', async () => {
+  const form = document.getElementById('employerRegForm');
 
-    if (Object.values(data).some(v => !v)) {
-      return showToast('⚠️ Fill all employer fields', 'warning');
-    }
-    if (!data.preferredUserId.endsWith('.employer')) {
-      return showToast('ID must end with ".employer"', 'error');
-    }
-    if (data.preferredPassword.length < 10) {
-      document.getElementById('passwordHelp').style.display = 'block';
-      return showToast('❗ Password must be at least 10 characters', 'warning');
-    }
+  const fields = [
+    'employerName', 'businessName', 'businessAddress',
+    'landlineNo', 'mobileNo', 'companyEmail',
+    'companyWebsite', 'preferredUserId', 'preferredPassword'
+  ];
 
-    try {
-      const r = await fetch('/api/employer/employers', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
-      });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error || 'Failed');
-      showToast('✅ Employer request sent', 'success');
-      document.getElementById('employerRegForm').reset();
-      bootstrap.Modal.getInstance(document.getElementById('employerModal')).hide();
-    } catch (err) {
-      showToast('❌ ' + (err.message || 'Failed'), 'error');
+  let hasError = false;
+
+  // Reset previous error styles
+  fields.forEach(id => {
+    document.getElementById(id).classList.remove('input-error');
+  });
+  document.getElementById('passwordHelp').style.display = 'none';
+
+  const data = {};
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    data[id] = el.value.trim();
+    if (!data[id]) {
+      el.classList.add('input-error');
+      hasError = true;
     }
   });
+
+  if (hasError) {
+    return showToast('⚠️ Fill all required fields', 'warning');
+  }
+
+  if (!data.preferredUserId.endsWith('.employer')) {
+    document.getElementById('preferredUserId').classList.add('input-error');
+    return showToast('ID must end with ".employer"', 'error');
+  }
+
+  if (data.preferredPassword.length < 10) {
+    document.getElementById('preferredPassword').classList.add('input-error');
+    document.getElementById('passwordHelp').style.display = 'block';
+    return showToast('❗ Password must be at least 10 characters', 'warning');
+  }
+
+  try {
+    const r = await fetch('/api/employer/employers', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Failed');
+
+    showToast('✅ Employer request sent', 'success');
+    form.reset();
+    bootstrap.Modal.getInstance(document.getElementById('employerModal')).hide();
+
+    // Remove error styles after successful submission
+    fields.forEach(id => document.getElementById(id).classList.remove('input-error'));
+  } catch (err) {
+    showToast('❌ ' + (err.message || 'Failed'), 'error');
+  }
+});
+
 
   /*******************************
    * Feed loader: GET /api/events
@@ -762,7 +800,7 @@ async function loadFeed() {
       const feedHtml = `
         <article class="feed-card">
           <div class="feed-header">
-            <img src="Logo2.png" class="avatar" alt="avatar">
+            <img src="Logo2.png" class="avatar1" alt="avatar1">
             <div>
               <div class="feed-title">${(post.title||'Untitled Event')}</div>
               <div class="feed-date">${new Date(post.datePosted).toLocaleString()}</div>
@@ -772,7 +810,7 @@ async function loadFeed() {
           ${post.image ? `<img src="${post.image}" class="feed-image" alt="event image" onerror="this.style.display='none'">` : ''}
 
           <div style="margin-top:10px;">
-            <div class="small" style="color:var(--muted);">${post.description || ''}</div>
+            <div class="small text-justify" style="color:var(--muted);">${post.description || ''}</div>
           </div>
 
           <div class="feed-meta">
@@ -838,7 +876,13 @@ async function loadFeed() {
       const careers = (await r3.json()).careers || [];
 
       document.getElementById('idAnnouncementList').innerHTML =
-        idA.map(a => `<div class="announce-item"><div style="font-weight:600">${a.title}</div><div class="small-muted">Posted: ${new Date(a.datePosted).toLocaleDateString()}</div></div>`).join('') || '<div class="text-muted">No ID announcements</div>';
+        idA.map(a => `
+        <div class="announce-item">
+            <div style="font-weight:600">${a.title}</div>
+            <div class="small-muted">Posted: ${new Date(a.datePosted).toLocaleDateString()}</div>
+            <div class="small-muted mt-1" style="text-align: justify;">${a.description}</div>
+          </div>
+        `).join('') || '<div class="text-muted">No ID announcements</div>';
 
       document.getElementById('eventList').innerHTML =
         events.map(e => `<div class="announce-item"><div style="font-weight:600">${e.title}</div><div class="small-muted">Posted: ${new Date(e.datePosted).toLocaleDateString()}</div><div class="small">${e.location||''}</div></div>`).join('') || '<div class="text-muted">No events</div>';

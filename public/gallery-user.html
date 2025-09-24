@@ -1,179 +1,572 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF‑8" />
-  <meta name="viewport" content="width=device-width, initial‑scale=1.0"/>
-  <title>Event Gallery</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Gallery – Flip Cards</title>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
-  <!-- Font Awesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <!-- Font Awesome for Social Media Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <link rel="icon" type="image/png" href="/Logo2.png">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
+<style>
+body {
+  font-family: 'Albert Sans', sans-serif;
+  background: #bebebe;
+}
+.navbar-brand img {
+  height: 40px;
+  border-radius: 50%;
+}
+.flip-card {
+  perspective: 1000px;
+  margin: 1rem 0;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.flip-card-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.flip-card-back {
+  background: #343a40;
+  color: #fff;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+}
+.flip-card-back img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  margin-bottom: 10px;
+}
+.contact-section {
+  background: #3b0e0e;
+  color: #fff;
+  padding: 2rem 0;
+  text-align: center;
+}
+.contact-section a {
+  color: #fff;
+  margin: 0 0.5rem;
+  font-size: 1.5rem;
+}
+.event-gallery-title {
+  font-family: 'Alegreya', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #343a40;
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(135deg, #882323, #555555);
+  color: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  <link rel="stylesheet" href="gallery-user.css" />
+.event-gallery-title::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255,255,255,0.15);
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+}
+
+.event-gallery-title:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+}
+
+.event-gallery-title:hover::before {
+  top: -10%;
+  left: -10%;
+}
+    /* Loader */
+    #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
+    .progress-bar-custom { width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin:auto; }
+</style>
 </head>
 <body>
-  <div class="eventpage">
-    <img class="Navbar" src="Navbar.png" />
-    <div class="Line1"></div>
-    <div class="label1">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE</div>
+
+
+    <!-- Loader -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div style="text-align:center;">
+      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+      <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
+        <div id="progress-bar" class="progress-bar-custom"></div>
+      </div>
+      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
+    </div>
+  </div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg shadow-sm px-3" style="background: linear-gradient(175deg, #882323 55%, #000000 60%);">
+  <div class="container-fluid d-flex flex-column flex-lg-row align-items-center justify-content-between">
     
-    <a href="user-homepage.html"><img class="Logo" src="Logo.png" alt="University Logo" /></a>
-    <button class="back-button" id="backBtn">←</button>
-    
-    <div class="a-l-u-m-n-i slide-in">
-      <span class="a-l-u-m-n-i-span">G</span>
-      <span class="a-l-u-m-n-i-span2">A L L E R Y</span>
-    </div>
+    <!-- Brand / Logo + Title -->
+    <a class="d-flex align-items-center text-decoration-none mb-2 mb-lg-0" href="#">
+      <img src="Logo2.png" alt="Logo" class="me-2" style="height:50px; width:auto;">
+      <span class="fw-bold text-white text-center text-lg-start">
+        Technological University of the Philippines – Cavite Campus
+      </span>
+    </a>
 
-    <div id="loader-wrapper">
-      <div class="loader-content">
-          <span class="loading-span">T</span>
-          <span class="loading-span2">ECHNOLOGICAL</span>
-          <span class="loading-span">U</span>
-          <span class="loading-span2">NIVERSITY OF THE</span>
-          <span class="loading-span">P</span>
-          <span class="loading-span2">HILIPPINES - </span>
-          <span class="loading-span">C</span>
-          <span class="loading-span2">AVITE</span>
+    <!-- Back Button -->
+    <button class="btn btn-outline-light" id="backBtn">← Back</button>
 
-        <div class="progress-container">
-          <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="percentage" id="percentage">0%</div>
-        <div class="footer-text">LOADING PLEASE WAIT</div>
-      </div>
-    </div>
+  </div>
+</nav>
 
-    <div class="container">
-      <div class="marquee" id="marquee"></div>
-      <div class="buttons">
-        <button id="prev"><i class="fa-solid fa-angle-left"></i></button>
-        <button id="next"><i class="fa-solid fa-angle-right"></i></button>
-      </div>
-    </div>
+<!-- Gallery -->
+<div class="container py-4">
+  <div class="text-center my-5">
+    <h2 class="event-gallery-title d-inline-block position-relative">GALLERY</h2>
+  </div>
+  <div class="row" id="flipGrid"></div>
+</div>
 
-    <!-- Modal -->
-    <div id="descModal" class="modal">
-      <div class="modal-content">
-        <span id="closeDesc" class="close-btn"></span>
-        <div id="modalTitle" style="font-weight:bold; margin-bottom:10px;"></div>
-        <img id="modalImg" src="" alt="Preview">
-      </div>
-    </div>
+<!-- Contact Section -->
+<div class="contact-section">
+  <p>Connect with us: tupc.alumni@tup.edu.ph</p>
+  <a href="https://www.facebook.com/TUPCAA" target="_blank"
+    class="d-inline-flex align-items-center justify-content-center rounded-circle"
+    style="width:37px; height:37px; background:#1877f2; color:white; font-size:1.5rem; text-decoration:none;
+            position:relative; top:7px; left:10px; z-index:1000;">
+    <i class="fab fa-facebook-f"></i>
+  </a>
 
-    <div class="contact-section">
-      </a>
-    </div>
+  <a href="https://www.tupcavite.edu.ph/" target="_blank">
+    <img src="Logo.png" alt="Facebook Logo" style="width:40px; height:40px; border-radius:50%;">
+  </a>
+</div>
+
+<!-- Bootstrap & Font Awesome -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
 
 <script>
-let scrollPos = 0, scrollSpeed = 1, ticker;
+const motivationQuotes = [
+"Keep pushing forward!",
+"Strive for excellence.",
+"Believe in yourself.",
+"Never give up.",
+"Success is a journey.",
+"Stay positive and work hard.",
+"Your potential is limitless.",
+"Make today count.",
+"Be the change you want to see.",
+"Dream big and act bigger.",
+"Focus on progress, not perfection.",
+"Your attitude determines your direction.",
+"Take small steps every day.",
+"Embrace challenges with courage.",
+"Stay strong, stay focused.",
+"Your hard work will pay off.",
+"Opportunities are everywhere.",
+"Success begins with belief.",
+"Push beyond your limits.",
+"Create your own path.",
+"Never settle for less.",
+"Keep learning and growing.",
+"Trust your instincts.",
+"Stay committed to your goals.",
+"Turn obstacles into opportunities.",
+"Your dreams deserve effort.",
+"Work hard in silence, let success speak.",
+"Small progress is still progress.",
+"Stay humble, stay hungry.",
+"Every step counts.",
+"Believe in the impossible.",
+"Consistency beats talent.",
+"Stay patient and persistent.",
+"Hard work beats luck.",
+"Rise above the challenges.",
+"Take risks, learn lessons.",
+"Focus on what you can control.",
+"Be fearless in pursuit of goals.",
+"Dream, believe, achieve.",
+"Make failure your teacher.",
+"Your future is created today.",
+"Step out of your comfort zone.",
+"Success is built daily.",
+"Keep moving forward no matter what.",
+"Motivation comes from action.",
+"Celebrate small victories.",
+"Be relentless in your efforts.",
+"Never underestimate yourself.",
+"Keep your vision clear.",
+"Dedication leads to success.",
+"Do it with passion or not at all.",
+"Turn your dreams into plans.",
+"Work until you’re proud.",
+"Be unstoppable today.",
+"Your mindset shapes your reality.",
+"Focus on solutions, not problems.",
+"Make each day your masterpiece.",
+"Believe in your inner strength.",
+"Push through discomfort.",
+"Success favors the brave.",
+"Act now, not later.",
+"Learn, adapt, improve.",
+"Take control of your life.",
+"Be your own inspiration.",
+"Your journey, your rules.",
+"Keep striving, keep thriving.",
+"Be bold, be daring.",
+"Trust the process.",
+"Keep climbing, never stop.",
+"Small efforts lead to big results.",
+"Stay driven, stay dedicated.",
+"Persistence conquers obstacles.",
+"Turn setbacks into comebacks.",
+"Challenge yourself daily.",
+"Your effort defines you.",
+"Strive for progress, not perfection.",
+"Be a warrior, not a worrier.",
+"Motivate yourself every morning.",
+"Success requires sacrifice.",
+"Every failure is a lesson.",
+"Your passion fuels success.",
+"Stay focused on your why.",
+"Keep evolving and improving.",
+"Believe in endless possibilities.",
+"Conquer fear with action.",
+"Hard work trumps talent.",
+"Your dreams need dedication.",
+"Keep moving despite fear.",
+"Do what others won’t.",
+"Success comes from discipline.",
+"Be proactive, not reactive.",
+"Push harder than yesterday.",
+"Turn ideas into action.",
+"Stay strong through adversity.",
+"Your persistence pays off.",
+"Keep the fire alive.",
+"Never stop exploring.",
+"Think big, start small.",
+"Be consistent, stay patient.",
+"Your vision is your power.",
+"Do not fear mistakes.",
+"Keep your eyes on the prize.",
+"Focus on the journey, not the outcome.",
+"Stay hungry for success.",
+"Embrace the grind.",
+"Work with purpose.",
+"Your effort creates results.",
+"Stay motivated every day.",
+"Dream it, do it.",
+"Success requires courage.",
+"Act with intention.",
+"Push limits, break barriers.",
+"Turn challenges into growth.",
+"Believe and achieve.",
+"Strive for greatness.",
+"Every action matters.",
+"Your determination is key.",
+"Stay confident in yourself.",
+"Take bold steps forward.",
+"Be relentless in pursuit.",
+"Keep learning, keep growing.",
+"Make your own luck.",
+"Be the best version of yourself.",
+"Stay focused and unstoppable.",
+"Push past your comfort zone.",
+"Your ambition drives you.",
+"Small wins lead to big victories.",
+"Keep the momentum going.",
+"Work smart and hard.",
+"Stay committed, stay strong.",
+"Your dreams are worth it.",
+"Believe in your power.",
+"Focus on what matters.",
+"Take charge of your destiny.",
+"Perseverance brings success.",
+"Never doubt your abilities.",
+"Keep building your legacy.",
+"Be fearless, be unstoppable.",
+"Turn vision into reality.",
+"Your courage defines you.",
+"Stay disciplined and driven.",
+"Action creates momentum.",
+"Keep reaching higher.",
+"Dream more, do more.",
+"Strive for daily improvement.",
+"Your effort creates opportunity.",
+"Stay strong, stay motivated.",
+"Push through every obstacle.",
+"Keep aiming for excellence.",
+"Success is earned, not given.",
+"Your journey is your strength.",
+"Work for it relentlessly.",
+"Stay passionate and persistent.",
+"Believe in your dreams every day.",
+"Take responsibility for success.",
+"Your focus determines your future.",
+"Keep grinding until it works.",
+"Strive to be extraordinary.",
+"Embrace challenges as opportunities.",
+"Take action, get results.",
+"Your discipline leads to greatness.",
+"Stay committed to growth.",
+"Work hard, dream big.",
+"Push forward without excuses.",
+"Your perseverance matters.",
+"Act with courage daily.",
+"Focus, work, achieve.",
+"Keep striving for improvement.",
+"Your mindset creates success.",
+"Do it for yourself.",
+"Never stop achieving.",
+"Stay determined through adversity.",
+"Turn ideas into accomplishments.",
+"Believe, act, succeed.",
+"Your vision drives you forward.",
+"Take steps toward greatness.",
+"Stay motivated in everything.",
+"Push past self-doubt.",
+"Work with consistency.",
+"Your goals define your efforts.",
+"Keep climbing to success.",
+"Be brave, be relentless.",
+"Make every day count.",
+"Turn dreams into achievements.",
+"Stay focused, stay positive.",
+"Take initiative and act.",
+"Your effort shapes your results.",
+"Keep the fire burning.",
+"Strive to exceed expectations.",
+"Believe in endless potential.",
+"Work with intention and passion.",
+"Stay disciplined, stay strong.",
+"Push limits, achieve dreams.",
+"Your focus is your power.",
+"Act with determination.",
+"Stay motivated and inspired.",
+"Keep improving every day.",
+"Your persistence builds success.",
+"Dream big, work hard, achieve.",
+"Stay consistent and resilient.",
+"Take control, take action.",
+"Your dedication defines you.",
+"Push through difficulties.",
+"Keep believing in yourself.",
+"Actively pursue excellence.",
+"Your ambition fuels achievement.",
+"Stay focused on your purpose.",
+"Turn challenges into victories.",
+"Keep moving toward goals.",
+"Your mindset is your foundation.",
+"Work hard, stay humble.",
+"Believe in growth and learning.",
+"Stay resilient through obstacles.",
+"Push beyond self-imposed limits.",
+"Take decisive action.",
+"Your efforts compound over time.",
+"Stay motivated, stay inspired.",
+"Keep striving for more.",
+"Dream, plan, execute.",
+"Your courage empowers you.",
+"Persist until you succeed.",
+"Stay focused, stay driven.",
+"Turn obstacles into opportunities.",
+"Keep your goals in sight.",
+"Your attitude creates reality.",
+"Act boldly and fearlessly.",
+"Keep working toward excellence.",
+"Your commitment brings results.",
+"Stay motivated and persistent.",
+"Push forward with confidence.",
+"Your vision shapes your future.",
+"Take responsibility, take action.",
+"Believe in your endless potential.",
+"Stay determined, stay strong.",
+"Keep challenging yourself daily.",
+"Your effort will be rewarded.",
+"Act with passion and purpose.",
+"Stay disciplined and focused.",
+"Push for continuous improvement.",
+"Your mindset drives success.",
+"Dream big, aim high.",
+"Stay persistent and positive.",
+"Keep achieving, keep growing.",
+"Your determination is unstoppable.",
+"Act with courage and confidence.",
+"Stay consistent and motivated.",
+"Push forward without hesitation.",
+"Your focus leads to achievement.",
+"Keep striving for your dreams.",
+"Believe in your ability to succeed.",
+"Stay motivated, stay committed.",
+"Take action and make progress.",
+"Your dedication drives results.",
+"Keep aiming for your highest potential.",
+"Push through adversity with strength.",
+"Stay disciplined in all endeavors.",
+"Act with purpose, act with power.",
+"Keep growing and learning daily.",
+"Your persistence will pay off.",
+"Believe, achieve, and inspire.",
+"Stay focused on your vision.",
+"Keep taking steps forward.",
+"Your ambition leads to success.",
+"Act consistently toward your goals.",
+"Stay motivated and determined.",
+"Push past fear, push past doubt.",
+"Keep pursuing your passions.",
+"Your mindset is key to success.",
+"Dream bigger, work harder.",
+"Stay resilient, stay positive.",
+"Take initiative and keep moving.",
+"Your efforts shape your future.",
+"Keep believing, keep achieving.",
+"Act with determination every day.",
+"Stay consistent, stay focused.",
+"Push yourself beyond limits.",
+"Keep striving for personal growth.",
+"Your goals motivate your actions.",
+"Believe in yourself relentlessly.",
+"Stay disciplined and proactive.",
+"Take steps to make an impact.",
+"Your persistence makes the difference.",
+"Keep working hard and smart.",
+"Act with confidence and clarity.",
+"Stay motivated, stay inspired.",
+"Push forward toward your dreams.",
+"Keep your vision and passion alive.",
+"Your effort creates your legacy.",
+"Believe in your own power.",
+"Stay consistent and determined.",
+"Take action to achieve greatness.",
+"Your mindset drives your journey.",
+"Keep pushing past obstacles.",
+"Act boldly to create success.",
+"Stay focused on what matters most.",
+"Push beyond what you think is possible.",
+"Keep striving for excellence.",
+"Your dedication shapes your destiny.",
+"Believe, act, and grow.",
+"Stay resilient, stay committed.",
+"Take decisive steps toward success.",
+"Keep motivated, keep inspired.",
+"Your effort drives your achievement.",
+"Act with clarity and courage.",
+"Stay disciplined, stay motivated.",
+"Push forward with purpose.",
+];
 
-async function loadGallery() {
+function getRandomMotivation() {
+  return motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)];
+}
+
+async function loadFlipGallery() {
   try {
     const res = await fetch('/api/gallery');
     if (!res.ok) throw new Error(await res.text());
     const { items } = await res.json();
-    const marquee = document.getElementById('marquee');
-    marquee.innerHTML = '';
+    const grid = document.getElementById('flipGrid');
+    grid.innerHTML = '';
 
-    // Duplicate list for seamless scroll effect
-    [...items, ...items].forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'marq-item';
-      div.style.backgroundImage = `url('${item.image}')`;
-      div.dataset.img = item.image;
-      div.dataset.title = item.title;
-      marquee.appendChild(div);
+    items.forEach(item => {
+      const col = document.createElement('div');
+      col.className = 'col-12 col-sm-6 col-md-4 col-lg-3';
+      const motivation = getRandomMotivation();
+      col.innerHTML = `
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <img src="${item.image}" alt="${item.title}">
+            </div>
+            <div class="flip-card-back">
+              <img src="Logo2.png" alt="Logo">
+              <p class="mt-2 mb-1">${motivation}</p>
+            </div>
+          </div>
+        </div>`;
+      grid.appendChild(col);
     });
-
-    setupModal();
   } catch (err) {
     console.error('❌ Failed to load gallery:', err.message);
   }
 }
 
-function setupModal() {
-  document.querySelectorAll('.info-btn').forEach(btn => {
-    btn.onclick = () => {
-      const parent = btn.closest('.marq-item');
-      document.getElementById('modalTitle').textContent = parent.dataset.title;
-      document.getElementById('modalImg').src = parent.dataset.img;
-      document.getElementById('descModal').style.display = 'flex';
-    };
-  });
+// Back button logic
+document.getElementById('backBtn').addEventListener('click', () => window.history.back());
 
-  document.getElementById('closeDesc').onclick = () =>
-    document.getElementById('descModal').style.display = 'none';
+window.addEventListener('DOMContentLoaded', loadFlipGallery);
 
-  document.getElementById('descModal').onclick = e => {
-    if (e.target.id === 'descModal') e.target.style.display = 'none';
-  };
-}
 
-function startScroll() {
-  const marquee = document.getElementById('marquee');
-  cancelAnimationFrame(ticker);
-  function step() {
-    scrollPos += scrollSpeed;
-    if (scrollPos >= marquee.scrollWidth / 2) scrollPos = 0;
-    marquee.style.transform = `translateX(-${scrollPos}px)`;
-    ticker = requestAnimationFrame(step);
-  }
-  ticker = requestAnimationFrame(step);
-}
+let lastScrollTop = 0;
+const contact = document.querySelector('.contact-section');
 
-document.getElementById('next').onclick = () => scrollPos += 596;
-document.getElementById('prev').onclick = () => scrollPos = Math.max(0, scrollPos - 596);
-
-window.addEventListener('DOMContentLoaded', () => {
-  loadGallery().then(startScroll);
-});
-
-// 🔄 Contact section animation
-document.addEventListener("DOMContentLoaded", function () {
-  const contactSection = document.querySelector('.contact-section');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      contactSection.classList.toggle('slide-up', entry.isIntersecting);
-      contactSection.classList.toggle('slide-down', !entry.isIntersecting);
-    });
-  }, { threshold: 0.1 });
-  observer.observe(contactSection);
-});
-
-// 🔙 Smart back button
-document.getElementById('backBtn').addEventListener('click', () => {
-  const from = new URLSearchParams(window.location.search).get('from');
-  if (from === 'homepage.html' || from === 'user-homepage.html') {
-    window.location.href = from;
+window.addEventListener('scroll', () => {
+  const st = window.pageYOffset || document.documentElement.scrollTop;
+  
+  if (st > lastScrollTop) {
+    // Scrolling down → hide contact
+    contact.style.transform = 'translateY(100%)';
   } else {
-    window.history.back();
+    // Scrolling up → show contact
+    contact.style.transform = 'translateY(0)';
   }
+  
+  lastScrollTop = st <= 0 ? 0 : st;
 });
 
-  // 🔄 Loader Progress
-  document.addEventListener("DOMContentLoaded", () => {
-    let p = 80;
-    const wrap = document.getElementById("loader-wrapper");
-    const bar = document.getElementById("progress-bar");
-    const text = document.getElementById("percentage");
+
+    /*******************************
+   * Loader progress
+   *******************************/
+  document.addEventListener('DOMContentLoaded', () => {
+    let p = 0;
+    const bar = document.getElementById('progress-bar');
+    const pct = document.getElementById('percentage');
+    const wrap = document.getElementById('loader-wrapper');
     const iv = setInterval(() => {
-      p = Math.min(100, p + 1);
-      bar.style.width = `${p}%`;
-      text.textContent = `${p}%`;
+      p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
+      bar.style.width = p + '%';
+      pct.textContent = p + '%';
       if (p >= 100) {
         clearInterval(iv);
         wrap.style.display = 'none';
       }
-    }, 30);
+    }, 70);
   });
 </script>
+
 </body>
 </html>

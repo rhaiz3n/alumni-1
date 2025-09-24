@@ -57,6 +57,27 @@ router.post("/upload-logo", requireEmployer, logoUpload.single("companyLogo"), a
   }
 });
 
+
+
+router.post("/api/employers/upload-logo", logoUpload.single("logo"), async (req, res) => {
+  if (!req.session.employer) {
+    return res.status(401).json({ error: "Not logged in as employer" });
+  }
+
+  try {
+    const filePath = "/uploads/companyLogos/" + req.file.filename;
+
+    await pool.execute(
+      `UPDATE employers SET companyLogo = ? WHERE id = ?`,
+      [filePath, req.session.employer.id]
+    );
+
+    res.json({ success: true, logoPath: filePath });
+  } catch (err) {
+    console.error("❌ Upload Logo Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
 /**
  * ✅ Get current employer profile
  */

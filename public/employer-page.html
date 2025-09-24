@@ -1,582 +1,543 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HOMEPAGE PAGE | TUP - Cavite</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Employer Dashboard | TUP - Cavite</title>
 
-  <!-- Google Fonts -->
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts (kept) -->
   <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&family=Albert+Sans:wght@400;500;700&family=Sanchez&display=swap" rel="stylesheet" />
-  <!-- Font Awesome for Icons -->
+
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <!-- Font Awesome for Social Media Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <link rel="icon" type="image/png" href="/Logo2.png">
 
 
-  <!-- External CSS -->
-  <link rel="stylesheet" href="employer-page.css" />
+  <style>
+    /* Minimal overrides to make Bootstrap layout fit your existing class hooks */
+    body { font-family: "Albert Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: #f6f7f8; }
+    .navbar-brand img { height: 40px; }
+    .profile-circle-employer { cursor: pointer; }
+    .card-rounded { border-radius: .75rem; }
+    .feed-card .feed-img { max-height: 280px; object-fit: cover; width: 100%; border-radius: .5rem; }
+    .countdown { font-weight: 600; color: #333; }
+    .applications-container table td, .applications-container table th { vertical-align: middle; }
+    /* preserve some of your classes if your CSS depends on them */
+    .modal-profile-employer, .modal-applications-employer { display: none; }
+    /* small responsive tweak so left column stays visible and content centers */
+    @media (max-width: 991px) {
+      .col-lg-3 { margin-bottom: 1rem; }
+    }
+  </style>
 </head>
 <body>
-  <div class="adminpage">
-    <img class="Navbar" src="Navbar.png" />
-    <div class="Line1"></div>
-    <div class="Line2"></div>
 
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center" href="employer-page.html">
+        <img src="Logo.png" alt="Logo">
+        <span class="ms-2 fw-bold text-primary">TUP - Employer</span>
+      </a>
 
-    <button id="signOutBtn" class="sign-out-button slide-in">
-      <div class="content"><div class="state-layer"><div class="hover-underline1">SIGN-OUT</div></div></div>
-    </button>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <span id="employerNameDisplay" class="d-none d-md-inline fw-semibold"></span>
 
-    <div id="loader-wrapper">
-      <div class="loader-content">
-          <span class="loading-span">T</span>
-          <span class="loading-span2">ECHNOLOGICAL</span>
-          <span class="loading-span">U</span>
-          <span class="loading-span2">NIVERSITY OF THE</span>
-          <span class="loading-span">P</span>
-          <span class="loading-span2">HILIPPINES - </span>
-          <span class="loading-span">C</span>
-          <span class="loading-span2">AVITE</span>
+        <!-- small circle employer logo trigger (kept id/class) -->
+        <img id="employerLogo"
+             src="/images/default-company.png"
+             alt="Company Logo"
+             class="profile-circle-employer rounded-circle border"
+             width="44" height="44"
+             onclick="openEmployerProfileModal()">
 
-        <div class="progress-container">
-          <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="percentage" id="percentage">0%</div>
-        <div class="footer-text">LOADING PLEASE WAIT</div>
+        <!-- sign out button kept with ID -->
+        <button id="signOutBtn" class="btn btn-outline-danger btn-sm">SIGN-OUT</button>
       </div>
     </div>
+  </nav>
 
-    <a href="employer-page.html">
-      <img class="Logo" src="Logo.png" alt="University Logo" />
-    </a>
+  <!-- MAIN LAYOUT (3 columns) -->
+  <main class="container-fluid" style="margin-top: 90px;">
+    <div class="row justify-content-center gx-4">
 
-    <div class="a-l-u-m-n-i slide-in">
-      <span class="a-l-u-m-n-i-span">E</span>
-      <span class="a-l-u-m-n-i-span2">M P L O Y E R</span>
-    </div>
+      <!-- LEFT: Employer Profile -->
+      <aside class="col-lg-3">
+        <div class="card card-rounded shadow-sm mb-4">
+          <div class="card-body text-center">
+         <img id="sidebarEmployerLogo" 
+          src="/images/default-company.png" 
+          class="profile-pic-employer rounded-circle" 
+          style="width:120px;height:120px;">    
 
-    <div class="technological-university-of-the-philippines-cavite">
-      TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES – CAVITE
-    </div>
+            <h5 id="employerName" class="fw-bold mb-1">EMPLOYER NAME</h5>
 
-
-    <div id="feed"></div>
-    
-    <!-- Trigger Button -->
-<button id="openModalBtn" class="galaxy-btn">POST NEW CAREER</button>
-
-<!-- Modal -->
-<div id="eventModal" class="modal">
-  <div class="modal-content galaxy-card">
-    <span class="close-btn" id="closeModalBtn">&times;</span>
-    <h1>Create Career</h1>
-    <form id="adminForm" enctype="multipart/form-data">
-      <label>Career Type</label>
-      <select id="careerType" name="careerType" required>
-        <option value="">-- Select a Career --</option>
-        <option value="Electrician">Electrician</option>
-        <option value="Mechanic">Mechanic</option>
-        <option value="Education">Education</option>
-        <option value="Software Developer">Software Developer</option>
-        <option value="Network Engineer">Network Engineer</option>
-        <option value="Telecommunications Engineer">Telecommunications Engineer</option>
-        <option value="Electrical Engineer">Electrical Engineer</option>
-        <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
-      </select>
-
-      <input type="hidden" id="careerTitle" name="title">
-
-      <label>Company Name</label>
-      <input type="text" name="link" required>
-
-      <label>Image</label>
-      <input type="file" name="image" accept=".png,.jpg" required>
-
-      <label>Description</label>
-      <textarea name="description" rows="3" required></textarea>
-
-      <button type="submit" class="galaxy-btn2">Publish</button>
-    </form>
-  </div>
-</div>
-
-
-
-<!-- 🌤️ Application Modal -->
-<div id="modal-application" class="modal-application">
-  <div class="modal-content-application">
-    <h2>📄 Applications</h2>
-    <div id="applications-container"></div>
-  </div>
-</div>
-
-<!-- Employer Logo Trigger (Dashboard Circle) -->
-<img id="employerLogo"
-     src="/images/default-company.png"
-     alt="Company Logo"
-     class="profile-circle-employer"
-     onclick="openEmployerProfileModal()">
-
-<!-- Employer Profile Modal -->
-<div id="modal-employer-profile" class="modal-profile-employer" aria-hidden="true">
-  <div class="modal-profile-content-employer">
-
-    <!-- Profile Card Layout -->
-    <div class="profile-card-employer">
-      <!-- LEFT: Company Logo -->
-      <div class="profile-left-employer">
-        <div class="profile-pic-frame-employer">
-          <img id="modalEmployerLogo" src="/images/default-company.png" alt="" class="profile-pic-employer">
-        </div>
-        <p class="profile-label-employer">EMPLOYER PROFILE</p>
-      </div>
-
-      <!-- RIGHT: Employer Name + Buttons -->
-      <div class="profile-right-employer">
-        <h2 id="employerName">EMPLOYER NAME</h2>
-        <div class="profile-buttons-employer">
-          <button id="viewApplicantsBtn" class="profile-btn-employer">VIEW APPLICANTS</button>
-
-          <!-- Applicants Modal -->
-          <div id="applicantsModal" class="modal-applications-employer" aria-hidden="true">
-            <div class="modal-app-content-employer">
-              
-              <!-- Modal Header with Close Button -->
-              <div class="modal-header-employer">
-                <h3>APPLICANTS</h3>
-              </div>
-
-              <table class="applications-table-employer">
-                <thead>
-                  <tr>
-                    <th>NAME</th>
-                    <th>PHONE NO.</th>
-                    <th>EMAIL</th>
-                    <th>RESUME</th>
-                    <th>SUBMITTED AT</th> <!-- ✅ new column -->
-                  </tr>
-                </thead>
-                <tbody id="applicantsTableBody">
-                  <tr><td colspan="5">Loading...</td></tr>
-                </tbody>
-              </table>
+            <div class="d-grid gap-2 mt-3">
+              <button id="viewApplicantsBtn" class="btn btn-outline-primary btn-sm">VIEW APPLICANTS</button>
+              <button id="changeLogoBtn" class="btn btn-outline-secondary btn-sm">Change Profile Picture</button>
+              <input type="file" id="uploadCompanyLogo" name="companyLogo" style="display:none" />
+              <button id="editEmployerBtn" class="btn btn-warning btn-sm">Edit Profile</button>
+              <button id="saveEmployerBtn" class="btn btn-success btn-sm" style="display:none;">Save</button>
+              <button id="confirmEmployerProfileBtn" class="btn btn-primary btn-sm" style="display:none;">Confirm Profile</button>
             </div>
+
+            <div id="employerProfileNotice" class="alert alert-warning mt-3 d-none profile-notice-employer" role="alert"></div>
           </div>
 
-
-          <button id="changeLogoBtn" class="profile-btn-employer">Change Profile Picture</button>
-          <input type="file" id="uploadCompanyLogo" accept="image/*" style="display:none;">
-          <button id="editEmployerBtn" class="profile-btn-employer edit-btn-employer">Edit Profile</button>
-          <button id="saveEmployerBtn" class="profile-btn-employer save-btn-employer" style="display:none;">Save</button>
-
-          <div id="employerProfileNotice" class="profile-notice-employer hidden"></div>
-          <button id="confirmEmployerProfileBtn" class="profile-btn-employer" style="display:none;">Confirm Profile</button>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Business Name:</strong> <span id="businessName">-</span></li>
+            <li class="list-group-item"><strong>Address:</strong> <span id="businessAddress">-</span></li>
+            <li class="list-group-item"><strong>Landline:</strong> <span id="landlineNo">-</span><input id="editLandlineNo" class="form-control mt-1 d-none" style="max-width:250px;"></li>
+            <li class="list-group-item"><strong>Mobile:</strong> <span id="mobileNo">-</span><input id="editMobileNo" class="form-control mt-1 d-none" style="max-width:250px;"></li>
+            <li class="list-group-item"><strong>Email:</strong> <span id="companyEmail">-</span><input id="editCompanyEmail" class="form-control mt-1 d-none" style="max-width:250px;"></li>
+            <li class="list-group-item"><strong>Website:</strong> <span id="companyWebsite">-</span></li>
+          </ul>
         </div>
+      </aside>
+
+      <!-- CENTER: Feed -->
+      <section class="col-lg-6">
+        <!-- Post button and controls -->
+        <div class="d-flex justify-content-end mb-3">
+          <button id="openModalBtn" class="btn btn-primary galaxy-btn"><i class="fa-solid fa-plus me-1"></i> POST NEW CAREER</button>
+        </div>
+
+        <!-- FEED container (kept id feed) -->
+        <div id="feed">
+          <!-- feed content will be inserted by JS (loadFeed) - cards styled by Bootstrap in JS portion -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ============================
+       Create Career Modal (kept IDs/classes)
+       Implemented as a simple centered element (not Bootstrap modal) to keep your original JS display logic intact.
+       If you prefer Bootstrap modal behavior, we can switch, but this preserves your existing handlers.
+  ============================= -->
+  <div id="eventModal" class="modal" tabindex="-1" style="display:none; position:fixed; inset:0; z-index:1050; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
+    <div class="modal-content galaxy-card card-rounded p-4" role="dialog" style="max-width:720px;">
+      <button class="btn-close float-end" id="closeModalBtn" aria-label="Close"></button>
+      <h4>Create Career</h4>
+      <form id="adminForm" enctype="multipart/form-data" class="mt-3">
+        <div class="mb-2">
+          <label class="form-label">Career Type</label>
+          <select id="careerType" name="careerType" required class="form-select">
+            <option value="">-- Select a Career --</option>
+            <option value="Electrician">Electrician</option>
+            <option value="Mechanic">Mechanic</option>
+            <option value="Education">Education</option>
+            <option value="Software Developer">Software Developer</option>
+            <option value="Network Engineer">Network Engineer</option>
+            <option value="Telecommunications Engineer">Telecommunications Engineer</option>
+            <option value="Electrical Engineer">Electrical Engineer</option>
+            <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
+          </select>
+          <input type="hidden" id="careerTitle" name="title">
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Company Name</label>
+          <input type="text" name="link" class="form-control" required>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Image</label>
+          <input type="file" name="image" accept=".png,.jpg" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea name="description" rows="3" class="form-control" required></textarea>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-success galaxy-btn2">Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Applications modal (used inside employer profile, kept) -->
+  <div id="applicantsModal" class="modal-applications-employer" aria-hidden="true" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
+    <div class="modal-app-content-employer card p-3" style="max-width:900px;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">APPLICANTS</h5>
+        <button class="btn-close" onclick="closeApplicantsModal()"></button>
+      </div>
+      <div class="table-responsive applications-container">
+        <table class="table table-striped applications-table-employer mb-0">
+          <thead>
+            <tr><th>NAME</th><th>PHONE NO.</th><th>EMAIL</th><th>RESUME</th><th>SUBMITTED AT</th></tr>
+          </thead>
+          <tbody id="applicantsTableBody">
+            <tr><td colspan="5">Loading...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
-    <!-- Employer Details -->
-    <div id="employer-profile-details" class="profile-details-employer">
-      <p><strong>Business Name:</strong> <span id="businessName">-</span></p>
-      <p><strong>Business Address:</strong> <span id="businessAddress">-</span></p>
-
-      <p>
-        <strong>Landline:</strong>
-        <span id="landlineNo">-</span>
-        <input type="text" id="editLandlineNo" style="display:none;">
-      </p>
-      <p>
-        <strong>Mobile No.:</strong>
-        <span id="mobileNo">-</span>
-        <input type="text" id="editMobileNo" style="display:none;">
-      </p>
-      <p>
-        <strong>Company Email:</strong>
-        <span id="companyEmail">-</span>
-        <input type="email" id="editCompanyEmail" style="display:none;">
-      </p>
-
-      <p><strong>Website:</strong> <span id="companyWebsite">-</span></p>
-    </div>
-
   </div>
-</div>
+
+  <!-- Application viewer modal (for center feed expand) -->
+  <div id="modal-application" class="modal-application" style="display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
+    <div class="modal-content-application card p-3" style="max-width:720px;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">📄 Applications</h5>
+        <button class="btn-close" onclick="document.getElementById('modal-application').style.display='none'"></button>
+      </div>
+      <div id="applications-container"></div>
+    </div>
+  </div>
 
 
-<div class="employer-header">
-  <i class="fas fa-user-circle"></i>
-  <span id="employerNameDisplay"></span>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- Include sign-out module (kept) -->
+  <script type="module">
+    import { setupSignOut } from './sign-out.js';
+    setupSignOut('employer'); // 🔒 restrict to employer only
+  </script>
 
-<script type="module">
-  import { setupSignOut } from './sign-out.js';
-  setupSignOut('employer'); // 🔒 restrict to employer only
-</script>
+  <script>
+    // --- Dropdown helper kept (no changes) ---
+    function toggleDropdown() {
+      document.getElementById('dropdownMenu')?.classList.toggle('show');
+    }
 
-<script>
-  // Loading Screen Animation
-  document.addEventListener("DOMContentLoaded", () => {
-    let pct = 80;
-    const loaderWrapper = document.getElementById("loader-wrapper");
-    const progressBar = document.getElementById("progress-bar");
-    const percentageText = document.getElementById("percentage");
+    function navigateTo(url) {
+      window.location.href = url;
+    }
 
-    const interval = setInterval(() => {
-      if (pct < 100) {
-        pct++;
-        progressBar.style.width = pct + "%";
-        percentageText.textContent = pct + "%";
-      } else {
-        clearInterval(interval);
-        loaderWrapper.style.display = "none";
+    window.addEventListener('click', e => {
+      const trigger = document.querySelector('.select-trigger');
+      const menu = document.getElementById('dropdownMenu');
+      if (!trigger?.contains(e.target) && !menu?.contains(e.target)) {
+        menu?.classList.remove('show');
       }
-    }, 30);
-  });
-
-  // Dropdown toggle
-  function toggleDropdown() {
-    document.getElementById('dropdownMenu')?.classList.toggle('show');
-  }
-
-  function navigateTo(url) {
-    window.location.href = url;
-  }
-
-  // Close dropdown if clicked outside
-  window.addEventListener('click', e => {
-    const trigger = document.querySelector('.select-trigger');
-    const menu = document.getElementById('dropdownMenu');
-    if (!trigger?.contains(e.target) && !menu?.contains(e.target)) {
-      menu?.classList.remove('show');
-    }
-  });
-
-  // Access Control
-  window.addEventListener('DOMContentLoaded', () => {
-    const role = sessionStorage.getItem('userRole');
-    if (role !== 'employer') {
-      window.location.href = 'homepage.html'; // ❌ block non-employers
-    }
-  });
-
-  // ✅ Toast Function
-  function showToast(message) {
-    let toast = document.getElementById("toast");
-    if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "toast";
-      toast.style.position = "fixed";
-      toast.style.bottom = "30px";
-      toast.style.left = "50%";
-      toast.style.transform = "translateX(-50%)";
-      toast.style.background = "#333";
-      toast.style.color = "#fff";
-      toast.style.padding = "12px 20px";
-      toast.style.borderRadius = "6px";
-      toast.style.zIndex = "10000";
-      toast.style.fontSize = "15px";
-      toast.style.opacity = "0";
-      toast.style.transition = "opacity 0.5s, bottom 0.5s";
-      document.body.appendChild(toast);
-    }
-    toast.textContent = message;
-    toast.style.opacity = "1";
-    toast.style.bottom = "50px";
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.bottom = "30px";
-    }, 3000);
-  }
-
-  // ✅ Modal references
-  const modal = document.getElementById('eventModal');
-  const editModal = document.getElementById('editModal'); // make sure you actually have <div id="editModal"> in your HTML!
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* ---------------------------
-   Load Employer Profile
----------------------------- */
-async function loadEmployerProfile(updateModal = false) {
-  const logo = document.getElementById("employerLogo");
-  const modalLogo = document.getElementById("modalEmployerLogo");
-
-  try {
-    const res = await fetch("/api/employers/me", {
-      credentials: "include",
-      cache: "no-store"
     });
-    if (!res.ok) throw new Error("Not logged in");
 
-    const employer = await res.json();
+    // Access control (kept)
+    window.addEventListener('DOMContentLoaded', () => {
+      const role = sessionStorage.getItem('userRole');
+      if (role !== 'employer') {
+        // If not employer, redirect to homepage (kept behavior)
+        window.location.href = 'homepage.html';
+      }
+    });
 
-    // ✅ Logos
-    const pic = employer.companyLogo || "/images/default-company.png";
-    if (logo) logo.src = pic;
-    if (updateModal && modalLogo) modalLogo.src = pic;
+    // Toast function (kept)
+    function showToast(message) {
+      let toast = document.getElementById("toast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        toast.style.position = "fixed";
+        toast.style.bottom = "30px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.background = "#333";
+        toast.style.color = "#fff";
+        toast.style.padding = "12px 20px";
+        toast.style.borderRadius = "6px";
+        toast.style.zIndex = "10000";
+        toast.style.fontSize = "15px";
+        toast.style.opacity = "0";
+        toast.style.transition = "opacity 0.35s, bottom 0.35s";
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.style.opacity = "1";
+      toast.style.bottom = "50px";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.bottom = "30px";
+      }, 3000);
+    }
 
-    // ✅ Basic Info
-    document.getElementById("employerName").textContent =
-      (employer.employerName || "EMPLOYER NAME").toUpperCase();
-    document.getElementById("businessName").textContent = employer.businessName || "-";
-    document.getElementById("businessAddress").textContent = employer.businessAddress || "-";
-    document.getElementById("landlineNo").textContent = employer.landlineNo || "-";
-    document.getElementById("mobileNo").textContent = employer.mobileNo || "-";
-    document.getElementById("companyEmail").textContent = employer.companyEmail || "-";
-    document.getElementById("companyWebsite").textContent = employer.companyWebsite || "-";
+    // Modal references
+    const modal = document.getElementById('eventModal');
+    const editModal = document.getElementById('editModal'); // may be undefined if not present — original code had this too
 
-    // ✅ Fill inputs for edit mode
-    document.getElementById("editLandlineNo").value = employer.landlineNo || "";
-    document.getElementById("editMobileNo").value = employer.mobileNo || "";
-    document.getElementById("editCompanyEmail").value = employer.companyEmail || "";
+    /* ---------------------------
+       Load Employer Profile
+    ---------------------------- */
+    async function loadEmployerProfile(updateModal = false) {
+      const logo = document.getElementById("employerLogo");
+      
 
-    // ✅ Confirm button + lock modal
-    const confirmBtn = document.getElementById("confirmEmployerProfileBtn");
-    const notice = document.getElementById("employerProfileNotice");
-    const modal = document.getElementById("modal-employer-profile");
+      try {
+        const res = await fetch("/api/employers/me", {
+          credentials: "include",
+          cache: "no-store"
+        });
+        if (!res.ok) throw new Error("Not logged in");
 
-    if (employer.profileConfirmed === 1) {
-      confirmBtn.style.display = "none";
-      notice.style.display = "none";
-      if (modal) delete modal.dataset.locked; // ✅ allow closing/opening freely
-    } else {
-      confirmBtn.style.display = "inline-block";
-      notice.style.display = "block";
+        const employer = await res.json();
 
-      if (employer.companyLogo && !employer.companyLogo.includes("default-company.png")) {
-        notice.textContent = "✅ Logo uploaded. Click Confirm to continue.";
-        confirmBtn.disabled = false;
-      } else {
-        notice.textContent = "⚠️ Please upload your company logo to continue.";
-        confirmBtn.disabled = true;
+        // Logos
+        const pic = employer.companyLogo || "/images/default-company.png";
+        if (logo) logo.src = pic;
+        if (updateModal && modalLogo) modalLogo.src = pic;
 
-        // 🚨 Force open + lock modal (cannot be closed)
-        if (modal) {
-          modal.style.display = "flex";
-          modal.setAttribute("aria-hidden", "false");
-          modal.dataset.locked = "true"; // 🔒 lock modal until upload + confirm
+        // Basic Info
+        document.getElementById("employerName").textContent =
+          (employer.employerName || "EMPLOYER NAME").toUpperCase();
+        document.getElementById("businessName").textContent = employer.businessName || "-";
+        document.getElementById("businessAddress").textContent = employer.businessAddress || "-";
+        document.getElementById("landlineNo").textContent = employer.landlineNo || "-";
+        document.getElementById("mobileNo").textContent = employer.mobileNo || "-";
+        document.getElementById("companyEmail").textContent = employer.companyEmail || "-";
+        document.getElementById("companyWebsite").textContent = employer.companyWebsite || "-";
+
+        // Fill inputs for edit mode
+        document.getElementById("editLandlineNo").value = employer.landlineNo || "";
+        document.getElementById("editMobileNo").value = employer.mobileNo || "";
+        document.getElementById("editCompanyEmail").value = employer.companyEmail || "";
+
+        // Confirm button + lock modal
+        const confirmBtn = document.getElementById("confirmEmployerProfileBtn");
+        const notice = document.getElementById("employerProfileNotice");
+        const modalProfile = document.getElementById("modal-employer-profile");
+
+        if (employer.profileConfirmed === 1) {
+          if (confirmBtn) confirmBtn.style.display = "none";
+          if (notice) { notice.style.display = "none"; notice.classList.add('d-none'); }
+          if (modalProfile) modalProfile && delete modalProfile.dataset.locked;
+        } else {
+          if (confirmBtn) confirmBtn.style.display = "inline-block";
+          if (notice) { notice.style.display = "block"; notice.classList.remove('d-none'); }
+
+          if (employer.companyLogo && !employer.companyLogo.includes("default-company.png")) {
+            if (notice) notice.textContent = "✅ Logo uploaded. Click Confirm to continue.";
+            if (confirmBtn) confirmBtn.disabled = false;
+          } else {
+            if (notice) notice.textContent = "⚠️ Please upload your company logo to continue.";
+            if (confirmBtn) confirmBtn.disabled = true;
+
+            // Force open + lock modal (cannot be closed)
+            if (modalProfile) {
+              modalProfile.style.display = "flex";
+              modalProfile.setAttribute("aria-hidden", "false");
+              modalProfile.dataset.locked = "true";
+            }
+          }
         }
+
+      } catch (err) {
+        console.error("❌ Error loading employer info:", err);
+        if (logo) logo.src = "/images/default-company.png";
       }
     }
 
-  } catch (err) {
-    console.error("❌ Error loading employer info:", err);
-    if (logo) logo.src = "/images/default-company.png";
-  }
-}
+    /* ---------------------------
+       Modal Open / Close for Employer Profile
+    ---------------------------- */
+    function openEmployerProfileModal() {
+      const modalProfile = document.getElementById("modal-employer-profile");
+      if (!modalProfile) return;
+      modalProfile.style.display = "flex";
+      modalProfile.setAttribute("aria-hidden", "false");
+      document.getElementById("employerName").textContent = "Loading...";
+      loadEmployerProfile(true);
+    }
 
-/* ---------------------------
-   Modal Open / Close
----------------------------- */
-function openEmployerProfileModal() {
-  const modal = document.getElementById("modal-employer-profile");
-  if (!modal) return;
-  modal.style.display = "flex";
-  modal.setAttribute("aria-hidden", "false");
-  document.getElementById("employerName").textContent = "Loading...";
-  loadEmployerProfile(true);
-}
+    function closeEmployerProfileModal() {
+      const modalProfile = document.getElementById("modal-employer-profile");
+      // prevent closing if locked
+      if (modalProfile && modalProfile.dataset.locked !== "true") {
+        modalProfile.style.display = "none";
+        modalProfile.setAttribute("aria-hidden", "true");
+      }
+    }
 
-function closeEmployerProfileModal() {
-  const modal = document.getElementById("modal-employer-profile");
-  // ❌ prevent closing if locked
-  if (modal && modal.dataset.locked !== "true") {
-    modal.style.display = "none";
-    modal.setAttribute("aria-hidden", "true");
-  }
-}
-
-
-/* ---------------------------
-   Enable Edit Mode
----------------------------- */
-function enableEmployerEdit() {
-  ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
-    document.getElementById(field).style.display = "none";
-    document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1)).style.display = "inline";
-  });
-
-  document.getElementById("editEmployerBtn").style.display = "none";
-  document.getElementById("saveEmployerBtn").style.display = "inline";
-}
-
-/* ---------------------------
-   Save Employer Profile
----------------------------- */
-async function saveEmployerProfile() {
-  const updatedData = {
-    landlineNo: document.getElementById("editLandlineNo").value,
-    mobileNo: document.getElementById("editMobileNo").value,
-    companyEmail: document.getElementById("editCompanyEmail").value,
-  };
-
-  try {
-    const res = await fetch("/api/employers/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(updatedData),
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      showToast("✅ Employer profile updated!");
-      document.getElementById("landlineNo").textContent = updatedData.landlineNo;
-      document.getElementById("mobileNo").textContent = updatedData.mobileNo;
-      document.getElementById("companyEmail").textContent = updatedData.companyEmail;
-
-      // Switch back to view mode
+    /* ---------------------------
+       Enable Edit Mode
+    ---------------------------- */
+    function enableEmployerEdit() {
       ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
-        document.getElementById(field).style.display = "inline";
-        document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1)).style.display = "none";
+        document.getElementById(field).style.display = "none";
+        const editField = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
+        if (editField) editField.style.display = "inline";
       });
 
-      document.getElementById("editEmployerBtn").style.display = "inline";
-      document.getElementById("saveEmployerBtn").style.display = "none";
-    } else {
-      showToast("❌ Error: " + data.error, true);
+      document.getElementById("editEmployerBtn").style.display = "none";
+      document.getElementById("saveEmployerBtn").style.display = "inline";
     }
-  } catch (err) {
-    console.error("❌ Update error:", err);
-    showToast("Server error while updating", true);
-  }
-}
 
-/* ---------------------------
-   Upload Company Logo
----------------------------- */
-document.getElementById("uploadCompanyLogo")?.addEventListener("change", async e => {
-  const file = e.target.files[0];
+    /* ---------------------------
+       Save Employer Profile
+    ---------------------------- */
+    async function saveEmployerProfile() {
+      const updatedData = {
+        landlineNo: document.getElementById("editLandlineNo").value,
+        mobileNo: document.getElementById("editMobileNo").value,
+        companyEmail: document.getElementById("editCompanyEmail").value,
+      };
+
+      try {
+        const res = await fetch("/api/employers/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(updatedData),
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast("✅ Employer profile updated!");
+          document.getElementById("landlineNo").textContent = updatedData.landlineNo;
+          document.getElementById("mobileNo").textContent = updatedData.mobileNo;
+          document.getElementById("companyEmail").textContent = updatedData.companyEmail;
+
+          // Switch back to view mode
+          ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
+            document.getElementById(field).style.display = "inline";
+            const editField = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
+            if (editField) editField.style.display = "none";
+          });
+
+          document.getElementById("editEmployerBtn").style.display = "inline";
+          document.getElementById("saveEmployerBtn").style.display = "none";
+        } else {
+          showToast("❌ Error: " + data.error);
+        }
+      } catch (err) {
+        console.error("❌ Update error:", err);
+        showToast("Server error while updating");
+      }
+    }
+
+    /* ---------------------------
+       Upload Company Logo
+    ---------------------------- */
+const fileInput = document.getElementById("uploadCompanyLogo");
+fileInput.onchange = async () => {
+  const file = fileInput.files[0];
   if (!file) return;
 
-  // Preview immediately
-  const reader = new FileReader();
-  reader.onload = ev => {
-    document.getElementById("modalEmployerLogo").src = ev.target.result;
-    document.getElementById("employerLogo").src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-
   const formData = new FormData();
-  formData.append("companyLogo", file);
+  formData.append("logo", file); // must match backend's upload.single("logo")
 
   try {
-    const res = await fetch("/api/employers/upload-logo", {
+    const res = await fetch("/api/employers/upload-logo", { // <-- plural 'employers'
       method: "POST",
-      body: formData,
-      credentials: "include"
+      body: formData
     });
+
     const data = await res.json();
 
-    if (data.success && data.logoUrl) {
-      document.getElementById("modalEmployerLogo").src = data.logoUrl;
-      document.getElementById("employerLogo").src = data.logoUrl;
-      showToast("✅ Logo updated!");
-
-      // enable confirm button if not yet confirmed
-      const confirmBtn = document.getElementById("confirmEmployerProfileBtn");
-      confirmBtn.style.display = "inline-block";
-      confirmBtn.disabled = false;
-    } else {
-      showToast("❌ Upload failed", true);
+    if (!res.ok) {
+      showToast(`❌ Upload failed: ${JSON.stringify(data)}`);
+      return;
     }
-  } catch (err) {
-    console.error("❌ Upload error:", err);
-    showToast("Server error while uploading", true);
-  }
-});
 
-/* ---------------------------
-   Confirm Employer Profile
----------------------------- */
-document.getElementById("confirmEmployerProfileBtn")?.addEventListener("click", async () => {
-  try {
-    const res = await fetch("/api/employers/confirm", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
+    // update images
+    const sidebarLogo = document.getElementById("sidebarEmployerLogo");
+    const navbarLogo = document.getElementById("employerLogo");
+    if (sidebarLogo) sidebarLogo.src = data.logoPath;
+    if (navbarLogo) navbarLogo.src = data.logoPath;
+
+    showToast("✅ Logo uploaded!");
+    checkEmployerProfilePic(); // re-enable POST NEW CAREER button if needed
+  } catch (err) {
+    console.error("❌ Upload failed:", err);
+    showToast("❌ Upload failed: " + err.message);
+  }
+};
+
+    /* ---------------------------
+       Confirm Employer Profile
+    ---------------------------- */
+    document.getElementById("confirmEmployerProfileBtn")?.addEventListener("click", async () => {
+      try {
+        const res = await fetch("/api/employers/confirm", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          const modalProfile = document.getElementById("modal-employer-profile");
+          delete modalProfile.dataset.locked;
+          modalProfile.style.display = "none";
+          const notice = document.getElementById("employerProfileNotice");
+          if (notice) notice.style.display = "none";
+          document.getElementById("confirmEmployerProfileBtn").style.display = "none";
+          showToast("✅ Profile confirmed!");
+        } else {
+          showToast(data.error || "Please upload a logo first.");
+        }
+      } catch (err) {
+        console.error("❌ confirmEmployerProfileBtn error:", err);
+        showToast("Server error while confirming");
+      }
     });
-    const data = await res.json();
 
-    if (res.ok && data.success) {
-      const modal = document.getElementById("modal-employer-profile");
-      delete modal.dataset.locked;
-      modal.style.display = "none";
-      document.getElementById("employerProfileNotice").style.display = "none";
-      document.getElementById("confirmEmployerProfileBtn").style.display = "none";
-      showToast("✅ Profile confirmed!");
-    } else {
-      showToast(data.error || "Please upload a logo first.", true);
+    /* ---------------------------
+       Applicants Modal (employer-side)
+    ---------------------------- */
+    async function openApplicantsModal() {
+      const modal = document.getElementById("applicantsModal");
+      modal.style.display = "flex";
+
+      const tbody = document.getElementById("applicantsTableBody");
+      tbody.innerHTML = `<tr><td colspan="5">⏳ Loading...</td></tr>`;
+
+      try {
+        const res = await fetch("/api/applications/employer", { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch applicants");
+
+        const applicants = await res.json();
+        tbody.innerHTML = applicants.length
+          ? applicants.map(app => `
+            <tr>
+              <td>${(app.firstName || "").toUpperCase()} ${(app.lastName || "").toUpperCase()}</td>
+              <td>${app.phoneNo || "-"}</td>
+              <td>${app.email || "-"}</td>
+              <td><a href="/uploads/resumes/${app.resumePath}" target="_blank">VIEW</a></td>
+              <td>${app.dateSubmitted ? new Date(app.dateSubmitted).toLocaleString() : "-"}</td>
+            </tr>
+          `).join("")
+          : `<tr><td colspan="5">No applications found</td></tr>`;
+      } catch (err) {
+        console.error("❌ Error loading applicants:", err);
+        tbody.innerHTML = `<tr><td colspan="5">⚠️ Failed to load applicants</td></tr>`;
+      }
     }
-  } catch (err) {
-    console.error("❌ confirmEmployerProfileBtn error:", err);
-    showToast("Server error while confirming", true);
-  }
-});
+
+    function closeApplicantsModal() {
+      const modal = document.getElementById("applicantsModal");
+      if (modal) modal.style.display = "none";
+    }
+
 
 /* ---------------------------
-   Applicants Modal
+   Event Bindings on DOMContentLoaded
 ---------------------------- */
-async function openApplicantsModal() {
-  const modal = document.getElementById("applicantsModal");
-  modal.style.display = "flex";
+document.addEventListener("DOMContentLoaded", () => {;
+  const editModal = document.getElementById('editModal');
 
-  const tbody = document.getElementById("applicantsTableBody");
-  tbody.innerHTML = `<tr><td colspan="5">⏳ Loading...</td></tr>`;
-
-  try {
-    const res = await fetch("/api/applications/employer", { credentials: "include" });
-    if (!res.ok) throw new Error("Failed to fetch applicants");
-
-    const applicants = await res.json();
-    tbody.innerHTML = applicants.length
-      ? applicants.map(app => `
-        <tr>
-          <td>${(app.firstName || "").toUpperCase()} ${(app.lastName || "").toUpperCase()}</td>
-          <td>${app.phoneNo || "-"}</td>
-          <td>${app.email || "-"}</td>
-          <td><a href="/uploads/resumes/${app.resumePath}" target="_blank">VIEW</a></td>
-          <td>${app.dateSubmitted ? new Date(app.dateSubmitted).toLocaleString() : "-"}</td>
-        </tr>
-      `).join("")
-      : `<tr><td colspan="5">No applications found</td></tr>`;
-  } catch (err) {
-    console.error("❌ Error loading applicants:", err);
-    tbody.innerHTML = `<tr><td colspan="5">⚠️ Failed to load applicants</td></tr>`;
-  }
-}
-
-function closeApplicantsModal() {
-  const modal = document.getElementById("applicantsModal");
-  if (modal) modal.style.display = "none";
-}
-
-/* ---------------------------
-   Event Bindings
----------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
   // Profile modal open
   document.getElementById("employerLogo")?.addEventListener("click", openEmployerProfileModal);
 
-  // Profile modal outside click close
-  document.getElementById("modal-employer-profile")?.addEventListener("click", e => {
-    if (e.target.id === "modal-employer-profile") {
-      closeEmployerProfileModal();
-    }
-  });
-
-  // Applicants modal open
+  // Open applicants modal button
   document.getElementById("viewApplicantsBtn")?.addEventListener("click", openApplicantsModal);
 
-  // Applicants modal outside click close
+  // Close when clicking outside certain modals
+  document.getElementById("modal-employer-profile")?.addEventListener("click", e => {
+    if (e.target.id === "modal-employer-profile") closeEmployerProfileModal();
+  });
   document.getElementById("applicantsModal")?.addEventListener("click", e => {
-    if (e.target.id === "applicantsModal") {
-      closeApplicantsModal();
-    }
+    if (e.target.id === "applicantsModal") closeApplicantsModal();
   });
 
-  // Change logo
+  // Change logo trigger
   document.getElementById("changeLogoBtn")?.addEventListener("click", () =>
     document.getElementById("uploadCompanyLogo").click()
   );
@@ -585,158 +546,74 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("editEmployerBtn")?.addEventListener("click", enableEmployerEdit);
   document.getElementById("saveEmployerBtn")?.addEventListener("click", saveEmployerProfile);
 
-  // Initial load
-  loadEmployerProfile();
-});
+  // ---------------------------
+  // Upload company logo
+  // ---------------------------
+ // upload when file selected
+document.getElementById("uploadCompanyLogo").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // ✅ Feed Loader
-  async function loadFeed() {
-    const container = document.getElementById('feed');
-    container.innerHTML = 'Loading your posted careers...';
-
-    try {
-      const res = await fetch('/api/careers'); // ✅ session-based
-      const { careers } = await res.json();
-
-      if (!careers || careers.length === 0) {
-        container.innerHTML = "📭 You haven’t posted any careers yet.";
-        return;
-      }
-
-    container.innerHTML = careers
-      .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted))
-      .map(post => `
-        <div class="feed-card" id="career-${post.id}">
-          ${post.id ? `<img class="feed-img" src="/api/careers/image/${post.id}" alt="">` : ""}
-          <div class="feed-content">
-            <h2>${post.title.toUpperCase()} <small>[Career]</small></h2>
-            <p>${post.description}</p>
-            <small>
-              🏢 Company: ${post.link || "N/A"} <br>
-              🕒 Posted on: ${new Date(post.datePosted).toLocaleString()} <br>
-              ⏳ <span class="countdown" data-time="${post.datePosted}"></span>
-            </small>
-            <br>
-            <button onclick="toggleApplications(${post.id})" class="btn-view-apps">
-              📄 VIEW APPLICATIONS
-            </button>
-            <div id="applications-${post.id}" class="applications-container" style="display:none;"></div>
-          </div>
-        </div>
-      `).join('');
-
-
-
-      // ✅ Countdown updater
-      function updateCountdowns() {
-        document.querySelectorAll(".countdown").forEach(el => {
-          const postedTime = new Date(el.dataset.time);
-          const expireTime = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000);
-          const now = new Date();
-          const diffMs = expireTime - now;
-
-          const card = el.closest(".feed-card");
-
-          if (diffMs <= 0) {
-            el.textContent = "❌ Closed";
-            if (card) card.classList.add("expired");
-            return;
-          }
-
-          const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-          el.textContent = days > 0
-            ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
-            : `${hours}h ${minutes}m ${seconds}s left`;
-        });
-      }
-
-      updateCountdowns();
-      setInterval(updateCountdowns, 1000);
-
-    } catch (err) {
-      console.error(err);
-      container.textContent = '⚠️ Failed to load your careers.';
-    }
-  }
-
-  // ✅ Application loader
-// ✅ Employer-side Application loader
-async function toggleApplications(careerId) {
-  const container = document.getElementById(`applications-${careerId}`);
-  if (!container) return;
-
-  // Toggle visibility
-  if (container.style.display === "block") {
-    container.style.display = "none";
-    return;
-  }
-
-  container.style.display = "block";
-  container.innerHTML = "⏳ Loading applications...";
+  const formData = new FormData();
+  formData.append("companyLogo", file); // MUST match multer.single("companyLogo")
 
   try {
-    const res = await fetch(`/api/applications/career/${careerId}`);
-    const apps = await res.json();
+    const res = await fetch("/api/employers/upload-logo", {
+      method: "POST",
+      body: formData
+    });
 
-    if (!apps.length) {
-      container.innerHTML = "<p>⚠️ No applications yet.</p>";
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      showToast(`❌ Upload failed: ${JSON.stringify(data)}`);
       return;
     }
 
-    // ✅ Build employer view table (firstName, lastName, email, phoneNo, resumePath)
-    container.innerHTML = `
-      <table class="applications-table">
-        <thead>
-          <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Resume</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${apps.map(app => `
-            <tr>
-              <td>${(app.firstName || "").toUpperCase()}</td>
-              <td>${(app.lastName || "").toUpperCase()}</td>
-              <td>${app.email}</td>
-              <td>${app.phoneNo}</td>
-              <td>
-                <a href="/uploads/resumes/${app.resumePath}" target="_blank">VIEW</a>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    `;
+    // update UI
+    const sidebarLogo = document.getElementById("sidebarEmployerLogo");
+    const navbarLogo = document.getElementById("employerLogo");
+    if (sidebarLogo) sidebarLogo.src = data.logoUrl;
+    if (navbarLogo) navbarLogo.src = data.logoUrl;
+
+    showToast("✅ Logo uploaded successfully!");
   } catch (err) {
-    console.error("❌ Failed to load applications:", err);
-    container.innerHTML = "<p>⚠️ Failed to load applications.</p>";
+    console.error(err);
+    showToast("❌ Upload failed: Server error");
   }
-}
+});
 
+  // ---------------------------
+  // POST NEW CAREER button
+  // ---------------------------
+// ⚡ Correct modal reference
+const modal = document.getElementById('eventModal');
 
+document.getElementById('openModalBtn').onclick = async () => {
+  const role = sessionStorage.getItem("userRole");
 
-  document.addEventListener('DOMContentLoaded', loadFeed);
+  // 1️⃣ Load employer profile to check logo
+  let employerLogo = '/images/default-company.png';
+  try {
+    const resProfile = await fetch(`/api/employers/me`, { credentials: 'include' });
+    if (resProfile.ok) {
+      const data = await resProfile.json();
+      employerLogo = data.companyLogo || '/images/default-company.png';
+    } else {
+      console.warn("Failed to load employer profile:", resProfile.status);
+    }
+  } catch (err) {
+    console.warn("Could not load employer profile:", err);
+  }
 
-  // ✅ Modal open/close logic
-  document.getElementById('openModalBtn').onclick = async () => {
-    const role = sessionStorage.getItem("userRole");
-    const userId = sessionStorage.getItem("userId"); // ✅ get stored ID
+  if (employerLogo === '/images/default-company.png') {
+    showToast("⚠️ You need to upload a profile picture to access this posting");
+    return;
+  }
 
-    if (role === 'employer') {
+  // 2️⃣ Check last post time
+  if (role === 'employer') {
+    try {
+      const userId = sessionStorage.getItem("userId");
       const res = await fetch(`/api/careers/last-post/${userId}`);
       if (res.ok) {
         const data = await res.json();
@@ -744,38 +621,45 @@ async function toggleApplications(careerId) {
           const lastPostTime = new Date(data.lastPost);
           const now = new Date();
           const diffMs = now - lastPostTime;
-          const hoursPassed = diffMs / (1000 * 60 * 60);
-
-          if (hoursPassed < 24) {
+          if (diffMs < 24 * 60 * 60 * 1000) {
             const remainingMs = 24 * 60 * 60 * 1000 - diffMs;
             const hours = Math.floor(remainingMs / (1000 * 60 * 60));
             const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
-
             showToast(`⚠️ You can only post 1 career per day. Try again in ${hours}h ${minutes}m ${seconds}s`);
             return;
           }
         }
       }
+    } catch (err) {
+      console.warn("Could not check last post:", err);
     }
+  }
 
-    modal.style.display = 'flex';
-  };
+  // 3️⃣ Open modal
+  modal.style.display = 'flex';
+};
 
-  document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
+// Close modal
+document.getElementById('closeModalBtn').onclick = () => {
+  modal.style.display = 'none';
+};
 
-  window.onclick = e => {
-    if (e.target === modal) modal.style.display = 'none';
-    if (editModal && e.target === editModal) editModal.classList.remove('show');
-  };
+// Close on outside click
+window.onclick = e => {
+  if (e.target === modal) modal.style.display = 'none';
+};
 
-  // 📌 Career form submit
+
+  // ---------------------------
+  // Career form submit
+  // ---------------------------
   document.getElementById('adminForm').onsubmit = async e => {
     e.preventDefault();
 
     const careerType = document.getElementById("careerType");
     const hiddenTitle = document.getElementById("careerTitle");
-    hiddenTitle.value = careerType.value; // ✅ fill hidden field
+    hiddenTitle.value = careerType.value;
 
     if (!hiddenTitle.value) {
       alert("⚠️ Please select a career type.");
@@ -783,38 +667,247 @@ async function toggleApplications(careerId) {
     }
 
     const formData = new FormData(e.target);
-    formData.append("userId", sessionStorage.getItem("userId")); // ✅ Send employer ID
+    formData.append("userId", sessionStorage.getItem("userId"));
 
-    const res = await fetch('/api/careers/add', {
-      method: 'POST',
-      body: formData
-    });
+    try {
+      const res = await fetch('/api/careers/add', {
+        method: 'POST',
+        body: formData
+      });
 
-    if (!res.ok) {
-      showToast('❌ Error: ' + await res.text());
-      return;
+      if (!res.ok) {
+        showToast('❌ Error: ' + await res.text());
+        return;
+      }
+
+      showToast('✅ Career posted!');
+      e.target.reset();
+      hiddenTitle.value = "";
+      modal.style.display = 'none';
+      loadFeed(); // reload feed after posting
+    } catch (err) {
+      console.error("❌ Error posting career:", err);
+      showToast("Server error while posting career");
     }
-
-    showToast('✅ Career posted!');
-    e.target.reset();
-    hiddenTitle.value = "";
-    modal.style.display = 'none';
-    loadFeed(); // reload feed after posting
   };
 
+  // ---------------------------
+  // Initial loads
+  // ---------------------------
+  loadEmployerProfile();
+  loadFeed();
+});
 
-fetch('/api/employer/me')
-  .then(res => res.json())
-  .then(user => {
-    const nameEl = document.getElementById("employerNameDisplay");
-    if (user.role === "employer" && user.employerName) {
-      nameEl.textContent = user.employerName.toUpperCase(); // ✅ safe now
-    } else {
-      nameEl.textContent = "GUEST";
+
+
+    /* ---------------------------
+       FEED: loadFeed & toggleApplications
+       (kept logic, but styled to Bootstrap cards)
+    ---------------------------- */
+    async function loadFeed() {
+      const container = document.getElementById('feed');
+      container.innerHTML = '<div class="text-center text-muted py-4">Loading your posted careers...</div>';
+
+      try {
+        const res = await fetch('/api/careers');
+        if (!res.ok) throw new Error('Failed to fetch careers');
+
+        const payload = await res.json();
+        const careers = payload.careers || [];
+
+        if (!careers.length) {
+          container.innerHTML = '<div class="text-center text-muted py-4">📭 You haven’t posted any careers yet.</div>';
+          return;
+        }
+
+        container.innerHTML = careers
+          .sort((a,b) => new Date(b.datePosted) - new Date(a.datePosted))
+          .map(post => `
+            <div class="card shadow-sm rounded-3 mb-4 feed-card" id="career-${post.id}">
+              <div class="card-body">
+                <div class="d-flex align-items-start mb-3">
+                  <img src="Logo2.png" class="rounded-circle border me-3" width="56" height="56" alt="">
+                  <div class="flex-fill">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div>
+                        <h6 class="mb-0 fw-bold">${(post.link || 'Company').toUpperCase()}</h6>
+                        <small class="text-muted">Posted on: ${new Date(post.datePosted).toLocaleString()}</small>
+                      </div>
+                      <small class="text-muted countdown" data-time="${post.datePosted}"></small>
+                    </div>
+                  </div>
+                </div>
+
+                <h5 class="fw-bold">${(post.title || '').toUpperCase()} <small class="fw-normal">[Career]</small></h5>
+                <p class="mb-3">${post.description || ''}</p>
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="text-muted small"><i class="fa-regular fa-building me-1"></i> ${post.link || 'N/A'}</div>
+                  <div>
+                    <button onclick="toggleApplications(${post.id})" class="btn btn-outline-primary btn-sm">📄 VIEW APPLICATIONS</button>
+                  </div>
+                </div>
+
+                <div id="applications-${post.id}" class="applications-container mt-3" style="display:none;"></div>
+              </div>
+            </div>
+          `).join('');
+
+        // countdown updater
+        function updateCountdowns() {
+          document.querySelectorAll(".countdown").forEach(el => {
+            const postedTime = new Date(el.dataset.time);
+            const expireTime = new Date(postedTime.getTime() + 5 * 24 * 60 * 60 * 1000);
+            const now = new Date();
+            const diffMs = expireTime - now;
+
+            const card = el.closest(".feed-card");
+
+            if (diffMs <= 0) {
+              el.textContent = "❌ Closed";
+              if (card) card.classList.add("expired");
+              return;
+            }
+
+            const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+            el.textContent = days > 0
+              ? `${days}d ${hours}h ${minutes}m ${seconds}s left`
+              : `${hours}h ${minutes}m ${seconds}s left`;
+          });
+        }
+
+        updateCountdowns();
+        // clear any previous interval if necessary by wrapping in closure — simple approach:
+        if (window.__countdownInterval) clearInterval(window.__countdownInterval);
+        window.__countdownInterval = setInterval(updateCountdowns, 1000);
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div class="text-center text-danger py-4">⚠️ Failed to load your careers.</div>';
+      }
     }
-  });
-</script>
 
+    // toggleApplications: show/hide and fetch applications for specific career
+    async function toggleApplications(careerId) {
+      const container = document.getElementById(`applications-${careerId}`);
+      if (!container) return;
+
+      if (container.style.display === "block") {
+        container.style.display = "none";
+        container.innerHTML = '';
+        return;
+      }
+
+      container.style.display = "block";
+      container.innerHTML = `<div class="text-muted">⏳ Loading applications...</div>`;
+
+      try {
+        const res = await fetch(`/api/applications/career/${careerId}`);
+        if (!res.ok) throw new Error("Failed to fetch applications");
+
+        const apps = await res.json();
+        if (!apps.length) {
+          container.innerHTML = '<div class="text-muted">⚠️ No applications yet.</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+              <thead class="table-light"><tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Phone</th><th>Resume</th></tr></thead>
+              <tbody>
+                ${apps.map(app => `
+                  <tr>
+                    <td>${(app.firstName||'').toUpperCase()}</td>
+                    <td>${(app.lastName||'').toUpperCase()}</td>
+                    <td>${app.email || '-'}</td>
+                    <td>${app.phoneNo || '-'}</td>
+                    <td><a href="/uploads/resumes/${app.resumePath}" target="_blank">VIEW</a></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        console.error("❌ Failed to load applications:", err);
+        container.innerHTML = "<div class='text-danger'>⚠️ Failed to load applications.</div>";
+      }
+    }
+
+    // Fetch basic employer display name for navbar
+    fetch('/api/employer/me')
+      .then(res => res.json())
+      .then(user => {
+        const nameEl = document.getElementById("employerNameDisplay");
+        if (!nameEl) return;
+        if (user && user.role === "employer" && user.employerName) {
+          nameEl.textContent = user.employerName.toUpperCase();
+          nameEl.classList.remove('d-none');
+        } else {
+          nameEl.textContent = "GUEST";
+          nameEl.classList.remove('d-none');
+        }
+      })
+      .catch(() => {
+        // ignore errors, keep element hidden or show GUEST
+      });
+
+
+      // Fetch the employer logo and update the image
+async function loadEmployerLogo() {
+  try {
+    const res = await fetch("/api/employers/get-logo"); // correct route
+    const data = await res.json();
+
+    if (data.companyLogo) {
+      // Update both modal and sidebar
+      document.getElementById("sidebarEmployerLogo").src = data.companyLogo;
+    }
+  } catch (err) {
+    console.error("❌ Could not load employer logo:", err);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", loadEmployerLogo);
+
+
+
+async function saveEmployerProfile() {
+  const updatedData = {
+    companyEmail: document.getElementById("editCompanyEmail").value,
+    mobileNo: document.getElementById("editMobileNo").value,
+    landlineNo: document.getElementById("editLandlineNo").value,
+  };
+
+  try {
+    const res = await fetch("/api/employers/me", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updatedData),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      showToast("✅ Employer profile updated!");
+      // Update visible fields
+      document.getElementById("companyEmail").textContent = updatedData.companyEmail;
+      document.getElementById("mobileNo").textContent = updatedData.mobileNo;
+      document.getElementById("landlineNo").textContent = updatedData.landlineNo;
+    } else {
+      showToast("❌ " + (data.error || "Update failed"));
+    }
+  } catch (err) {
+    console.error("❌ Update error:", err);
+    showToast("Server error while updating profile");
+  }
+}
+</script>
 </body>
-</head>
 </html>

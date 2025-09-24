@@ -86,10 +86,5 @@ const logoUpload = multer({
   }
 });
 
-module.exports = { 
-  imageUpload, 
-  excelUpload, 
-  resumeUpload, 
-  profilePicUpload, 
-  logoUpload    // ✅ now available
-};
+
+module.exports = { imageUpload, excelUpload, resumeUpload, profilePicUpload, logoUpload};

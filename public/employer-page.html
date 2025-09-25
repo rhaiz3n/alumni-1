@@ -19,7 +19,7 @@
 
   <style>
     /* Minimal overrides to make Bootstrap layout fit your existing class hooks */
-    body { font-family: "Albert Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: #f6f7f8; }
+    body { font-family: "Albert Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: #bebebe; }
     .navbar-brand img { height: 40px; }
     .profile-circle-employer { cursor: pointer; }
     .profile-pic-employer {
@@ -59,11 +59,14 @@
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="employer-page.html">
         <img src="Logo.png" alt="Logo">
-        <span class="ms-2 fw-bold text-primary">Technological University of the Philippines - Cavite Campus - Employer</span>
+        <span class="ms-2 fw-bold text-white">
+          Technological University of the Philippines - Cavite Campus - Employer
+        </span>
       </a>
 
       <div class="ms-auto d-flex align-items-center gap-3">
-        <span id="employerNameDisplay" class="d-none d-md-inline fw-semibold"></span>
+        <span id="employerNameDisplay" class="d-none d-md-inline fw-semibold text-white"></span>
+
 
         <!-- small circle employer logo trigger (kept id/class) -->
         <img id="employerLogo"
@@ -391,6 +394,23 @@ function enableEmployerEdit() {
     if (inputEl) {
       inputEl.classList.remove("d-none");         // show input
       inputEl.value = textEl.textContent.trim() !== "NA" ? textEl.textContent.trim() : "";
+
+      if (field === "landlineNo" || field === "mobileNo") {
+        inputEl.setAttribute("maxlength", "15");
+
+        inputEl.addEventListener("input", () => {
+          let val = inputEl.value.toUpperCase();
+
+          // Allow exactly "NA" or "NONE"
+          if (val === "NA" || val === "NONE") {
+            inputEl.value = val;
+            return;
+          }
+
+          // Otherwise allow only digits (max 15 already handled by maxlength)
+          inputEl.value = val.replace(/[^0-9]/g, "");
+        });
+      }
     }
   });
 
@@ -398,6 +418,7 @@ function enableEmployerEdit() {
   document.getElementById("saveEmployerBtn").classList.remove("d-none");
   document.getElementById("closeEmployerBtn").classList.remove("d-none");
 }
+
 
 function exitEditMode() {
   ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {

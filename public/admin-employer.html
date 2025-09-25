@@ -230,8 +230,6 @@
         <table class="table table-bordered">
           <thead>
             <tr>
-              <th>Field</th>
-              <th>Current</th>
               <th>Pending</th>
             </tr>
           </thead>
@@ -423,13 +421,13 @@ async function showPendingModal(id){
       changes.push("Employer wants to change their LOGO");
     }
     if (emp.pendingProfile.landlineNo) {
-      changes.push("Employer wants to change Landline Number");
+      changes.push(`Employer wants to change Landline Number = ${emp.pendingProfile.landlineNo}`);
     }
     if (emp.pendingProfile.mobileNo) {
-      changes.push("Employer wants to change Mobile Number");
+      changes.push(`Employer wants to change Mobile Number = ${emp.pendingProfile.mobileNo}`);
     }
     if (emp.pendingProfile.companyEmail) {
-      changes.push("Employer wants to change Company Email");
+      changes.push(`Employer wants to change Company Email = ${emp.pendingProfile.companyEmail}`);
     }
 
     // ✅ Render messages

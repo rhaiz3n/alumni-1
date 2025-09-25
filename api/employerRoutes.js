@@ -339,6 +339,52 @@ router.post("/:id/reject-pending", requireAdmin, async (req, res) => {
   }
 });
 
+// ✅ Approve pending profile fields (landline, mobile, email)
+router.post("/:id/approve-profile", requireAdmin, async (req, res) => {
+  const employerId = req.params.id;
+
+  try {
+    await pool.query(
+      `UPDATE employers 
+       SET landlineNo = COALESCE(pendingLandlineNo, landlineNo),
+           mobileNo = COALESCE(pendingMobileNo, mobileNo),
+           companyEmail = COALESCE(pendingCompanyEmail, companyEmail),
+           pendingLandlineNo = NULL,
+           pendingMobileNo = NULL,
+           pendingCompanyEmail = NULL
+       WHERE id = ?`,
+      [employerId]
+    );
+
+    res.json({ success: true, message: "✅ Pending profile approved" });
+  } catch (err) {
+    console.error("❌ Approve profile error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// ❌ Reject pending profile fields
+router.post("/:id/reject-profile", requireAdmin, async (req, res) => {
+  const employerId = req.params.id;
+
+  try {
+    await pool.query(
+      `UPDATE employers 
+       SET pendingLandlineNo = NULL,
+           pendingMobileNo = NULL,
+           pendingCompanyEmail = NULL
+       WHERE id = ?`,
+      [employerId]
+    );
+
+    res.json({ success: true, message: "❌ Pending profile rejected" });
+  } catch (err) {
+    console.error("❌ Reject profile error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
 
 // Admin guard
 function requireAdmin(req, res, next) {

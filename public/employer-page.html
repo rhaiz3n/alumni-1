@@ -22,6 +22,9 @@
     body { font-family: "Albert Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: #f6f7f8; }
     .navbar-brand img { height: 40px; }
     .profile-circle-employer { cursor: pointer; }
+    .profile-pic-employer {
+      border: 4px solid rgb(199, 199, 199); /* custom color */
+    }
     .card-rounded { border-radius: .75rem; }
     .feed-card .feed-img { max-height: 280px; object-fit: cover; width: 100%; border-radius: .5rem; }
     .countdown { font-weight: 600; color: #333; }
@@ -52,11 +55,11 @@
   </div>
 
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top" style="background: linear-gradient(175deg, #882323 55%, #000000 60%);">
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="employer-page.html">
         <img src="Logo.png" alt="Logo">
-        <span class="ms-2 fw-bold text-primary">TUP - Employer</span>
+        <span class="ms-2 fw-bold text-primary">Technological University of the Philippines - Cavite Campus - Employer</span>
       </a>
 
       <div class="ms-auto d-flex align-items-center gap-3">
@@ -89,14 +92,13 @@
           class="profile-pic-employer rounded-circle" 
           style="width:120px;height:120px;">    
 
-            <h5 id="employerName" class="fw-bold mb-1">EMPLOYER NAME</h5>
-
             <div class="d-grid gap-2 mt-3">
               <button id="viewApplicantsBtn" class="btn btn-outline-primary btn-sm">VIEW APPLICANTS</button>
               <button id="changeLogoBtn" class="btn btn-outline-secondary btn-sm">Change Profile Picture</button>
               <input type="file" id="uploadCompanyLogo" name="companyLogo" style="display:none" />
-              <button id="editEmployerBtn" class="btn btn-warning btn-sm">Edit Profile</button>
-              <button id="saveEmployerBtn" class="btn btn-success btn-sm" style="display:none;">Save</button>
+              <button id="editEmployerBtn" class="btn btn-primary">Edit</button>
+              <button id="saveEmployerBtn" class="btn btn-success d-none">Save</button>
+              <button id="closeEmployerBtn" class="btn btn-secondary d-none">Close</button>
               <button id="confirmEmployerProfileBtn" class="btn btn-success btn-sm mt-2" style="display:none;">✅ Confirm Profile</button>
               <div id="employerProfileNotice" class="alert alert-warning mt-2" style="display:none;">⚠️ Please upload your company logo to continue.</div>
             </div>
@@ -380,37 +382,53 @@ async function loadEmployerProfile() {
     /* ---------------------------
        Enable Edit Mode
     ---------------------------- */
-    function enableEmployerEdit() {
-      ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
-        document.getElementById(field).style.display = "none";
+function enableEmployerEdit() {
+  ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
+    const textEl = document.getElementById(field);
+    const inputEl = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
 
-        const editField = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
-        if (editField) {
-          editField.classList.remove("d-none");  // ✅ show input
-        }
-      });
-
-      document.getElementById("editEmployerBtn").style.display = "none";
-      document.getElementById("saveEmployerBtn").style.display = "inline";
+    if (textEl) textEl.classList.add("d-none");   // hide text
+    if (inputEl) {
+      inputEl.classList.remove("d-none");         // show input
+      inputEl.value = textEl.textContent.trim() !== "NA" ? textEl.textContent.trim() : "";
     }
+  });
 
-    /* ---------------------------
-       Save Employer Profile
-    ---------------------------- */
+  document.getElementById("editEmployerBtn").classList.add("d-none");
+  document.getElementById("saveEmployerBtn").classList.remove("d-none");
+  document.getElementById("closeEmployerBtn").classList.remove("d-none");
+}
+
+function exitEditMode() {
+  ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
+    const textEl = document.getElementById(field);
+    const inputEl = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
+
+    if (textEl) textEl.classList.remove("d-none"); // show text again
+    if (inputEl) {
+      inputEl.classList.add("d-none");             // hide input
+      inputEl.value = "";                          // clear input
+    }
+  });
+
+  document.getElementById("editEmployerBtn").classList.remove("d-none");
+  document.getElementById("saveEmployerBtn").classList.add("d-none");
+  document.getElementById("closeEmployerBtn").classList.add("d-none");
+}
+
 async function saveEmployerProfile() {
-  const updates = {};
+  const landline = document.getElementById("editLandlineNo").value.trim();
+  const mobile = document.getElementById("editMobileNo").value.trim();
+  const email = document.getElementById("editCompanyEmail").value.trim();
 
-  const landlineVal = document.getElementById("editLandlineNo").value.trim();
-  const mobileVal = document.getElementById("editMobileNo").value.trim();
-  const emailVal = document.getElementById("editCompanyEmail").value.trim();
+  const updatedData = {};
+  if (landline) updatedData.landlineNo = landline;
+  if (mobile) updatedData.mobileNo = mobile;
+  if (email) updatedData.companyEmail = email;
 
-  if (landlineVal) updates.landlineNo = landlineVal;
-  if (mobileVal) updates.mobileNo = mobileVal;
-  if (emailVal) updates.companyEmail = emailVal;
-
-  // 🚨 nothing to update
-  if (Object.keys(updates).length === 0) {
-    showToast("⚠️ No changes to save");
+  if (Object.keys(updatedData).length === 0) {
+    showToast("⚠️ No changes to save, closing edit mode.");
+    exitEditMode();
     return;
   }
 
@@ -419,38 +437,24 @@ async function saveEmployerProfile() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify(updates),
+      body: JSON.stringify(updatedData),
     });
 
     const data = await res.json();
-
     if (data.success) {
       showToast("✅ Changes submitted for admin approval");
-
-      // Update UI only for changed fields
-      if (updates.landlineNo) document.getElementById("landlineNo").textContent = updates.landlineNo;
-      if (updates.mobileNo) document.getElementById("mobileNo").textContent = updates.mobileNo;
-      if (updates.companyEmail) document.getElementById("companyEmail").textContent = updates.companyEmail;
-
-      // Switch back to view mode
-      ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
-        document.getElementById(field).style.display = "inline";
-
-        const editField = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
-        if (editField) editField.classList.add("d-none");
-      });
-
-      document.getElementById("editEmployerBtn").style.display = "inline";
-      document.getElementById("saveEmployerBtn").style.display = "none";
+      exitEditMode();
     } else {
-      showToast("❌ Error: " + (data.error || "Update failed"));
+      showToast("❌ Error: " + data.error);
     }
   } catch (err) {
     console.error("❌ Update error:", err);
     showToast("Server error while updating");
   }
 }
-
+    /* ---------------------------
+       Save Employer Profile
+    ---------------------------- */
 
     /* ---------------------------
        Upload Company Logo
@@ -592,6 +596,10 @@ document.addEventListener("DOMContentLoaded", () => {;
   // Edit/save profile
   document.getElementById("editEmployerBtn")?.addEventListener("click", enableEmployerEdit);
   document.getElementById("saveEmployerBtn")?.addEventListener("click", saveEmployerProfile);
+  document.getElementById("closeEmployerBtn")?.addEventListener("click", () => {
+    showToast("❌ Edit cancelled");
+    exitEditMode();
+  });
 
   // ---------------------------
   // Upload company logo
@@ -924,34 +932,6 @@ async function loadEmployerLogo() {
 
 window.addEventListener("DOMContentLoaded", loadEmployerLogo);
 
-
-
-async function saveEmployerProfile() {
-  const updatedData = {
-    landlineNo: document.getElementById("editLandlineNo").value,
-    mobileNo: document.getElementById("editMobileNo").value,
-    companyEmail: document.getElementById("editCompanyEmail").value,
-  };
-
-  try {
-    const res = await fetch("/api/employers/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(updatedData),
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      showToast("✅ Changes submitted for admin approval");
-    } else {
-      showToast("❌ Error: " + data.error);
-    }
-  } catch (err) {
-    console.error("❌ Update error:", err);
-    showToast("Server error while updating");
-  }
-}
 
 
   /*******************************

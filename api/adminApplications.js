@@ -3,6 +3,15 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db/mysql");
 
+function requireAdmin(req, res, next) {
+  if (!req.session.user || !req.session.user.isAdmin) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+  next();
+}
+
+
+
 // GET /api/admin-applications
 // Returns applications for careers that belong to the logged-in user
 router.get("/", async (req, res) => {

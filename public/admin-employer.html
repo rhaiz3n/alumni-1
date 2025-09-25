@@ -193,6 +193,36 @@
     </div>
   </div>
 
+  <!-- Pending Changes Modal -->
+<div id="pendingModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Pending Employer Updates</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Current</th>
+              <th>Pending</th>
+            </tr>
+          </thead>
+          <tbody id="pendingChangesTable"></tbody>
+        </table>
+        <div id="pendingLogoPreview" class="text-center"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="approvePendingBtn" class="btn btn-success">Approve</button>
+        <button id="rejectPendingBtn" class="btn btn-danger">Reject</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <!-- Popup warning -->
   <div id="popup" class="popup-warning">⚠️ No picture available</div>
 
@@ -200,226 +230,195 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Inline JS (keeps your endpoints and logic) -->
-  <script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.querySelector('#employerTable tbody');
+  const pageSelect = document.getElementById('pageSelect');
+  const statusFilter = document.getElementById('statusFilter');
+  const searchInput = document.getElementById('searchInput');
+  const printAcceptedBtn = document.getElementById('printAcceptedBtn');
+  const printTitle = document.getElementById('printTitle');
+
+  const ROWS_PER_PAGE = 100;
+  let currentPage = 1, totalPages = 1, allEmployers = [];
+
+  if (sessionStorage.getItem('userRole') !== 'admin') {
+    window.location.href = 'homepage.html';
+    return;
+  }
+
+  function formatDateForDisplay(dateValue) {
+    if (!dateValue) return '';
+    const d = new Date(dateValue);
+    return isNaN(d.getTime()) ? dateValue : d.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  }
+
+  function statusBadge(s) {
+    s = (s || 'PENDING').toUpperCase();
+    if (s === 'ACCEPTED') return `<span class="badge-ACCEPTED">ACCEPTED</span>`;
+    if (s === 'ARCHIVED') return `<span class="badge-ARCHIVED">ARCHIVED</span>`;
+    return `<span class="badge-PENDING">PENDING</span>`;
+  }
+
+  function buildPagination() {
+    pageSelect.innerHTML = '';
+    for (let i=1; i<=Math.max(1, totalPages); i++){
+      pageSelect.appendChild(new Option(`Page ${i}`, i, i===currentPage, i===currentPage));
+    }
+  }
+
+  async function loadPage(page = 1) {
+    currentPage = page;
+    tbody.innerHTML = `<tr><td colspan="12">⏳ Loading...</td></tr>`;
+
+    try {
+      const res = await fetch(`/api/employers/list?page=${page}&limit=${ROWS_PER_PAGE}&search=${searchInput.value||''}`, { credentials: "include" });
+      const { employers } = await res.json();
+      allEmployers = employers || [];
+
+      const statusPriority = { PENDING:1, ACCEPTED:2, ARCHIVED:3 };
+      const sorted = allEmployers
+        .filter(emp => statusFilter.value==="ALL" || (emp.status||"PENDING").toUpperCase()===statusFilter.value)
+        .sort((a,b)=> (statusPriority[(a.status||"PENDING").toUpperCase()]||9) - (statusPriority[(b.status||"PENDING").toUpperCase()]||9)
+          || new Date(b.submittedAt)-new Date(a.submittedAt));
+
+      totalPages = Math.ceil(sorted.length/ROWS_PER_PAGE) || 1;
+      buildPagination();
+
+      tbody.innerHTML = "";
+      sorted.slice((page-1)*ROWS_PER_PAGE, page*ROWS_PER_PAGE).forEach(emp=>{
+        const tr = document.createElement('tr');
+
+        // Profile
+        const tdPic = document.createElement('td');
+        if (emp.companyLogo) {
+          tdPic.innerHTML = `<img src="${emp.companyLogo.startsWith('/')?emp.companyLogo:'/uploads/companyLogos/'+emp.companyLogo}" class="company-logo"/>`;
+        } else tdPic.textContent="No Picture";
+        tr.appendChild(tdPic);
+
+        tr.innerHTML += `
+          <td>${emp.employerName||''}</td>
+          <td><button class="btn btn-sm btn-outline-secondary">View</button></td>
+          <td><button class="btn btn-sm btn-outline-secondary">View</button></td>
+          <td><button class="btn btn-sm btn-outline-secondary">View</button></td>
+          <td><button class="btn btn-sm btn-outline-secondary">View</button></td>
+          <td><button class="btn btn-sm btn-outline-secondary">View</button></td>
+          <td><button class="btn btn-sm btn-outline-secondary">View</button></td>
+          <td>${emp.preferredUserId||''}</td>
+          <td>${statusBadge(emp.status)}</td>
+          <td>${formatDateForDisplay(emp.submittedAt)}</td>
+          <td class="text-center">
+            <button class="btn btn-success btn-sm me-1 accept-btn" data-id="${emp.id}">Accept</button>
+            <button class="btn btn-danger btn-sm me-1 archive-btn" data-id="${emp.id}">Archive</button>
+            ${emp.pendingLogo || emp.pendingLandlineNo || emp.pendingMobileNo || emp.pendingCompanyEmail
+              ? `<button class="btn btn-warning btn-sm show-pending-btn" data-id="${emp.id}">Show Pending</button>`
+              : ""}
+          </td>`;
+        tbody.appendChild(tr);
+      });
+
+      attachActionEvents();
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="12">❌ Failed to load employers</td></tr>`;
+    }
+  }
+
+  function attachActionEvents() {
+    document.querySelectorAll('.accept-btn').forEach(btn=>{
+      btn.onclick = ()=>updateStatus(btn.dataset.id,'ACCEPTED');
+    });
+    document.querySelectorAll('.archive-btn').forEach(btn=>{
+      btn.onclick = ()=>updateStatus(btn.dataset.id,'ARCHIVED');
+    });
+    document.querySelectorAll('.show-pending-btn').forEach(btn=>{
+      btn.onclick = ()=>showPendingModal(btn.dataset.id);
+    });
+  }
+
+  async function updateStatus(id,status){
+    await fetch(`/api/employers/${id}/status`, {
+      method:"PATCH",
+      headers:{'Content-Type':'application/json'},
+      credentials:"include",
+      body:JSON.stringify({status})
+    });
+    loadPage(currentPage);
+  }
+
+async function showPendingModal(id){
+  try {
+    // ✅ Fetch pending info
+    const res = await fetch(`/api/employers/${id}/pending`, { credentials:"include" });
+    const emp = await res.json();
+
+    const tbody = document.getElementById("pendingChangesTable");
+    tbody.innerHTML = "";
+
+    // ✅ Collect changes as messages
+    const changes = [];
+
+    if (emp.pendingLogo) {
+      changes.push("Employer wants to change their LOGO");
+    }
+    if (emp.pendingProfile.landlineNo) {
+      changes.push("Employer wants to change Landline Number");
+    }
+    if (emp.pendingProfile.mobileNo) {
+      changes.push("Employer wants to change Mobile Number");
+    }
+    if (emp.pendingProfile.companyEmail) {
+      changes.push("Employer wants to change Company Email");
+    }
+
+    // ✅ Render messages
+    if (changes.length > 0) {
+      tbody.innerHTML = changes.map(c => `<tr><td colspan="3">${c}</td></tr>`).join("");
+    } else {
+      tbody.innerHTML = `<tr><td colspan="3">No pending changes</td></tr>`;
+    }
+
+    // ✅ Show logo preview if pending
+    const logoDiv = document.getElementById("pendingLogoPreview");
+    logoDiv.innerHTML = emp.pendingLogo 
+      ? `<img src="${emp.pendingLogo}" style="max-width:150px;"/>` 
+      : "";
+
+    // ✅ Approve button
+    document.getElementById("approvePendingBtn").onclick = async ()=>{
+      if (emp.pendingLogo) {
+        await fetch(`/api/employers/${id}/approve-pending`, { method:"POST", credentials:"include" });
+      }
+      bootstrap.Modal.getInstance(document.getElementById("pendingModal")).hide();
+      loadPage(currentPage);
+    };
+
+    // ✅ Reject button
+    document.getElementById("rejectPendingBtn").onclick = async ()=>{
+      if (emp.pendingLogo) {
+        await fetch(`/api/employers/${id}/reject-pending`, { method:"POST", credentials:"include" });
+      }
+      bootstrap.Modal.getInstance(document.getElementById("pendingModal")).hide();
+      loadPage(currentPage);
+    };
+
+    new bootstrap.Modal(document.getElementById("pendingModal")).show();
+  } catch(err){
+    console.error("❌ Failed to load pending:", err);
+  }
+}
+  // Filters & pagination
+  searchInput.addEventListener('input',()=>loadPage(1));
+  statusFilter.addEventListener('change',()=>loadPage(1));
+  pageSelect.addEventListener('change',()=>loadPage(+pageSelect.value));
+
+  loadPage();
+});
+
+
+  /*******************************
+   * Loader progress
+   *******************************/
   document.addEventListener('DOMContentLoaded', () => {
-    // Elements
-    const tbody = document.querySelector('#employerTable tbody');
-    const pageSelect = document.getElementById('pageSelect');
-    const statusFilter = document.getElementById('statusFilter');
-    const searchInput = document.getElementById('searchInput');
-    const printAcceptedBtn = document.getElementById('printAcceptedBtn');
-    const infoModal = document.getElementById('infoModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalContent = document.getElementById('modalContent');
-    const modalClose = infoModal.querySelector('.close-btn');
-    const popup = document.getElementById('popup');
-    const printTitle = document.getElementById('printTitle');
-
-    const ROWS_PER_PAGE = 100;
-    let currentPage = 1, totalPages = 1, allEmployers = [], showOnlyAccepted = false;
-
-    // Admin guard
-    if (sessionStorage.getItem('userRole') !== 'admin') {
-      window.location.href = 'homepage.html';
-      return;
-    }
-
-    // Modal helpers
-    function openInfoModal(title, content) {
-      modalTitle.textContent = title;
-      modalContent.textContent = content || 'N/A';
-      infoModal.style.display = 'flex';
-    }
-    function closeInfoModal() {
-      infoModal.style.display = 'none';
-    }
-    modalClose.addEventListener('click', closeInfoModal);
-    infoModal.addEventListener('click', (e) => { if (e.target === infoModal) closeInfoModal(); });
-
-    // Format date
-    function formatDateForDisplay(dateValue) {
-      if (!dateValue) return '';
-      try {
-        const date = new Date(dateValue);
-        if (isNaN(date.getTime())) return dateValue;
-        return date.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-      } catch { return dateValue; }
-    }
-
-    // Status badge
-    function statusBadge(s) {
-      const st = (s || 'PENDING').toUpperCase();
-      if (st === 'ACCEPTED') return `<span class="badge-PENDING badge-ACCEPTED">ACCEPTED</span>`.replace('badge-PENDING','');
-      if (st === 'ARCHIVED') return `<span class="badge-ARCHIVED">ARCHIVED</span>`;
-      return `<span class="badge-PENDING">PENDING</span>`;
-    }
-
-    // Build pagination select
-    function buildPagination() {
-      pageSelect.innerHTML = '';
-      for (let i=1; i<=Math.max(1, totalPages); i++){
-        const opt = new Option(`Page ${i}`, i, i===currentPage, i===currentPage);
-        pageSelect.appendChild(opt);
-      }
-    }
-
-    // Fetch and render page
-    async function loadPage(page = 1) {
-      currentPage = page;
-      tbody.innerHTML = `<tr><td colspan="12">⏳ Loading...</td></tr>`;
-      try {
-        const res = await fetch('/api/employer/list');
-        if (!res.ok) throw new Error(await res.text());
-        const { employers } = await res.json();
-        allEmployers = employers || [];
-
-        // Filter & sort
-        const statusPriority = { 'PENDING':1, 'ACCEPTED':2, 'ARCHIVED':3 };
-        const filterVal = statusFilter.value || 'ALL';
-
-        const sortedEmployers = allEmployers
-          .filter(emp => {
-            const st = (emp.status || 'PENDING').toUpperCase();
-            return filterVal === 'ALL' || st === filterVal;
-          })
-          .sort((a,b) => {
-            const sa = statusPriority[(a.status||'PENDING').toUpperCase()] || 99;
-            const sb = statusPriority[(b.status||'PENDING').toUpperCase()] || 99;
-            if (sa !== sb) return sa - sb;
-            return new Date(b.submittedAt) - new Date(a.submittedAt);
-          });
-
-        totalPages = Math.ceil(sortedEmployers.length / ROWS_PER_PAGE) || 1;
-        buildPagination();
-
-        const start = (currentPage - 1) * ROWS_PER_PAGE;
-        const paginated = sortedEmployers.slice(start, start + ROWS_PER_PAGE);
-
-        tbody.innerHTML = '';
-        paginated.forEach(emp => {
-          const tr = document.createElement('tr');
-          const currentStatus = (emp.status || 'PENDING').toUpperCase();
-
-          // Profile picture
-          const tdPic = document.createElement('td');
-          if (emp.companyLogo) {
-            const img = document.createElement('img');
-            if (emp.companyLogo.startsWith('/')) img.src = emp.companyLogo;
-            else img.src = (emp.companyLogo.startsWith('http') ? emp.companyLogo : '/uploads/companyLogos/' + emp.companyLogo);
-            img.alt = 'Company Logo';
-            img.className = 'company-logo';
-            img.addEventListener('click', () => window.open(img.src, '_blank'));
-            tdPic.appendChild(img);
-          } else {
-            tdPic.textContent = 'No Picture';
-          }
-          tr.appendChild(tdPic);
-
-          // Employer name
-          const tdName = document.createElement('td'); tdName.textContent = emp.employerName || ''; tr.appendChild(tdName);
-
-          // Long fields -> view buttons
-          function makeViewCell(label, value) {
-            const td = document.createElement('td');
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-sm btn-outline-secondary';
-            btn.textContent = 'View';
-            btn.addEventListener('click', () => openInfoModal(label, value));
-            td.appendChild(btn);
-            return td;
-          }
-          tr.appendChild(makeViewCell('Business Name', emp.businessName));
-          tr.appendChild(makeViewCell('Business Address', emp.businessAddress));
-          tr.appendChild(makeViewCell('Landline', emp.landlineNo));
-          tr.appendChild(makeViewCell('Mobile', emp.mobileNo));
-          tr.appendChild(makeViewCell('Company Email', emp.companyEmail));
-          tr.appendChild(makeViewCell('Website', emp.companyWebsite));
-
-          // User ID
-          const tdUser = document.createElement('td'); tdUser.textContent = emp.preferredUserId || ''; tr.appendChild(tdUser);
-
-          // Status
-          const tdStatus = document.createElement('td'); tdStatus.innerHTML = statusBadge(currentStatus); tr.appendChild(tdStatus);
-
-          // Submitted At
-          const tdDate = document.createElement('td'); tdDate.textContent = formatDateForDisplay(emp.submittedAt); tr.appendChild(tdDate);
-
-          // Actions
-          const tdAction = document.createElement('td');
-          tdAction.className = 'text-center';
-          tdAction.innerHTML = `
-            <button class="btn btn-success btn-sm action-btn accept-btn me-1" data-id="${emp.id}">Accept</button>
-            <button class="btn btn-danger btn-sm action-btn archive-btn" data-id="${emp.id}">Archive</button>
-          `;
-          tr.appendChild(tdAction);
-
-          tbody.appendChild(tr);
-        });
-
-        attachActionEvents();
-      } catch (err) {
-        console.error('❌ Error loading employers:', err);
-        tbody.innerHTML = `<tr><td colspan="12">❌ Failed to load employers</td></tr>`;
-      }
-    }
-
-    function attachActionEvents() {
-      document.querySelectorAll('.accept-btn').forEach(btn => {
-        btn.onclick = () => updateStatus(btn.dataset.id, 'ACCEPTED');
-      });
-      document.querySelectorAll('.archive-btn').forEach(btn => {
-        btn.onclick = () => updateStatus(btn.dataset.id, 'ARCHIVED');
-      });
-    }
-
-    async function updateStatus(id, status) {
-      const buttons = document.querySelectorAll(`[data-id="${id}"]`);
-      buttons.forEach(b => b.disabled = true);
-      try {
-        const res = await fetch(`/api/employer/${id}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status })
-        });
-        if (!res.ok) throw new Error(await res.text());
-        await loadPage(currentPage);
-      } catch (err) {
-        console.error('❌ Update error:', err);
-        alert('❌ ' + (err.message || 'Update failed'));
-      } finally {
-        buttons.forEach(b => b.disabled = false);
-      }
-    }
-
-    // Print accepted only
-    printAcceptedBtn.addEventListener('click', () => {
-      showOnlyAccepted = true;
-      printTitle.classList.remove('d-none');
-      // render will honor showOnlyAccepted by filtering table rows before print
-      // easiest approach: temporarily hide non-accepted rows, call print, then restore via afterprint
-      document.querySelectorAll('#employerTable tbody tr').forEach(row => {
-        const badge = row.querySelector('td:nth-child(10) span');
-        const status = badge ? badge.textContent.trim().toUpperCase() : row.querySelector('td:nth-child(10)')?.textContent?.trim().toUpperCase();
-        row.style.display = (status === 'ACCEPTED') ? '' : 'none';
-      });
-      setTimeout(() => window.print(), 100);
-    });
-
-    // after print restore
-    window.addEventListener('afterprint', () => {
-      document.querySelectorAll('#employerTable tbody tr').forEach(row => row.style.display = '');
-      showOnlyAccepted = false;
-      printTitle.classList.add('d-none');
-    });
-
-    // Controls
-    searchInput.addEventListener('input', () => { currentPage = 1; loadPage(1); });
-    statusFilter.addEventListener('change', () => { currentPage = 1; loadPage(1); });
-    pageSelect.addEventListener('change', () => { loadPage(+pageSelect.value); });
-
-
-
-    // Loader progress
     let p = 0;
     const bar = document.getElementById('progress-bar');
     const pct = document.getElementById('percentage');
@@ -428,13 +427,13 @@
       p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
       bar.style.width = p + '%';
       pct.textContent = p + '%';
-      if (p >= 100) { clearInterval(iv); wrap.style.display = 'none'; }
+      if (p >= 100) {
+        clearInterval(iv);
+        wrap.style.display = 'none';
+      }
     }, 70);
-    // Initial load
-    loadPage();
-
   });
-  </script>
+</script>
 
 </body>
 </html>

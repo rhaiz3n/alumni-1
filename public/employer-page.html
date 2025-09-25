@@ -32,9 +32,24 @@
     @media (max-width: 991px) {
       .col-lg-3 { margin-bottom: 1rem; }
     }
+        /* Loader overlay */
+    #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
+    .progress-bar-custom { left: 100px; width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
   </style>
 </head>
 <body>
+
+      <!-- Loader (Bootstrap replacement) -->
+  <div id="loader-wrapper" role="status" aria-live="polite">
+    <div style="text-align:center;">
+      <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
+      <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
+        <div id="progress-bar" class="progress-bar-custom"></div>
+      </div>
+      <div id="percentage" style="margin-top:10px; color:#6b7280;">0%</div>
+    </div>
+  </div>
 
   <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
@@ -82,8 +97,11 @@
               <input type="file" id="uploadCompanyLogo" name="companyLogo" style="display:none" />
               <button id="editEmployerBtn" class="btn btn-warning btn-sm">Edit Profile</button>
               <button id="saveEmployerBtn" class="btn btn-success btn-sm" style="display:none;">Save</button>
-              <button id="confirmEmployerProfileBtn" class="btn btn-primary btn-sm" style="display:none;">Confirm Profile</button>
+              <button id="confirmEmployerProfileBtn" class="btn btn-success btn-sm mt-2" style="display:none;">✅ Confirm Profile</button>
+              <div id="employerProfileNotice" class="alert alert-warning mt-2" style="display:none;">⚠️ Please upload your company logo to continue.</div>
             </div>
+
+            
 
             <div id="employerProfileNotice" class="alert alert-warning mt-3 d-none profile-notice-employer" role="alert"></div>
           </div>
@@ -266,73 +284,77 @@
     /* ---------------------------
        Load Employer Profile
     ---------------------------- */
-    async function loadEmployerProfile(updateModal = false) {
-      const logo = document.getElementById("employerLogo");
-      
+async function loadEmployerProfile() {
+  const logo = document.getElementById("employerLogo");
 
-      try {
-        const res = await fetch("/api/employers/me", {
-          credentials: "include",
-          cache: "no-store"
-        });
-        if (!res.ok) throw new Error("Not logged in");
+  try {
+    const res = await fetch("/api/employers/me", {
+      credentials: "include",
+      cache: "no-store"
+    });
+    if (!res.ok) throw new Error("Not logged in");
 
-        const employer = await res.json();
+    const employer = await res.json();
 
-        // Logos
-        const pic = employer.companyLogo || "/images/default-company.png";
-        if (logo) logo.src = pic;
-        if (updateModal && modalLogo) modalLogo.src = pic;
+    // Fill details
+    document.getElementById("businessName").textContent = employer.businessName || "NA";
+    document.getElementById("businessAddress").textContent = employer.businessAddress || "NA";
+    document.getElementById("landlineNo").textContent = employer.landlineNo || "NA";
+    document.getElementById("mobileNo").textContent = employer.mobileNo || "NA";
+    document.getElementById("companyEmail").textContent = employer.companyEmail || "NA";
+    document.getElementById("companyWebsite").textContent = employer.companyWebsite || "NA";
 
-        // Basic Info
-        document.getElementById("employerName").textContent =
-          (employer.employerName || "EMPLOYER NAME").toUpperCase();
-        document.getElementById("businessName").textContent = employer.businessName || "-";
-        document.getElementById("businessAddress").textContent = employer.businessAddress || "-";
-        document.getElementById("landlineNo").textContent = employer.landlineNo || "-";
-        document.getElementById("mobileNo").textContent = employer.mobileNo || "-";
-        document.getElementById("companyEmail").textContent = employer.companyEmail || "-";
-        document.getElementById("companyWebsite").textContent = employer.companyWebsite || "-";
+    // ✅ Logo
+    logo.src = employer.companyLogo || "/images/default-company.png";
 
-        // Fill inputs for edit mode
-        document.getElementById("editLandlineNo").value = employer.landlineNo || "";
-        document.getElementById("editMobileNo").value = employer.mobileNo || "";
-        document.getElementById("editCompanyEmail").value = employer.companyEmail || "";
+    // ✅ Post button (disabled until confirmed)
+    const postBtn = document.getElementById("openModalBtn");
+    if (employer.profileConfirmed === 1) {
+      postBtn.disabled = false;
+      postBtn.classList.remove("btn-secondary");
+      postBtn.classList.add("btn-primary");
+    } else {
+      postBtn.disabled = true;
+      postBtn.classList.remove("btn-primary");
+      postBtn.classList.add("btn-secondary");
+    }
 
-        // Confirm button + lock modal
-        const confirmBtn = document.getElementById("confirmEmployerProfileBtn");
-        const notice = document.getElementById("employerProfileNotice");
-        const modalProfile = document.getElementById("modal-employer-profile");
+    // ✅ Confirm button logic
+    const confirmBtn = document.getElementById("confirmProfileBtn");
+    const notice = document.getElementById("employerProfileNotice");
 
-        if (employer.profileConfirmed === 1) {
-          if (confirmBtn) confirmBtn.style.display = "none";
-          if (notice) { notice.style.display = "none"; notice.classList.add('d-none'); }
-          if (modalProfile) modalProfile && delete modalProfile.dataset.locked;
-        } else {
-          if (confirmBtn) confirmBtn.style.display = "inline-block";
-          if (notice) { notice.style.display = "block"; notice.classList.remove('d-none'); }
+    if (employer.profileConfirmed === 1) {
+      document.getElementById("confirmEmployerProfileBtn").style.display = "none";
+      document.getElementById("employerProfileNotice").style.display = "none";
 
-          if (employer.companyLogo && !employer.companyLogo.includes("default-company.png")) {
-            if (notice) notice.textContent = "✅ Logo uploaded. Click Confirm to continue.";
-            if (confirmBtn) confirmBtn.disabled = false;
-          } else {
-            if (notice) notice.textContent = "⚠️ Please upload your company logo to continue.";
-            if (confirmBtn) confirmBtn.disabled = true;
+      // enable post button
+      const postBtn = document.getElementById("openModalBtn");
+      postBtn.disabled = false;
+      postBtn.classList.remove("btn-secondary");
+      postBtn.classList.add("btn-primary");
+    } else {
+      const confirmBtn = document.getElementById("confirmEmployerProfileBtn");
+      const notice = document.getElementById("employerProfileNotice");
 
-            // Force open + lock modal (cannot be closed)
-            if (modalProfile) {
-              modalProfile.style.display = "flex";
-              modalProfile.setAttribute("aria-hidden", "false");
-              modalProfile.dataset.locked = "true";
-            }
-          }
-        }
-
-      } catch (err) {
-        console.error("❌ Error loading employer info:", err);
-        if (logo) logo.src = "/images/default-company.png";
+      if (employer.companyLogo && !employer.companyLogo.includes("default-company.png")) {
+        // logo uploaded but not confirmed yet
+        confirmBtn.style.display = "block";
+        notice.style.display = "block";
+        notice.textContent = "⚠️ Click Confirm to activate your account.";
+      } else {
+        // still missing logo
+        confirmBtn.style.display = "none";
+        notice.style.display = "block";
+        notice.textContent = "⚠️ Please upload your company logo to continue.";
       }
     }
+
+
+  } catch (err) {
+    console.error("❌ Error loading employer info:", err);
+    logo.src = "/images/default-company.png";
+  }
+}
 
     /* ---------------------------
        Modal Open / Close for Employer Profile
@@ -361,8 +383,11 @@
     function enableEmployerEdit() {
       ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
         document.getElementById(field).style.display = "none";
+
         const editField = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
-        if (editField) editField.style.display = "inline";
+        if (editField) {
+          editField.classList.remove("d-none");  // ✅ show input
+        }
       });
 
       document.getElementById("editEmployerBtn").style.display = "none";
@@ -372,112 +397,134 @@
     /* ---------------------------
        Save Employer Profile
     ---------------------------- */
-    async function saveEmployerProfile() {
-      const updatedData = {
-        landlineNo: document.getElementById("editLandlineNo").value,
-        mobileNo: document.getElementById("editMobileNo").value,
-        companyEmail: document.getElementById("editCompanyEmail").value,
-      };
+async function saveEmployerProfile() {
+  const updates = {};
 
-      try {
-        const res = await fetch("/api/employers/update", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(updatedData),
-        });
-        const data = await res.json();
+  const landlineVal = document.getElementById("editLandlineNo").value.trim();
+  const mobileVal = document.getElementById("editMobileNo").value.trim();
+  const emailVal = document.getElementById("editCompanyEmail").value.trim();
 
-        if (data.success) {
-          showToast("✅ Employer profile updated!");
-          document.getElementById("landlineNo").textContent = updatedData.landlineNo;
-          document.getElementById("mobileNo").textContent = updatedData.mobileNo;
-          document.getElementById("companyEmail").textContent = updatedData.companyEmail;
+  if (landlineVal) updates.landlineNo = landlineVal;
+  if (mobileVal) updates.mobileNo = mobileVal;
+  if (emailVal) updates.companyEmail = emailVal;
 
-          // Switch back to view mode
-          ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
-            document.getElementById(field).style.display = "inline";
-            const editField = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
-            if (editField) editField.style.display = "none";
-          });
-
-          document.getElementById("editEmployerBtn").style.display = "inline";
-          document.getElementById("saveEmployerBtn").style.display = "none";
-        } else {
-          showToast("❌ Error: " + data.error);
-        }
-      } catch (err) {
-        console.error("❌ Update error:", err);
-        showToast("Server error while updating");
-      }
-    }
-
-    /* ---------------------------
-       Upload Company Logo
-    ---------------------------- */
-const fileInput = document.getElementById("uploadCompanyLogo");
-fileInput.onchange = async () => {
-  const file = fileInput.files[0];
-  if (!file) return;
-
-  const formData = new FormData();
-  formData.append("logo", file); // must match backend's upload.single("logo")
+  // 🚨 nothing to update
+  if (Object.keys(updates).length === 0) {
+    showToast("⚠️ No changes to save");
+    return;
+  }
 
   try {
-    const res = await fetch("/api/employers/upload-logo", { // <-- plural 'employers'
+    const res = await fetch("/api/employers/update", {
       method: "POST",
-      body: formData
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updates),
     });
 
     const data = await res.json();
 
-    if (!res.ok) {
-      showToast(`❌ Upload failed: ${JSON.stringify(data)}`);
-      return;
+    if (data.success) {
+      showToast("✅ Changes submitted for admin approval");
+
+      // Update UI only for changed fields
+      if (updates.landlineNo) document.getElementById("landlineNo").textContent = updates.landlineNo;
+      if (updates.mobileNo) document.getElementById("mobileNo").textContent = updates.mobileNo;
+      if (updates.companyEmail) document.getElementById("companyEmail").textContent = updates.companyEmail;
+
+      // Switch back to view mode
+      ["landlineNo", "mobileNo", "companyEmail"].forEach(field => {
+        document.getElementById(field).style.display = "inline";
+
+        const editField = document.getElementById("edit" + field.charAt(0).toUpperCase() + field.slice(1));
+        if (editField) editField.classList.add("d-none");
+      });
+
+      document.getElementById("editEmployerBtn").style.display = "inline";
+      document.getElementById("saveEmployerBtn").style.display = "none";
+    } else {
+      showToast("❌ Error: " + (data.error || "Update failed"));
     }
-
-    // update images
-    const sidebarLogo = document.getElementById("sidebarEmployerLogo");
-    const navbarLogo = document.getElementById("employerLogo");
-    if (sidebarLogo) sidebarLogo.src = data.logoPath;
-    if (navbarLogo) navbarLogo.src = data.logoPath;
-
-    showToast("✅ Logo uploaded!");
-    checkEmployerProfilePic(); // re-enable POST NEW CAREER button if needed
   } catch (err) {
-    console.error("❌ Upload failed:", err);
-    showToast("❌ Upload failed: " + err.message);
+    console.error("❌ Update error:", err);
+    showToast("Server error while updating");
   }
-};
+}
+
+
+    /* ---------------------------
+       Upload Company Logo
+    ---------------------------- */
+// const fileInput = document.getElementById("uploadCompanyLogo");
+// fileInput.onchange = async () => {
+//   const file = fileInput.files[0];
+//   if (!file) return;
+
+//   const formData = new FormData();
+//   formData.append("logo", file); // must match backend's upload.single("logo")
+
+//   try {
+//     const res = await fetch("/api/employers/upload-logo", { // <-- plural 'employers'
+//       method: "POST",
+//       body: formData
+//     });
+
+//     const data = await res.json();
+
+//     if (!res.ok) {
+//       showToast(`❌ Upload failed: ${JSON.stringify(data)}`);
+//       return;
+//     }
+
+//     // update images
+//     const sidebarLogo = document.getElementById("sidebarEmployerLogo");
+//     const navbarLogo = document.getElementById("employerLogo");
+//     if (sidebarLogo) sidebarLogo.src = data.logoPath;
+//     if (navbarLogo) navbarLogo.src = data.logoPath;
+
+//     showToast("✅ Logo uploaded!");
+//     checkEmployerProfilePic(); // re-enable POST NEW CAREER button if needed
+//   } catch (err) {
+//     console.error("❌ Upload failed:", err);
+//     showToast("❌ Upload failed: " + err.message);
+//   }
+// };
 
     /* ---------------------------
        Confirm Employer Profile
     ---------------------------- */
-    document.getElementById("confirmEmployerProfileBtn")?.addEventListener("click", async () => {
-      try {
-        const res = await fetch("/api/employers/confirm", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          const modalProfile = document.getElementById("modal-employer-profile");
-          delete modalProfile.dataset.locked;
-          modalProfile.style.display = "none";
-          const notice = document.getElementById("employerProfileNotice");
-          if (notice) notice.style.display = "none";
-          document.getElementById("confirmEmployerProfileBtn").style.display = "none";
-          showToast("✅ Profile confirmed!");
-        } else {
-          showToast(data.error || "Please upload a logo first.");
-        }
-      } catch (err) {
-        console.error("❌ confirmEmployerProfileBtn error:", err);
-        showToast("Server error while confirming");
-      }
+document.getElementById("confirmEmployerProfileBtn")?.addEventListener("click", async () => {
+  try {
+    const res = await fetch("/api/employers/confirm", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
     });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      showToast("✅ Profile confirmed!");
+
+      // Enable Post button
+      const postBtn = document.getElementById("openModalBtn");
+      postBtn.disabled = false;
+      postBtn.classList.remove("btn-secondary");
+      postBtn.classList.add("btn-primary");
+
+      // Hide notice
+      const notice = document.getElementById("employerProfileNotice");
+      if (notice) notice.style.display = "none";
+
+      // Hide confirm button
+      document.getElementById("confirmEmployerProfileBtn").style.display = "none";
+    } else {
+      showToast(data.error || "Please upload a logo first.");
+    }
+  } catch (err) {
+    console.error("❌ Confirm error:", err);
+    showToast("Server error while confirming");
+  }
+});
 
     /* ---------------------------
        Applicants Modal (employer-side)
@@ -555,7 +602,7 @@ document.getElementById("uploadCompanyLogo").addEventListener("change", async (e
   if (!file) return;
 
   const formData = new FormData();
-  formData.append("companyLogo", file); // MUST match multer.single("companyLogo")
+  formData.append("companyLogo", file);
 
   try {
     const res = await fetch("/api/employers/upload-logo", {
@@ -569,13 +616,15 @@ document.getElementById("uploadCompanyLogo").addEventListener("change", async (e
       return;
     }
 
-    // update UI
-    const sidebarLogo = document.getElementById("sidebarEmployerLogo");
-    const navbarLogo = document.getElementById("employerLogo");
-    if (sidebarLogo) sidebarLogo.src = data.logoUrl;
-    if (navbarLogo) navbarLogo.src = data.logoUrl;
+    // update UI logos
+    document.getElementById("sidebarEmployerLogo").src = data.logoUrl;
+    document.getElementById("employerLogo").src = data.logoUrl;
 
     showToast("✅ Logo uploaded successfully!");
+
+    // 🔥 refresh employer state without reloading the page
+    loadEmployerProfile();
+    
   } catch (err) {
     console.error(err);
     showToast("❌ Upload failed: Server error");
@@ -879,35 +928,50 @@ window.addEventListener("DOMContentLoaded", loadEmployerLogo);
 
 async function saveEmployerProfile() {
   const updatedData = {
-    companyEmail: document.getElementById("editCompanyEmail").value,
-    mobileNo: document.getElementById("editMobileNo").value,
     landlineNo: document.getElementById("editLandlineNo").value,
+    mobileNo: document.getElementById("editMobileNo").value,
+    companyEmail: document.getElementById("editCompanyEmail").value,
   };
 
   try {
-    const res = await fetch("/api/employers/me", {
-      method: "PUT",
+    const res = await fetch("/api/employers/update", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(updatedData),
     });
-
     const data = await res.json();
 
-    if (res.ok && data.success) {
-      showToast("✅ Employer profile updated!");
-      // Update visible fields
-      document.getElementById("companyEmail").textContent = updatedData.companyEmail;
-      document.getElementById("mobileNo").textContent = updatedData.mobileNo;
-      document.getElementById("landlineNo").textContent = updatedData.landlineNo;
+    if (data.success) {
+      showToast("✅ Changes submitted for admin approval");
     } else {
-      showToast("❌ " + (data.error || "Update failed"));
+      showToast("❌ Error: " + data.error);
     }
   } catch (err) {
     console.error("❌ Update error:", err);
-    showToast("Server error while updating profile");
+    showToast("Server error while updating");
   }
 }
+
+
+  /*******************************
+   * Loader progress
+   *******************************/
+  document.addEventListener('DOMContentLoaded', () => {
+    let p = 0;
+    const bar = document.getElementById('progress-bar');
+    const pct = document.getElementById('percentage');
+    const wrap = document.getElementById('loader-wrapper');
+    const iv = setInterval(() => {
+      p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
+      bar.style.width = p + '%';
+      pct.textContent = p + '%';
+      if (p >= 100) {
+        clearInterval(iv);
+        wrap.style.display = 'none';
+      }
+    }, 70);
+  });
 </script>
 </body>
 </html>

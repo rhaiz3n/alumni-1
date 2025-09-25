@@ -47,7 +47,6 @@ app.use("/api/applications", applicationsRoutes);
 app.use("/api/careers", careersRoutes);
 app.use("/api/fullInformation", profileRoutes);
 app.use("/api/employers", employerRoutes);
-app.use("/api/admin-applications", adminApplicationsRoutes);
 
 app.use("/api/admin-applications", requireAdmin, adminApplicationsRoutes);
 
@@ -55,6 +54,10 @@ app.use("/api/admin-applications", requireAdmin, adminApplicationsRoutes);
 // Public homepage
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/homepage.html"));
+});
+
+app.get("/api/debug/session", (req, res) => {
+  res.json({ session: req.session });
 });
 
 // Excel import
@@ -232,17 +235,32 @@ async function initTables() {
       employerName VARCHAR(255) NOT NULL,
       businessName VARCHAR(255) NOT NULL,
       businessAddress VARCHAR(255) NOT NULL,
+
+      -- Live (approved) profile info
       landlineNo VARCHAR(50) NOT NULL,
       mobileNo VARCHAR(50) NOT NULL,
       companyEmail VARCHAR(150) NOT NULL,
       companyWebsite VARCHAR(255) NOT NULL,
+
+      -- Current approved logo
       companyLogo VARCHAR(255) DEFAULT '/images/default-company.png',
+
+      -- New uploaded logo awaiting admin approval
+      pendingLogo VARCHAR(255) DEFAULT NULL,
+
+      -- Pending profile edits (awaiting admin approval)
+      pendingLandlineNo VARCHAR(50) DEFAULT NULL,
+      pendingMobileNo VARCHAR(50) DEFAULT NULL,
+      pendingCompanyEmail VARCHAR(150) DEFAULT NULL,
+
+      -- Status flags
       profileConfirmed TINYINT(1) DEFAULT 0,
       preferredUserId VARCHAR(100) UNIQUE,
       preferredPassword VARCHAR(255),
       status VARCHAR(50) DEFAULT 'PENDING',
       submittedAt DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
+
     idposts: `CREATE TABLE IF NOT EXISTS idposts (
       id INT AUTO_INCREMENT PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
@@ -989,7 +1007,8 @@ app.post('/api/registration/login', async (req, res) => {
       lastName: user.lastName,
       personalEmail: user.personalEmail,
       gender: user.gender,
-      isAdmin
+      isAdmin,
+      isEmployer: false   // 👈 always explicit
     };
     req.session.userId = user.id;
 
@@ -1323,8 +1342,9 @@ app.post('/api/employer/login', async (req, res) => {
     req.session.user = {
       id: employer.id,
       preferredUserId: employer.preferredUserId,
-      employerName: employer.employerName,  // 🔥 important
-      isEmployer: true
+      employerName: employer.employerName,
+      isEmployer: true,
+      isAdmin: false   // 👈 always explicit
     };
 
     console.log('✅ Employer Login successful for:', userId);

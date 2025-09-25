@@ -2446,6 +2446,7 @@ app.post('/api/requests/add', idUpload.single('idImage'), async (req, res) => {
   }
 });
 
+// ✅ Get list of requests (with validIdUrl)
 app.get('/api/requests/list', async (req, res) => {
   const page = +req.query.page || 1;
   const limit = +req.query.limit || 100;
@@ -2453,14 +2454,12 @@ app.get('/api/requests/list', async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-    // FIXED: Removed .promise()
     const [countResult] = await pool.execute(
       `SELECT COUNT(*) AS total FROM requests WHERE fullName LIKE ?`,
       [search]
     );
     const total = countResult[0].total;
 
-    // FIXED: Use template literals for LIMIT/OFFSET and removed .promise()
     const [rows] = await pool.execute(
       `SELECT id, fullName, degree, yearGraduated, studentNo, phoneNo, email, submittedAt, status
        FROM requests
@@ -2470,8 +2469,14 @@ app.get('/api/requests/list', async (req, res) => {
       [search]
     );
 
+    // Add validIdUrl for each request
+    const requests = rows.map(r => ({
+      ...r,
+      validIdUrl: `/api/requests/${r.id}/image`
+    }));
+
     res.json({
-      requests: rows,
+      requests,
       totalPages: Math.ceil(total / limit)
     });
   } catch (err) {
@@ -2513,11 +2518,11 @@ app.patch('/api/requests/:id/status', async (req, res) => {
 });
 
 
+// ✅ Get image for a specific request
 app.get('/api/requests/:id/image', async (req, res) => {
   const { id } = req.params;
 
   try {
-    // FIXED: Removed .promise()
     const [rows] = await pool.execute(
       `SELECT idImage FROM requests WHERE id = ?`,
       [id]
@@ -2527,8 +2532,16 @@ app.get('/api/requests/:id/image', async (req, res) => {
       return res.status(404).json({ error: 'Image not found' });
     }
 
-    res.set('Content-Type', 'image/jpeg'); // Adjust based on your image type
-    res.send(rows[0].idImage);
+    const imageBuffer = rows[0].idImage;
+
+    // Try detecting file type dynamically
+    let mimeType = 'image/jpeg'; // default
+    if (imageBuffer[0] === 0x89 && imageBuffer[1] === 0x50) {
+      mimeType = 'image/png'; // PNG signature
+    }
+
+    res.set('Content-Type', mimeType);
+    res.send(imageBuffer);
   } catch (err) {
     console.error('❌ Image Retrieval Error:', err);
     res.status(500).json({ error: 'Database error' });

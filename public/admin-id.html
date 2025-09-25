@@ -43,8 +43,9 @@
       text-align: center;              /* keeps headers aligned */
       background-color: #f8f9fa;       /* light gray background for contrast */
     }
+    /* Loader */
     #loader-wrapper { position: fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgb(230, 230, 230); z-index:1400; }
-    .progress-bar-custom { width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin: auto;}
+    .progress-bar-custom { width:0%; height:10px; background-color: maroon; border-radius:6px; transition: width .2s linear; margin:auto; }
 @media print {
   body * {
     visibility: hidden;
@@ -164,6 +165,7 @@
   <div id="loader-wrapper" role="status" aria-live="polite">
     <div style="text-align:center;">
       <img src="Logo2.png" alt="logo" style="height:60px; margin-bottom:10px;">
+      <div style="font-weight:700; letter-spacing:.6px; margin-bottom:8px;">TECHNOLOGICAL UNIVERSITY OF THE PHILIPPINES — CAVITE</div>
       <div style="width:360px; margin: auto; background:#f0f2f5; border-radius:8px; padding:6px;">
         <div id="progress-bar" class="progress-bar-custom"></div>
       </div>
@@ -172,36 +174,66 @@
   </div>
 
   <script>
+    function showToast(message) {
+      let toast = document.getElementById("toast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        toast.style.position = "fixed";
+        toast.style.bottom = "30px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.background = "#333";
+        toast.style.color = "#fff";
+        toast.style.padding = "12px 20px";
+        toast.style.borderRadius = "6px";
+        toast.style.zIndex = "10000";
+        toast.style.fontSize = "15px";
+        toast.style.opacity = "0";
+        toast.style.transition = "opacity 0.35s, bottom 0.35s";
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.style.opacity = "1";
+      toast.style.bottom = "50px";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.bottom = "30px";
+      }, 3000);
+    }
+
+        /*******************************
+   * Loader progress
+   *******************************/
+  document.addEventListener('DOMContentLoaded', () => {
+    let p = 0;
+    const bar = document.getElementById('progress-bar');
+    const pct = document.getElementById('percentage');
+    const wrap = document.getElementById('loader-wrapper');
+    const iv = setInterval(() => {
+      p = Math.min(100, p + Math.floor(Math.random()*6) + 2);
+      bar.style.width = p + '%';
+      pct.textContent = p + '%';
+      if (p >= 100) {
+        clearInterval(iv);
+        wrap.style.display = 'none';
+      }
+    }, 70);
+  });
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.getElementById('reqBody');
   const searchInput = document.getElementById('searchInput');
   const statusFilter = document.getElementById('statusFilter');
   const pageSelect = document.getElementById('pageSelect');
   const printBtn = document.getElementById('printBtn');
-  const loaderWrapper = document.getElementById("loader-wrapper");
-  const progressBar = document.getElementById("progress-bar");
-  const percentageText = document.getElementById("percentage");
 
   let requests = [], currentPage = 1, totalPages = 1, LIMIT = 100;
 
   if (sessionStorage.getItem('userRole') !== 'admin') {
     return window.location.href = 'homepage.html';
   }
-
-  // Loader
-  (() => {
-    let pct = 80;
-    const iv = setInterval(() => {
-      if (pct < 100) {
-        pct++;
-        progressBar.style.width = pct + "%";
-        percentageText.textContent = pct + "%";
-      } else {
-        clearInterval(iv);
-        loaderWrapper.style.display = "none";
-      }
-    }, 30);
-  })();
 
   async function loadPage() {
     const search = encodeURIComponent(searchInput.value.trim());
@@ -277,12 +309,14 @@ function renderTable() {
       const viewBtn = tr.querySelector(".btn-view");
       if (viewBtn) {
         viewBtn.addEventListener("click", () => {
-          const url = viewBtn.getAttribute("data-url");
+          // Try multiple possible keys from backend
+          const url = r.validIdUrl || r.validId || r.idUrl || "";
+          
           if (url) {
             document.getElementById("idPreview").src = url;
             new bootstrap.Modal(document.getElementById("idModal")).show();
           } else {
-            alert("No ID uploaded by this user.");
+            showToast("⚠️ No ID uploaded by this user.");
           }
         });
       }
@@ -307,7 +341,7 @@ async function updateStatus(id, newStatus) {
     await loadPage();
   } catch (err) {
     console.error("❌ Error updating status:", err);
-    alert("Failed to update request");
+    showToast("Failed to update request");
   }
 }
 
@@ -331,7 +365,7 @@ async function updateStatus(id, newStatus) {
 // --- Initialize everything on DOM load ---
 document.addEventListener('DOMContentLoaded', () => {
   if (sessionStorage.getItem('userRole') !== 'admin') {
-    alert("⛔ Access denied. Admins only!");
+    showToast("⛔ Access denied. Admins only!");
     window.location.href = 'homepage.html';
   }
 });

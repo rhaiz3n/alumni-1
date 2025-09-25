@@ -59,7 +59,7 @@
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="employer-page.html">
         <img src="Logo.png" alt="Logo">
-        <span class="ms-2 fw-bold text-white">
+        <span class="d-block d-md-inline ms-2 fw-bold text-white text-wrap text-truncate" style="max-width: 100%;">
           Technological University of the Philippines - Cavite Campus - Employer
         </span>
       </a>
@@ -145,24 +145,27 @@
   ============================= -->
   <div id="eventModal" class="modal" tabindex="-1" style="display:none; position:fixed; inset:0; z-index:1050; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
     <div class="modal-content galaxy-card card-rounded p-4" role="dialog" style="max-width:720px;">
-      <button class="btn-close float-end" id="closeModalBtn" aria-label="Close"></button>
+      <button class="btn-close position-absolute" style="right: 20px; top: 20px;" id="closeModalBtn" aria-label="Close"></button>
       <h4>Create Career</h4>
       <form id="adminForm" enctype="multipart/form-data" class="mt-3">
         <div class="mb-2">
-          <label class="form-label">Career Type</label>
-          <select id="careerType" name="careerType" required class="form-select">
-            <option value="">-- Select a Career --</option>
-            <option value="Electrician">Electrician</option>
-            <option value="Mechanic">Mechanic</option>
-            <option value="Education">Education</option>
-            <option value="Software Developer">Software Developer</option>
-            <option value="Network Engineer">Network Engineer</option>
-            <option value="Telecommunications Engineer">Telecommunications Engineer</option>
-            <option value="Electrical Engineer">Electrical Engineer</option>
-            <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
-          </select>
-          <input type="hidden" id="careerTitle" name="title">
-        </div>
+        <label class="form-label">Career Type</label>
+        <select id="careerType" name="careerType" required class="form-select">
+          <option value="">-- Select a Career --</option>
+          <option value="Electrician">Electrician</option>
+          <option value="Mechanic">Mechanic</option>
+          <option value="Education">Education</option>
+          <option value="Software Developer">Software Developer</option>
+          <option value="Network Engineer">Network Engineer</option>
+          <option value="Telecommunications Engineer">Telecommunications Engineer</option>
+          <option value="Electrical Engineer">Electrical Engineer</option>
+          <option value="Maintenance Engineer / Technician">Maintenance Engineer / Technician</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <input type="hidden" id="careerTitle" name="title">
+        <input type="text" id="otherCareerInput" class="form-control mt-2" placeholder="Enter Career Type" style="display:none;">
+      </div>
 
         <div class="mb-2">
           <label class="form-label">Company Name</label>
@@ -665,7 +668,13 @@ document.getElementById("uploadCompanyLogo").addEventListener("change", async (e
   // ---------------------------
 // ⚡ Correct modal reference
 const modal = document.getElementById('eventModal');
+const form = document.getElementById('adminForm');
+const careerSelect = document.getElementById('careerType');
+const otherCareerInput = document.getElementById('otherCareerInput');
 
+// -----------------------------
+// Open modal button
+// -----------------------------
 document.getElementById('openModalBtn').onclick = async () => {
   const role = sessionStorage.getItem("userRole");
 
@@ -718,7 +727,9 @@ document.getElementById('openModalBtn').onclick = async () => {
   modal.style.display = 'flex';
 };
 
+// -----------------------------
 // Close modal
+// -----------------------------
 document.getElementById('closeModalBtn').onclick = () => {
   modal.style.display = 'none';
 };
@@ -728,46 +739,66 @@ window.onclick = e => {
   if (e.target === modal) modal.style.display = 'none';
 };
 
+// -----------------------------
+// Career type validation logic
+// -----------------------------
+careerSelect.addEventListener("change", () => {
+  if (careerSelect.value === "Other") {
+    otherCareerInput.style.display = "block";
+    otherCareerInput.removeAttribute("disabled");
+    otherCareerInput.setAttribute("required", "true");
+  } else {
+    otherCareerInput.style.display = "none";
+    otherCareerInput.setAttribute("disabled", "true");
+    otherCareerInput.removeAttribute("required");
+    otherCareerInput.value = "";
+  }
+});
 
-  // ---------------------------
-  // Career form submit
-  // ---------------------------
-  document.getElementById('adminForm').onsubmit = async e => {
+// -----------------------------
+// Submit handler (attach only once)
+// -----------------------------
+if (!form.dataset.listenerAttached) {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log("Submitting career form..."); // debug check
 
-    const careerType = document.getElementById("careerType");
-    const hiddenTitle = document.getElementById("careerTitle");
-    hiddenTitle.value = careerType.value;
-
-    if (!hiddenTitle.value) {
-      alert("⚠️ Please select a career type.");
+    if (!form.checkValidity()) {
+      form.classList.add("was-validated");
       return;
     }
 
-    const formData = new FormData(e.target);
-    formData.append("userId", sessionStorage.getItem("userId"));
+    const formData = new FormData(form);
+
+    // Override only if "Other" was selected
+    if (careerSelect.value === "Other" && otherCareerInput.value.trim()) {
+      formData.set("title", otherCareerInput.value.trim());
+    } else {
+      formData.set("title", careerSelect.value);
+    }
 
     try {
-      const res = await fetch('/api/careers/add', {
-        method: 'POST',
-        body: formData
-      });
+      const res = await fetch("/api/careers/add", { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Failed to post career");
 
-      if (!res.ok) {
-        showToast('❌ Error: ' + await res.text());
-        return;
-      }
+      // Close modal
+      modal.style.display = "none";
 
-      showToast('✅ Career posted!');
-      e.target.reset();
-      hiddenTitle.value = "";
-      modal.style.display = 'none';
-      loadFeed(); // reload feed after posting
+      // Reset form
+      form.reset();
+      form.classList.remove("was-validated");
+      otherCareerInput.style.display = "none";
+      otherCareerInput.setAttribute("disabled", "true");
+
+      loadFeed(); // reload feed
     } catch (err) {
-      console.error("❌ Error posting career:", err);
-      showToast("Server error while posting career");
+      console.error("❌ Career submission error:", err);
     }
-  };
+  });
+
+  // Mark listener as attached ✅
+  form.dataset.listenerAttached = "true";
+}
 
   // ---------------------------
   // Initial loads
@@ -798,38 +829,62 @@ window.onclick = e => {
           return;
         }
 
-        container.innerHTML = careers
-          .sort((a,b) => new Date(b.datePosted) - new Date(a.datePosted))
-          .map(post => `
-            <div class="card shadow-sm rounded-3 mb-4 feed-card" id="career-${post.id}">
-              <div class="card-body">
-                <div class="d-flex align-items-start mb-3">
-                  <img src="Logo2.png" class="rounded-circle border me-3" width="56" height="56" alt="">
-                  <div class="flex-fill">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div>
-                        <h6 class="mb-0 fw-bold">${(post.link || 'Company').toUpperCase()}</h6>
-                        <small class="text-muted">Posted on: ${new Date(post.datePosted).toLocaleString()}</small>
-                      </div>
-                      <small class="text-muted countdown" data-time="${post.datePosted}"></small>
-                    </div>
-                  </div>
-                </div>
-
-                <h5 class="fw-bold">${(post.title || '').toUpperCase()} <small class="fw-normal">[Career]</small></h5>
-                <p class="mb-3">${post.description || ''}</p>
-
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="text-muted small"><i class="fa-regular fa-building me-1"></i> ${post.link || 'N/A'}</div>
-                  <div>
-                    <button onclick="toggleApplications(${post.id})" class="btn btn-outline-primary btn-sm">📄 VIEW APPLICATIONS</button>
-                  </div>
-                </div>
-
-                <div id="applications-${post.id}" class="applications-container mt-3" style="display:none;"></div>
+ container.innerHTML = careers
+  .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted))
+  .map(post => `
+    <div class="card shadow-sm rounded-3 mb-4 feed-card" id="career-${post.id}">
+      <div class="card-body">
+        <!-- Header -->
+        <div class="d-flex align-items-start mb-3">
+          <img src="Logo2.png" class="rounded-circle border me-3" width="56" height="56" alt="">
+          <div class="flex-fill">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-0 fw-bold" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+                  ${(post.link || 'Company').toUpperCase()}
+                </h6>
+                <small class="text-muted">Posted on: ${new Date(post.datePosted).toLocaleString()}</small>
               </div>
             </div>
-          `).join('');
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h5 class="fw-bold" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+          ${(post.title || '').toUpperCase()} <small class="fw-normal">[Career]</small>
+        </h5>
+
+        <!-- Description -->
+        <p class="mb-3" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+          ${post.description || ''}
+        </p>
+
+        <!-- Footer Row -->
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-muted small" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+            <i class="fa-regular fa-building me-1"></i> ${post.link || 'N/A'}
+          </div>
+          <div>
+            <button onclick="toggleApplications(${post.id})" class="btn btn-outline-primary btn-sm">
+              📄 VIEW APPLICATIONS
+            </button>
+          </div>
+        </div>
+
+        <!-- Applications Container -->
+        <div id="applications-${post.id}" class="applications-container mt-3" style="display:none;"></div>
+
+        <!-- Countdown & Status -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted countdown" data-time="${post.datePosted}"></small>
+          <span class="badge bg-${post.isClosed ? 'danger' : 'success'}">
+            ${post.isClosed ? 'CLOSED' : 'ACTIVE'}
+          </span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
 
         // countdown updater
         function updateCountdowns() {

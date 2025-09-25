@@ -637,10 +637,10 @@ function renderFeed(filterType = "ALL") {
                       style="background:#f0f0f0; min-height:150px;">` : '' }
 
         <div class="feed-content">
-          <p class="mb-1"><strong>${title}</strong></p>
-          <p class="small-muted text-justify">${desc}</p>
+          <p class="mb-1" style="text-align: justify;"><strong>${title}</strong></p>
+          <p class="small-muted text-justify" style="word-break: break-word; white-space: pre-line;">${desc}</p>
           <div class="feed-meta">
-            <span>${extraInfo}</span>
+            <span style="display:block; text-align:justify; word-break:break-word; white-space:pre-line;">${extraInfo}</span>
           </div>
           ${post.deadlineMs ? `
             <div class="text-end mt-2">

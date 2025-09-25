@@ -322,56 +322,71 @@
 
 
   <!-- PROFILE MODAL -->
-  <div class="modal fade" id="modalProfile" tabindex="-1" aria-labelledby="modalProfileLabel">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Profile</h5>
-        </div>
-        <div class="modal-body">
-          <div class="d-flex gap-3">
-            <div>
-              <img id="modalProfilePic" src="/public/images/default-profile.png" alt="profile" class="rounded-circle" width="120" height="120">
-              <div class="mt-2">
-                <button id="changePicBtn" type="button" class="btn btn-sm btn-outline-primary mt-2">Change Picture</button>
-                <input type="file" id="uploadProfilePic" accept="image/*" style="display:none;">
-              </div>
-            </div>
-            <div class="flex-grow-1">
-              <h4 id="name">NAME</h4>
-              <p><strong>FULL NAME:</strong> <span id="userName">-</span></p>
-              <p>
-                <strong>Email:</strong> <span id="personalEmail">-</span>
-                <input id="editPersonalEmail" class="form-control form-control-sm mt-1" style="display:none; width: 60%;">
-              </p>
-              <p>
-                <strong>Phone:</strong> <span id="phoneNo">-</span>
-                <input id="editPhoneNo" class="form-control form-control-sm mt-1" style="display:none; width: 60%;">
-              </p>
-
-              <div class="mt-3">
-                <button id="editBtn" class="btn btn-sm btn-outline-secondary">Edit</button>
-                <button id="saveBtn" class="btn btn-sm btn-primary" style="display:none;">Save</button>
-                <button id="confirmProfileBtn" class="btn btn-sm btn-success" style="display:none;">Confirm Profile</button>
-                <div id="profileNotice" class="mt-2 text-warning" style="display:none;"></div>
-              </div>
-            </div>
-          </div>
-
-          <hr>
-
+<div class="modal fade" id="modalProfile" tabindex="-1" aria-labelledby="modalProfileLabel">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Profile</h5>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex gap-3">
           <div>
-            <h6>Extra Details</h6>
-            <p><strong>Gender:</strong> <span id="gender">-</span></p>
-            <p><strong>Date of Birth:</strong> <span id="dateBirth">-</span></p>
-            <p><strong>Major:</strong> <span id="major">-</span></p>
-            <p><strong>Year Started:</strong> <span id="yearStarted">-</span></p>
-            <p><strong>Graduated:</strong> <span id="graduated">-</span></p>
+            <img id="modalProfilePic" 
+              src="/public/images/default-profile.png" 
+              class="rounded-circle border border-dark" 
+              width="120" height="120">
+            <div class="mt-2">
+              <button id="changePicBtn" type="button" class="btn btn-sm btn-outline-primary mt-2">Change Picture</button>
+              <input type="file" id="uploadProfilePic" accept="image/*" style="display:none;">
+            </div>
           </div>
+          <div class="flex-grow-1">
+            <h4 id="name">NAME</h4>
+            <p><strong>FULL NAME:</strong> <span id="userName">-</span></p>
+            <p>
+              <strong>Email:</strong> <span id="personalEmail">-</span>
+              <input id="editPersonalEmail" class="form-control form-control-sm mt-1" style="display:none; width: 60%;">
+            </p>
+            <p>
+              <strong>Phone:</strong> <span id="phoneNo">-</span>
+              <input id="editPhoneNo" class="form-control form-control-sm mt-1" style="display:none; width: 60%;">
+            </p>
+            <p>
+              <strong>Civil Status:</strong> <span id="civilStatus">-</span>
+              <select id="editCivilStatus" class="form-select form-select-sm mt-1" style="display:none; width: 60%;">
+                <option value="" disabled selected hidden>Choose</option>
+                <option value="SINGLE">SINGLE</option>
+                <option value="MARRIED">MARRIED</option>
+                <option value="SEPARATED">SEPARATED</option>
+                <option value="WIDOWED">WIDOWED</option>
+                <option value="DIVORCED">DIVORCED</option>
+              </select>
+            </p>
+
+            <div class="mt-3">
+              <button id="editBtn" class="btn btn-sm btn-outline-secondary">Edit</button>
+              <button id="saveBtn" class="btn btn-sm btn-primary" style="display:none;">Save</button>
+              <button id="confirmProfileBtn" class="btn btn-sm btn-success" style="display:none;">Confirm Profile</button>
+              <div id="profileNotice" class="mt-2 text-warning" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div>
+          <h6>Extra Details</h6>
+          <p><strong>Gender:</strong> <span id="gender">-</span></p>
+          <p><strong>Date of Birth:</strong> <span id="dateBirth">-</span></p>
+          <p><strong>Major:</strong> <span id="major">-</span></p>
+          <p><strong>Year Started:</strong> <span id="yearStarted">-</span></p>
+          <p><strong>Graduated:</strong> <span id="graduated">-</span></p>
         </div>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- APPLICATIONS MODAL -->
   <div class="modal fade" id="applicationsModalBS" tabindex="-1" aria-labelledby="applicationsModalLabel">
@@ -1162,43 +1177,48 @@ async function loadFeed() {
       }
       const deadlineMs = deadlineDate ? deadlineDate.getTime() : '';
 
-      return `
-        <div class="feed-card" id="feed-card-${post.id}">
-          <!-- Header with logo -->
-          <div class="feed-header d-flex justify-content-between align-items-start mb-2">
-            <div class="d-flex align-items-center">
-              <img src="Logo2.png" alt="Logo2" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
-              <div>
-                <div class="fw-bold">TUP Cavite Alumni Association</div>
-                <small class="text-muted">Posted: ${new Date(post.datePosted).toLocaleString()}</small>
-              </div>
-            </div>
-            <div>
-              ${post.type === 'Career' 
-                ? `<span class="badge bg-success">Career</span>` 
-                : `<span class="badge bg-info">Event</span>`}
-            </div>
-          </div>
+return `
+  <div class="feed-card" id="feed-card-${post.id}">
+    <!-- Header with logo -->
+    <div class="feed-header d-flex justify-content-between align-items-start mb-2">
+      <div class="d-flex align-items-center">
+        <img src="Logo2.png" alt="Logo2" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
+        <div>
+          <div class="fw-bold">TUP Cavite Alumni Association</div>
+          <small class="text-muted">Posted: ${new Date(post.datePosted).toLocaleString()}</small>
+        </div>
+      </div>
+      <div>
+        ${post.type === 'Career' 
+          ? `<span class="badge bg-success">Career</span>` 
+          : `<span class="badge bg-info">Event</span>`}
+      </div>
+    </div>
 
-          <!-- Image -->
-          ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="" onerror="this.style.display='none'">` : ''}
+    <!-- Image -->
+    ${imgSrc ? `<img class="feed-img" src="${imgSrc}" alt="" onerror="this.style.display='none'">` : ''}
 
-          <!-- Content -->
-          <div class="fw-bold mt-2">${escapeHtml((post.title||'').toUpperCase())}</div>
-          <p class="mb-1" style="text-align: justify;">${escapeHtml(post.description || '')}</p>
-          <div class="text-muted small">
-            ${extraInfo}
-          </div>
+    <!-- Content -->
+    <div class="fw-bold mt-2" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+      ${escapeHtml((post.title || '').toUpperCase())}
+    </div>
+    <p class="mb-1" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+      ${escapeHtml(post.description || '')}
+    </p>
+    <div class="text-muted small" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+      ${extraInfo}
+    </div>
 
-          <!-- Footer -->
-          <div class="d-flex justify-content-between align-items-center mt-2">
-            <span class="countdown text-muted" data-time="${deadlineMs}" id="countdown-${idx}"></span>
-            ${post.type === 'Career'
-              ? `<button class="btn btn-sm btn-primary register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
-              : `<button class="btn btn-sm btn-outline-primary register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
-          </div>
-        </div>`;
-    }).join('');
+    <!-- Footer -->
+    <div class="d-flex justify-content-between align-items-center mt-2">
+      <span class="countdown text-muted" data-time="${deadlineMs}" id="countdown-${idx}"></span>
+      ${post.type === 'Career'
+        ? `<button class="btn btn-sm btn-primary register-btn" data-id="${post.id}" data-type="Career">Apply</button>`
+        : `<button class="btn btn-sm btn-outline-primary register-btn" data-id="${post.id}" data-type="Event">Register</button>`}
+    </div>
+  </div>`;
+}).join('');
+
 
     // ✅ Handle register clicks
     container.addEventListener('click', (e) => {
@@ -1681,68 +1701,99 @@ async function submitIdRequestForm() {
   // ------------------------------
   // PROFILE data loading, edit & save
   // ------------------------------
-  async function loadProfileData(updateModal = false) {
-    try {
-      const res = await fetch('/api/fullInformation/me', { credentials: 'include', cache: 'no-store' });
-      if (!res.ok) throw new Error('Not logged in');
-      const data = await res.json();
-      const pic = data.profilePic || '/public/images/default-profile.png';
-      document.getElementById('profilePic').src = pic;
-      document.getElementById('profilePicSmall').src = pic;
-      document.getElementById('modalProfilePic').src = pic;
-      document.getElementById('name').textContent = ([data.firstName, data.lastName].filter(Boolean).join(' ') || 'No Name').toUpperCase();
-      document.getElementById('nameTop').textContent = ([data.firstName, data.lastName].filter(Boolean).join(' ') || 'No Name');
-      document.getElementById('userName').textContent = data.userName || '-';
-      document.getElementById('personalEmail').textContent = data.personalEmail || '-';
-      document.getElementById('phoneNo').textContent = data.phoneNo || '-';
-      document.getElementById('gender').textContent = data.gender || '-';
-      document.getElementById('dateBirth').textContent = data.dateBirth ? new Date(data.dateBirth).toLocaleDateString() : '-';
-      document.getElementById('major').textContent = data.major || '-';
-      document.getElementById('yearStarted').textContent = data.yearStarted || '-';
-      document.getElementById('graduated').textContent = data.graduated || '-';
-      document.getElementById('studentNo').textContent = data.studentNo || '-';
-      document.getElementById('displayName').textContent = `${(data.firstName||'').toUpperCase()} ${(data.lastName||'').toUpperCase()}`;
-      // handle profile confirmation enforcement
-      enforceProfilePictureFlow(data);
-    } catch (err) {
-      console.error('Error loading profile:', err);
-    }
-  }
+async function loadProfileData(updateModal = false) {
+  try {
+    const res = await fetch('/api/fullInformation/me', { credentials: 'include', cache: 'no-store' });
+    if (!res.ok) throw new Error('Not logged in');
+    const data = await res.json();
 
-  function enableEdit() {
-    document.getElementById('personalEmail').style.display = 'none';
-    document.getElementById('editPersonalEmail').style.display = 'inline-block';
-    document.getElementById('editPersonalEmail').value = document.getElementById('personalEmail').textContent;
-    document.getElementById('phoneNo').style.display = 'none';
-    document.getElementById('editPhoneNo').style.display = 'inline-block';
-    document.getElementById('editPhoneNo').value = document.getElementById('phoneNo').textContent;
-    document.getElementById('editBtn').style.display = 'none';
-    document.getElementById('saveBtn').style.display = 'inline-block';
-  }
+    const pic = data.profilePic || '/public/images/default-profile.png';
+    document.getElementById('profilePic').src = pic;
+    document.getElementById('profilePicSmall').src = pic;
+    document.getElementById('modalProfilePic').src = pic;
 
-  async function saveProfile() {
-    const updatedData = { personalEmail: document.getElementById('editPersonalEmail').value, phoneNo: document.getElementById('editPhoneNo').value };
-    try {
-      const res = await fetch('/api/fullInformation/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(updatedData) });
-      const data = await res.json();
-      if (data.success) {
-        showNotification('✅ Profile updated!', 'success');
-        document.getElementById('personalEmail').textContent = updatedData.personalEmail;
-        document.getElementById('phoneNo').textContent = updatedData.phoneNo;
-        document.getElementById('personalEmail').style.display = 'inline';
-        document.getElementById('phoneNo').style.display = 'inline';
-        document.getElementById('editPersonalEmail').style.display = 'none';
-        document.getElementById('editPhoneNo').style.display = 'none';
-        document.getElementById('editBtn').style.display = 'inline-block';
-        document.getElementById('saveBtn').style.display = 'none';
-      } else {
-        showNotification('❌ Error: ' + (data.error || 'unknown'), 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      showNotification('Server error while updating', 'error');
-    }
+    document.getElementById('name').textContent = ([data.firstName, data.lastName].filter(Boolean).join(' ') || 'No Name').toUpperCase();
+    document.getElementById('nameTop').textContent = ([data.firstName, data.lastName].filter(Boolean).join(' ') || 'No Name');
+    document.getElementById('userName').textContent = data.userName || '-';
+    document.getElementById('personalEmail').textContent = data.personalEmail || '-';
+    document.getElementById('phoneNo').textContent = data.phoneNo || '-';
+    document.getElementById('civilStatus').textContent = data.civilStatus || '-'; // ✅ Civil Status
+    document.getElementById('gender').textContent = data.gender || '-';
+    document.getElementById('dateBirth').textContent = data.dateBirth ? new Date(data.dateBirth).toLocaleDateString() : '-';
+    document.getElementById('major').textContent = data.major || '-';
+    document.getElementById('yearStarted').textContent = data.yearStarted || '-';
+    document.getElementById('graduated').textContent = data.graduated || '-';
+    document.getElementById('studentNo').textContent = data.studentNo || '-';
+    document.getElementById('displayName').textContent = `${(data.firstName||'').toUpperCase()} ${(data.lastName||'').toUpperCase()}`;
+
+    enforceProfilePictureFlow(data);
+  } catch (err) {
+    console.error('Error loading profile:', err);
   }
+}
+
+function enableEdit() {
+  // email
+  document.getElementById('personalEmail').style.display = 'none';
+  document.getElementById('editPersonalEmail').style.display = 'inline-block';
+  document.getElementById('editPersonalEmail').value = document.getElementById('personalEmail').textContent;
+
+  // phone
+  document.getElementById('phoneNo').style.display = 'none';
+  document.getElementById('editPhoneNo').style.display = 'inline-block';
+  document.getElementById('editPhoneNo').value = document.getElementById('phoneNo').textContent;
+
+  // civil status (dropdown)
+  document.getElementById('civilStatus').style.display = 'none';
+  document.getElementById('editCivilStatus').style.display = 'inline-block';
+  document.getElementById('editCivilStatus').value = document.getElementById('civilStatus').textContent;
+
+  document.getElementById('editBtn').style.display = 'none';
+  document.getElementById('saveBtn').style.display = 'inline-block';
+}
+
+async function saveProfile() {
+  const updatedData = { 
+    personalEmail: document.getElementById('editPersonalEmail').value, 
+    phoneNo: document.getElementById('editPhoneNo').value,
+    civilStatus: document.getElementById('editCivilStatus').value
+  };
+
+  try {
+    const res = await fetch('/api/fullInformation/update', { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, 
+      credentials: 'include',
+      body: JSON.stringify(updatedData) 
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showNotification('✅ Profile updated!', 'success');
+
+      document.getElementById('personalEmail').textContent = updatedData.personalEmail;
+      document.getElementById('phoneNo').textContent = updatedData.phoneNo;
+      document.getElementById('civilStatus').textContent = updatedData.civilStatus;
+
+      document.getElementById('personalEmail').style.display = 'inline';
+      document.getElementById('phoneNo').style.display = 'inline';
+      document.getElementById('civilStatus').style.display = 'inline';
+
+      document.getElementById('editPersonalEmail').style.display = 'none';
+      document.getElementById('editPhoneNo').style.display = 'none';
+      document.getElementById('editCivilStatus').style.display = 'none';
+
+      document.getElementById('editBtn').style.display = 'inline-block';
+      document.getElementById('saveBtn').style.display = 'none';
+    } else {
+      showNotification('❌ Error: ' + (data.error || 'unknown'), 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showNotification('Server error while updating', 'error');
+  }
+}
+
 
   // ------------------------------
   // enforce profile picture flow

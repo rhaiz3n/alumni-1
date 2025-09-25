@@ -247,7 +247,7 @@
 
 
 <!-- Event Modal -->
-<div class="modal fade" id="modalEvent" tabindex="-1"  data-bs-backdrop="false">
+<div class="modal fade" id="modalEvent" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <form id="eventForm" enctype="multipart/form-data" novalidate>
@@ -290,7 +290,7 @@
 </div>
 
 <!-- Career Modal -->
-<div class="modal fade" id="modalCareer" tabindex="-1" data-bs-backdrop="false">
+<div class="modal fade" id="modalCareer" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <form id="careerForm" enctype="multipart/form-data" novalidate>
@@ -965,25 +965,25 @@ document.getElementById("eventForm").addEventListener("submit", async function (
     const res = await fetch("/api/events/add", { method: "POST", body: formData });
     if (!res.ok) throw new Error("Failed to post event");
 
-    // ✅ Hide modal first
-    const modalEl = document.getElementById("modalEvent");
-    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-    modal.hide();
+    // ✅ Add new event instantly to feed
+    await loadFeed();
 
-    // 👇 fix focus issue
-    document.activeElement.blur();
-    document.body.focus();
-
-    // ✅ Reset form after closing
+    // ✅ Clear form for next input
     form.reset();
     form.classList.remove("was-validated");
     other.classList.add("d-none");
 
-    loadFeed();
+    showToast("✅ Event posted successfully", "success");
+
+    // ❌ Don’t auto-close modal (stay open for multiple posts)
+    // If you want close only on demand, you can add:
+    // bootstrap.Modal.getInstance(document.getElementById("modalEvent")).hide();
   } catch (err) {
     console.error("❌ Event submission error:", err);
+    showToast("❌ Failed to post event", "error");
   }
 });
+
 
 
 
@@ -1025,19 +1025,23 @@ document.getElementById("careerForm").addEventListener("submit", async function(
     const res = await fetch("/api/careers/add", { method: "POST", body: formData });
     if (!res.ok) throw new Error("Failed to post career");
 
-    const modalEl = document.getElementById("modalCareer");
-    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-    modal.hide();
+    // ✅ Add new career instantly to feed
+    await loadFeed();
 
+    // ✅ Clear form for next input
     form.reset();
     form.classList.remove("was-validated");
     other.classList.add("d-none");
 
-    loadFeed(); // reload feed after submission
+    showToast("✅ Career posted successfully", "success");
+
+    // ❌ Don’t auto-close modal
   } catch (err) {
     console.error("❌ Career submission error:", err);
+    showToast("❌ Failed to post career", "error");
   }
 });
+
 
 
 

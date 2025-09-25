@@ -545,7 +545,7 @@
               <input type="text" name="firstName" id="firstName" placeholder="First Name" class="form-control" maxlength="20" required oninput="this.value = formatName(this.value)">
             </div>
             <div class="col-md-2">
-              <input type="text" name="middleInitial" id="middleInitial" placeholder="M" class="form-control" maxlength="1" oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase()">
+              <input type="text" name="middleInitial" id="middleInitial" placeholder="M" class="form-control" maxlength="1" required oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '').toUpperCase()">
             </div>
             <div class="col-md-6">
               <input type="text" name="lastName" id="lastName" placeholder="Last Name" class="form-control" maxlength="20" required oninput="this.value = formatName(this.value)">
@@ -564,7 +564,31 @@
               <label class="form-label">Program:</label>
               <select name="program" class="form-select" required>
                 <option value="" disabled selected>Select Program</option>
-                <option value="BET">BET</option><option value="BTVTED">BTVTED</option><option value="Other">Other</option>
+              <!-- BET Programs -->
+              <option value="BET">BET</option>
+              <option value="BET-CoET">BET-CoET</option>
+              <option value="BET-ET">BET-ET</option>
+              <option value="BET-ElecT">BET-ElecT</option>
+              <option value="BET-MT">BET-MT</option>
+              <option value="BET-MT-Auto">BET-MT-Auto</option>
+              <option value="BET-MT-PP">BET-MT-PP</option>
+
+              <!-- BTVTEd Programs -->
+              <option value="BTVTEd">BTVTEd</option>
+              <option value="BTVTEd-CP">BTVTEd-CP</option>
+              <option value="BTVTEd-ET">BTVTEd-ET</option>
+
+              <!-- BSIE Programs -->
+              <option value="BSIE">BSIE</option>
+              <option value="BSIE-HE">BSIE-HE</option>
+              <option value="BSIE-IA">BSIE-IA</option>
+              <option value="BSIE-ICT">BSIE-ICT</option>
+
+              <!-- Engineering -->
+              <option value="BSCE">BSCE</option>
+              <option value="BSEE">BSEE</option>
+              <option value="BSME">BSME</option>
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>
@@ -733,7 +757,7 @@
     <div class="modal-dialog modal-md modal-dialog-scrollable">
       <div class="modal-content">
         <form id="sportfestForm" class="modal-body p-4">
-          <div class="modal-header"><h5 class="modal-title">Sport Fest Registration</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+          <div class="modal-header"><h5 class="modal-title">REGISTRATION</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
 
           <div class="mb-2">
             <input type="text" name="firstName" placeholder="First Name" maxlength="20" class="form-control" required oninput="validateName(this)">

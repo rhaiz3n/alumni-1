@@ -14,6 +14,7 @@ const adminApplicationsRoutes = require("./adminApplications");
 const requireAdmin = require("./requireAdmin");
 const { sendOtpEmail } = require('../GmailMailer');
 const XLSX = require('xlsx');
+const sharp = require('sharp');
 
 const { imageUpload, excelUpload, resumeUpload } = require("./uploadConfig");
 const multer = require('multer');
@@ -1936,61 +1937,79 @@ app.get('/api/careers/last-post/:userId', async (req, res) => {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Use memory storage so we can process the image before saving
 const uploadReceipt = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 } // optional limit: 5MB
+  limits: { fileSize: 5 * 1024 * 1024 } // Max 5MB raw upload
 });
 
 app.post('/api/homeregs', uploadReceipt.single('receipt'), async (req, res) => {
   const { firstName, middleInitial, lastName, sex, program, yearGraduated, addon } = req.body;
 
   let imageBuffer = null;
-  if (addon !== 'no addon') {
-    if (!req.file) return res.status(400).json({ error: 'Receipt is required for selected add-on' });
-    imageBuffer = req.file.buffer;
-  }
-
-  const status = 'PENDING';
-  const submittedAt = new Date(); // Use Date object directly
-
-  const connection = await pool.getConnection();
   try {
-    await connection.beginTransaction();
+    if (addon !== 'no addon') {
+      if (!req.file) {
+        return res.status(400).json({ error: 'Receipt is required for selected add-on' });
+      }
 
-    const [insertResult] = await connection.execute(
-      `INSERT INTO homeregs 
-        (firstName, middleInitial, lastName, sex, program, yearGraduated, addon, image, status, submittedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [firstName, middleInitial || '', lastName, sex, program, yearGraduated, addon, imageBuffer, status, submittedAt]
-    );
+      // ✅ Compress and resize image before saving
+      imageBuffer = await sharp(req.file.buffer)
+          .resize({
+            width: 700,      // set desired width
+            height: 500,     // set desired height
+            fit: 'inside',   // keeps aspect ratio, fits within 600x400
+            withoutEnlargement: true // avoids upscaling small images
+          })  // keep aspect ratio, max 800px width
+        .jpeg({ quality: 40 })    // compress JPEG quality (70%)
+        .toBuffer();
+    }
 
-    const homeregId = insertResult.insertId;
+    const status = 'PENDING';
+    const submittedAt = new Date();
 
-    const notifMessage = `${firstName} ${lastName} submitted a HomeComing Registration Form.`;
-    const createdAt = submittedAt;
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
 
-    const [notifResult] = await connection.execute(
-      `INSERT INTO notifications (name, message, link, createdAt)
-       VALUES (?, ?, ?, ?)`,
-      ['HomeComing event', notifMessage, 'event-registration.html', createdAt]
-    );
+      const [insertResult] = await connection.execute(
+        `INSERT INTO homeregs 
+          (firstName, middleInitial, lastName, sex, program, yearGraduated, addon, image, status, submittedAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [firstName, middleInitial || '', lastName, sex, program, yearGraduated, addon, imageBuffer, status, submittedAt]
+      );
 
-    await connection.commit();
-    connection.release();
+      const homeregId = insertResult.insertId;
 
-    io.emit('newNotification', {
-      id: notifResult.insertId,
-      name: 'HomeComing Event Registration',
-      message: notifMessage,
-      link: 'event-registration.html',
-      createdAt: createdAt.toISOString()
-    });
+      const notifMessage = `${firstName} ${lastName} submitted a HomeComing Registration Form.`;
+      const createdAt = submittedAt;
 
-    res.json({ success: true, id: homeregId });
+      const [notifResult] = await connection.execute(
+        `INSERT INTO notifications (name, message, link, createdAt)
+         VALUES (?, ?, ?, ?)`,
+        ['HomeComing event', notifMessage, 'event-registration.html', createdAt]
+      );
+
+      await connection.commit();
+      connection.release();
+
+      io.emit('newNotification', {
+        id: notifResult.insertId,
+        name: 'HomeComing Event Registration',
+        message: notifMessage,
+        link: 'event-registration.html',
+        createdAt: createdAt.toISOString()
+      });
+
+      res.json({ success: true, id: homeregId });
+    } catch (err) {
+      await connection.rollback();
+      connection.release();
+      res.status(500).json({ error: err.message });
+    }
   } catch (err) {
-    await connection.rollback();
-    connection.release();
-    res.status(500).json({ error: err.message });
+    console.error("❌ Image processing failed:", err);
+    res.status(500).json({ error: "Image processing failed" });
   }
 });
 

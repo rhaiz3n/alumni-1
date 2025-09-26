@@ -26,7 +26,46 @@
       border: 4px solid rgb(199, 199, 199); /* custom color */
     }
     .card-rounded { border-radius: .75rem; }
-    .feed-card .feed-img { max-height: 280px; object-fit: cover; width: 100%; border-radius: .5rem; }
+.feed-card {
+  padding: 1rem;
+  border-radius: .75rem;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.feed-img {
+  width: 100%;
+  height: 220px;        /* keep consistent size */
+  object-fit: cover;    /* nicely cropped */
+  border-radius: .5rem;
+  margin-bottom: .75rem;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: .75rem;
+}
+
+.feed-header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: .75rem;
+}
+
+.feed-meta {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.feed-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: .75rem;
+}
+
     .countdown { font-weight: 600; color: #333; }
     .applications-container table td, .applications-container table th { vertical-align: middle; }
     /* preserve some of your classes if your CSS depends on them */
@@ -88,7 +127,8 @@
 
       <!-- LEFT: Employer Profile -->
       <aside class="col-lg-3">
-        <div class="card card-rounded shadow-sm mb-4">
+          <div class="card card-rounded shadow-sm mb-4" 
+       style="position: sticky; top: 90px; z-index: 100;">
           <div class="card-body text-center">
          <img id="sidebarEmployerLogo" 
           src="/images/default-company.png" 
@@ -829,61 +869,60 @@ if (!form.dataset.listenerAttached) {
           return;
         }
 
- container.innerHTML = careers
+container.innerHTML = careers
   .sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted))
-  .map(post => `
-    <div class="card shadow-sm rounded-3 mb-4 feed-card" id="career-${post.id}">
-      <div class="card-body">
-        <!-- Header -->
-        <div class="d-flex align-items-start mb-3">
-          <img src="Logo2.png" class="rounded-circle border me-3" width="56" height="56" alt="">
-          <div class="flex-fill">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <h6 class="mb-0 fw-bold" style="text-align:justify; word-break:break-word; white-space:pre-line;">
-                  ${(post.link || 'Company').toUpperCase()}
-                </h6>
-                <small class="text-muted">Posted on: ${new Date(post.datePosted).toLocaleString()}</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Title -->
-        <h5 class="fw-bold" style="text-align:justify; word-break:break-word; white-space:pre-line;">
-          ${(post.title || '').toUpperCase()} <small class="fw-normal">[Career]</small>
-        </h5>
-
-        <!-- Description -->
-        <p class="mb-3" style="text-align:justify; word-break:break-word; white-space:pre-line;">
-          ${post.description || ''}
-        </p>
-
-        <!-- Footer Row -->
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="text-muted small" style="text-align:justify; word-break:break-word; white-space:pre-line;">
-            <i class="fa-regular fa-building me-1"></i> ${post.link || 'N/A'}
-          </div>
+  .map((post, idx) => `
+    <div class="feed-card card shadow-sm border-0 rounded-3 mb-4" id="career-${post.id}">
+      <!-- Header -->
+      <div class="feed-header d-flex justify-content-between align-items-start mb-2">
+        <div class="d-flex align-items-center">
+        <img src="Logo2.png" 
+            alt="Logo2" 
+            class="rounded-circle me-2" 
+            style="width:40px; height:40px; object-fit:cover; border: 2px solid #bdbdbd;">
           <div>
-            <button onclick="toggleApplications(${post.id})" class="btn btn-outline-primary btn-sm">
-              📄 VIEW APPLICATIONS
-            </button>
+            <div class="fw-bold">TUP Cavite Alumni Association</div>
+            <small class="text-muted">
+              ${new Date(post.datePosted).toLocaleString()}
+            </small>
           </div>
         </div>
-
-        <!-- Applications Container -->
-        <div id="applications-${post.id}" class="applications-container mt-3" style="display:none;"></div>
-
-        <!-- Countdown & Status -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <small class="text-muted countdown" data-time="${post.datePosted}"></small>
-          <span class="badge bg-${post.isClosed ? 'danger' : 'success'}">
-            ${post.isClosed ? 'CLOSED' : 'ACTIVE'}
-          </span>
-        </div>
+        <span class="badge bg-${post.isClosed ? "danger" : "success"}">
+          ${post.isClosed ? "CLOSED" : "ACTIVE"}
+        </span>
       </div>
+
+      <img src="${post.image}" 
+          class="card-img-top img-fluid"
+          alt="Career image"
+          style="width: 100%; height: 350px; object-fit: cover; border-radius: 0.5rem; border: 3px solid #ccc;"
+          onerror="this.style.display='none'">
+
+      <!-- Content -->
+      <div class="fw-bold mt-2" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+        ${(post.title || '').toUpperCase()}
+      </div>
+      <p class="mb-1" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+        ${post.description || ''}
+      </p>
+      <div class="text-muted small" style="text-align:justify; word-break:break-word; white-space:pre-line;">
+        🏢 ${post.link || "N/A"}
+      </div>
+
+      <!-- Footer -->
+      <div class="d-flex justify-content-between align-items-center mt-2">
+        <span class="countdown text-muted small" data-time="${post.datePosted}" id="countdown-${idx}"></span>
+        <button onclick="toggleApplications(${post.id})" class="btn btn-sm btn-outline-primary">
+          📄 View Applications
+        </button>
+      </div>
+
+      <!-- Applications section -->
+      <div id="applications-${post.id}" class="applications-container mt-3" style="display:none;"></div>
     </div>
   `).join('');
+
+
 
 
         // countdown updater

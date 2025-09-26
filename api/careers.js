@@ -4,6 +4,7 @@ const router = express.Router();
 const pool = require("../db/mysql");
 const path = require("path");
 const multer = require("multer");
+const fs = require("fs");
 
 // Memory storage for images (BLOB)
 const uploadImage = multer({ storage: multer.memoryStorage() });
@@ -27,16 +28,28 @@ function authorizeAdmin(req, res, next) {
 router.get("/", authorizeEmployer, async (req, res) => {
   try {
     const user = req.session.user;
+    if (!user?.preferredUserId) {
+      return res.status(403).json({ error: "Unauthorized: No employer ID found" });
+    }
+
     const [rows] = await pool.execute(
-      "SELECT id, title, description, link, userId, datePosted FROM careers WHERE userId = ? ORDER BY datePosted DESC",
+      "SELECT id, title, description, link, userId, datePosted, image FROM careers WHERE userId = ? ORDER BY datePosted DESC",
       [user.preferredUserId]
     );
-    res.json({ careers: rows });
+
+    // Normalize image paths
+    const careers = rows.map(c => ({
+      ...c,
+      image: c.image ? `/uploads/careers/${path.basename(c.image)}` : null
+    }));
+
+    res.json({ careers });
   } catch (err) {
     console.error("❌ Error fetching careers:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 // ---------------------------
 // Employer/Admin: Add career
@@ -95,11 +108,17 @@ router.post(
 // ---------------------------
 router.get("/image/:id", async (req, res) => {
   try {
-    const [rows] = await pool.execute("SELECT image FROM careers WHERE id = ?", [req.params.id]);
+    const [rows] = await pool.execute(
+      "SELECT image FROM careers WHERE id = ?",
+      [req.params.id]
+    );
+
     if (!rows.length || !rows[0].image) return res.status(404).send("No image found");
 
-    res.setHeader("Content-Type", "image/jpeg");
-    res.send(rows[0].image);
+    const imagePath = path.join(__dirname, "../public", rows[0].image);
+    if (!fs.existsSync(imagePath)) return res.status(404).send("File not found");
+
+    res.sendFile(imagePath);
   } catch (err) {
     console.error("❌ Career image fetch error:", err);
     res.status(500).send("Server error");
